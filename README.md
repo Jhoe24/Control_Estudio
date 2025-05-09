@@ -89,17 +89,7 @@ pip install -r requirements.txt
 <summary>2. Instalación manual</summary>
 
 ```bash
-pip install \
-  customtkinter \
-  pillow \
-  tkcalendar \
-  sqlalchemy \
-  alembic \
-  reportlab \
-  openpyxl \
-  matplotlib \
-  pandas \
-  bcrypt
+pip install customtkinter pillow tkcalendar sqlalchemy alembic reportlab openpyxl matplotlib pandas logging bcrypt
 ```
 
 </details>
