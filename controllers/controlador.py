@@ -13,7 +13,6 @@ from views.admin.master_view import VistaMaster
 from controllers.loginController import ControladorInicioSesion
 from controllers.registerController import ControladorRegistroUsuario
 from controllers.forgotpassController import ControladorOlvideClave
-from controllers.estudiante_controller import EstudianteController
 
 from controllers.masterController import ControladorMaster
 
@@ -28,7 +27,7 @@ class ControladorPrincipal:
         self.olvideclave_controlador = ControladorOlvideClave()
         
         self.master_controlador = ControladorMaster(self.root)
-        self.estudiante_controlador = EstudianteController(self.root)
+        
         # mostramos la vista de login
         self.mostrar_vista_login()
 
@@ -61,8 +60,6 @@ class ControladorPrincipal:
             self.vista_actual.pack_forget()
         self.vista_actual = vistaCambioClave(self.root, self, usuario)
         self.vista_actual.pack()
-    
-    
     
     def mostrar_vista_master(self, usuario):
         if self.vista_actual:

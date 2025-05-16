@@ -3,11 +3,15 @@ import time
 from datetime import datetime
 from util.mensaje import CustomMessageBox
 
+from controllers.estudiante_controller import EstudianteController
 
 class ControladorMaster:
     def __init__(self, master):
         self.modelo = ModeloMaster()
         self.master = master
+        
+        
+        self.estudiantes = EstudianteController(self.modelo)
         
     
     def obtener_Usuario(self, id_usuario):
