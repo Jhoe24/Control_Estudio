@@ -44,7 +44,7 @@ class DatosPersonalesFrame(SectionFrameBase):
             ("Apellidos:", crear_entry, {"width":200}, 2, self, 'apellido_entry')
         ])
         self._crear_fila_widgets([
-            ("Género:", crear_option_menu, {"values":["Masculino", "Femenino"], "command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu', lambda w: w.set("Masculino")),
+            ("Género:", crear_option_menu, {"values":["M", "F"], "command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu', lambda w: w.set("Masculino")),
             ("Edo Civil:", crear_option_menu, {"values":["Soltero", "Casado", "Divorciado"], "command": lambda v: setattr(self.edo_civil_menu, '_current_value',v)}, 1, self, 'edo_civil_menu', lambda w: w.set("Soltero"))
         ])
         self._crear_fila_widgets([

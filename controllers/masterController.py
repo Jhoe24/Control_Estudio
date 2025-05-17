@@ -11,7 +11,7 @@ class ControladorMaster:
         self.master = master
         
         
-        self.estudiantes = EstudianteController(self.modelo)
+        self.estudiantes = EstudianteController()
         
     
     def obtener_Usuario(self, id_usuario):

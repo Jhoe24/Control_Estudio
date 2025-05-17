@@ -1,8 +1,11 @@
+
 import tkinter.messagebox as messagebox
 
+from models.RegistroEstudiantes import RegistroEstudiantes
+
 class EstudianteController:
-    def __init__(self, modelo):
-        pass
+    def __init__(self):
+        self.modelo = RegistroEstudiantes()
 
     def procesar_guardado_estudiante(self, datos_estudiante, vista_formulario):
         """
@@ -14,11 +17,17 @@ class EstudianteController:
             vista_formulario (FormularioEstudianteView): La instancia de la vista del formulario,
                                                         para poder interactuar con ella (ej. mostrar errores específicos).
         """
-        print(f"DEBUG: EstudianteController - Recibidos datos para guardar: {datos_estudiante}")
-
-        # Simulación de éxito
-        print(f"INFO: EstudianteController - Procesamiento de guardado para {datos_estudiante['nombre']} finalizado (simulación).")
-        return True  # Indica éxito a la vista para que pueda reaccionar (ej. limpiar campos)
+    
+        # registrar estudiantes en la base de datos
+        # funcion de procesar_guardado_de_datos
+        exito = self.modelo.registrar_estudiante(datos_estudiante)
+        
+        if exito:
+            messagebox.showinfo("Info", "Exito al registrar al nuevo estudiante")
+            return True
+        else:
+            messagebox.showerror("Error", "Hubo un error al registrar el estudiante.", parent=vista_formulario)
+            return False
 
     def cargar_estudiante_para_edicion(self, id_estudiante, vista_formulario):
         """
