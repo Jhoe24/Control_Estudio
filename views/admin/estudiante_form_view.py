@@ -54,3 +54,5 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
 
     def limpiar_formulario_completo(self):
         self.controlador.master_controlador.estudiantes.limpiar_formulario_completo(self)
+
+        #hola mundo
