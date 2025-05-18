@@ -44,11 +44,11 @@ class DatosPersonalesFrame(SectionFrameBase):
             ("Apellidos:", crear_entry, {"width":200}, 2, self, 'apellido_entry')
         ])
         self._crear_fila_widgets([
-            ("Género:", crear_option_menu, {"values":["M", "F"], "command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu', lambda w: w.set("Masculino")),
+            ("Género:", crear_option_menu, {"values":["M", "F"], "command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu', lambda w: w.set("M")),
             ("Edo Civil:", crear_option_menu, {"values":["Soltero", "Casado", "Divorciado"], "command": lambda v: setattr(self.edo_civil_menu, '_current_value',v)}, 1, self, 'edo_civil_menu', lambda w: w.set("Soltero"))
         ])
         self._crear_fila_widgets([
-            ("Nacionalidad:", crear_entry, {"width":150}, 1, self, 'nacionalidad_entry'),
+            ("Nacionalidad",crear_option_menu, {"values":["Venezolano", "Extranjero"], "command": lambda v: setattr(self.nacionalidad_menu, '_current_value',v)}, 1, self, 'nacionalidad_menu', lambda w: w.set("Venezolano")),
         ])
         self._crear_fila_widgets([
             ("F. Nacimiento:", crear_entry, {"width":120, "validate":"key", "validatecommand":(self.vcmd_fecha, "%S"), "placeholder_text":"dd/mm/aaaa"}, 1, self, 'fnac_entry'),
@@ -59,7 +59,9 @@ class DatosPersonalesFrame(SectionFrameBase):
             ("Correo Electrónico:", crear_entry, {"width":200}, 2, self, 'correo_electronico_entry')
         ])
         self._crear_fila_widgets([
+            ("Tipo de Telefono", crear_option_menu, {"values":['movil', 'casa', 'trabajo', 'otro'], "command": lambda v: setattr(self.tipo_telefono_p, '_current_value',v)}, 1, self, 'tipo_telefono_p', lambda w: w.set("movil")),
             ("Tel. Principal:", crear_entry, {"width":150, "validate":"key", "validatecommand":(self.vcmd_num, "%S")}, 1, self, 'telefono_principal_entry'),
+            ('Tipo de Telefono', crear_option_menu, {"values":['movil', 'casa', 'trabajo', 'otro'], "command": lambda v: setattr(self.tipo_telefono_s, '_current_value',v)}, 1, self, 'tipo_telefono_s', lambda w: w.set("movil")),
             ("Tel. Secundario:", crear_entry, {"width":150, "validate":"key", "validatecommand":(self.vcmd_num, "%S")}, 1, self, 'telefono_secundario_entry')
         ])
         self._crear_fila_widgets([

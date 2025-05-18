@@ -54,7 +54,7 @@ class RegistroEstudiantes:
                             VALUES (?,?,?,?)
                             ''',(
                                 persona_id,
-                                'movil',
+                                datos_estudiantes['tipo_telefono_p'],
                                 datos_estudiantes['telefono_principal'],
                                 1 # true
                             ))
@@ -66,7 +66,7 @@ class RegistroEstudiantes:
                             VALUES (?,?,?,?)
                             ''',(
                                 persona_id,
-                                'movil',
+                                datos_estudiantes['tipo_telefono_s'],
                                 datos_estudiantes['telefono_secundario'],
                                 0 # false
                             ))
@@ -86,7 +86,7 @@ class RegistroEstudiantes:
                                datos_estudiantes['calle'],
                                datos_estudiantes['casa_apart'],
                                f"{datos_estudiantes['estado']}, {datos_estudiantes['municipio']}, {datos_estudiantes['parroquia']},{datos_estudiantes['sector']},{datos_estudiantes['calle']},{datos_estudiantes['casa_apart']}",
-                               "residencia",
+                               datos_estudiantes['tipo_direccion'],
                                1 #True
                            ))
 

@@ -105,7 +105,8 @@ class EstudianteController:
             ("sector", "Sector"),
             ("calle", "Calle"),
             ("casa_apart", "Casa o Apartamento"),
-        ]
+            
+        ]   
 
         for campo, nombre_campo in campos_a_validar:
             valor_campo = datos_estudiante.get(campo, "").strip()
@@ -127,14 +128,16 @@ class EstudianteController:
             "nro_documento": vista_formulario.datos_personales_frame.nro_documento_entry.get(),
             "nombre": vista_formulario.datos_personales_frame.nombre_entry.get(),
             "apellido": vista_formulario.datos_personales_frame.apellido_entry.get(),
+            "nacionalidad": vista_formulario.datos_personales_frame.nacionalidad_menu.get(),
             "genero": vista_formulario.datos_personales_frame.genero_menu.get(),
             "edo_civil": vista_formulario.datos_personales_frame.edo_civil_menu.get(),
-            "nacionalidad": vista_formulario.datos_personales_frame.nacionalidad_entry.get(),
             "f_nacimiento": vista_formulario.datos_personales_frame.fnac_entry.get(),
             "lugar_nacimiento": vista_formulario.datos_personales_frame.lugar_nac_entry.get(),
             "f_ingreso": vista_formulario.datos_personales_frame.fingreso_entry.get(),
             "correo_electronico": vista_formulario.datos_personales_frame.correo_electronico_entry.get(),
+            "tipo_telefono_p": vista_formulario.datos_personales_frame.tipo_telefono_p.get(),
             "telefono_principal": vista_formulario.datos_personales_frame.telefono_principal_entry.get(),
+            "tipo_telefono_s": vista_formulario.datos_personales_frame.tipo_telefono_s.get(),
             "telefono_secundario": vista_formulario.datos_personales_frame.telefono_secundario_entry.get(),
             "condicion": vista_formulario.datos_personales_frame.condicion_menu.get(),
             "tipo_institucion": vista_formulario.informacion_academica_frame.tipo_inst_menu.get(),
@@ -149,7 +152,8 @@ class EstudianteController:
             "parroquia": vista_formulario.datos_ubicacion_frame.parroquia_entry.get(),
             "sector": vista_formulario.datos_ubicacion_frame.sector_entry.get(),
             "calle": vista_formulario.datos_ubicacion_frame.calle_entry.get(),
-            "casa_apart": vista_formulario.datos_ubicacion_frame.casa_apart_entry.get()
+            "casa_apart": vista_formulario.datos_ubicacion_frame.casa_apart_entry.get(),
+            "tipo_direccion": vista_formulario.datos_ubicacion_frame.tipo_direccion_menu.get()
         }
         return datos
 
@@ -158,7 +162,6 @@ class EstudianteController:
             vista_formulario.datos_personales_frame.nro_documento_entry,
             vista_formulario.datos_personales_frame.nombre_entry,
             vista_formulario.datos_personales_frame.apellido_entry,
-            vista_formulario.datos_personales_frame.nacionalidad_entry,
             vista_formulario.datos_personales_frame.fnac_entry,
             vista_formulario.datos_personales_frame.lugar_nac_entry,
             vista_formulario.datos_personales_frame.fingreso_entry,
@@ -181,7 +184,12 @@ class EstudianteController:
         option_menus_a_resetear = {
             vista_formulario.datos_personales_frame.genero_menu: "Masculino",
             vista_formulario.datos_personales_frame.edo_civil_menu: "Soltero",
-            vista_formulario.informacion_academica_frame.tipo_inst_menu: "Pública"
+            vista_formulario.datos_personales_frame.nacionalidad_menu: "Venezolano",
+            vista_formulario.informacion_academica_frame.tipo_inst_menu: "Pública",
+            vista_formulario.datos_personales_frame.condicion_menu: "Regular",
+            vista_formulario.datos_personales_frame.tipo_telefono_p: "Movil",
+            vista_formulario.datos_personales_frame.tipo_telefono_s: "Movil",
+            vista_formulario.datos_ubicacion_frame.tipo_direccion_menu: "Residencial",
         }
 
         for entry in entries_a_limpiar:

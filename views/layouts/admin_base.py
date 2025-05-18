@@ -3,6 +3,8 @@ from views.layouts.base import VistaBase
 from tkinter import filedialog
 import shutil, os
 
+
+
 class AdminBase(VistaBase):
     """
     Base para vistas de administrador: barra superior, sidebar y cuerpo principal.
@@ -81,20 +83,38 @@ class AdminBase(VistaBase):
             ("Configuración","config.png",       self.Configuracion),
             ("Cerrar Sesión","cerrar-sesion.png", self.controlador.mostrar_vista_login)
         ]
+
+
         for texto, archivo, comando in menu_items:
-            icono = self.leer_imagen(f"./src/{archivo}", (32,32))
-            btn = ctk.CTkButton(
-                self.menu_lateral,
-                text=texto,
-                image=icono,
-                anchor="w",
-                font=("Roboto",18),
-                fg_color="transparent",
-                command=comando
-            )
-            pady = 80 if texto == "Cerrar Sesión" else 0
-            btn.pack(fill="x", pady=pady)
-            self.bind_hover_events(btn)
+            if texto == "Estudiantes":
+                menu_opciones = ['Registrar Estudiante', 'Modificar Estudiante', 'Eliminar Estudiante', 'Consultar Estudiante']
+                # Crear el menú desplegable
+                menu = ctk.CTkOptionMenu(
+                    self.menu_lateral,
+                    values=menu_opciones,
+                    anchor="w",
+                    font=("Roboto",18),
+                    #fg_color="white",
+                    command=self.opcion_seleccionada,
+                    dropdown_fg_color="#3556a3",
+                    dropdown_text_color="white" 
+                )
+                menu.pack(fill="x")
+                self.bind_hover_events(menu)
+            else:
+                icono = self.leer_imagen(f"./src/{archivo}", (32,32))
+                btn = ctk.CTkButton(
+                    self.menu_lateral,
+                    text=texto,
+                    image=icono,
+                    anchor="w",
+                    font=("Roboto",18),
+                    fg_color="transparent",
+                    command=comando
+                )
+                pady = 80 if texto == "Cerrar Sesión" else 0
+                btn.pack(fill="x", pady=pady)
+                self.bind_hover_events(btn)
 
     # MÉTODOS COMUNES
     def toggle_panel(self):
@@ -108,9 +128,15 @@ class AdminBase(VistaBase):
         button.bind("<Leave>", lambda e: button.configure(text_color='white', fg_color="#18244c"))
 
     # Funciones a implementar por subclases para contenido
-    def crear_contenido_especifico(self):
-        pass
+    def opcion_seleccionada(self, opcion):
+        if opcion == "Registrar Estudiante":
+            self.estudiantes()
+        else:
+            print("Demas opciones no implementadas")
 
+
+    def crear_contenido_especifico(self, opcion):
+        pass
     def inicio(self):
         pass
 

@@ -14,7 +14,8 @@ class DatosUbicacionFrame(SectionFrameBase):
             ("Parroquia:", crear_entry, {"width":220}, 2, self, 'parroquia_entry'),
             ("Sector:", crear_entry, {"width":220}, 2, self, 'sector_entry'),
             ("Calle:", crear_entry, {"width":220}, 2, self, 'calle_entry'),
-            ("Nro Casa o Apartamento:", crear_entry, {"width":220}, 1, self, 'casa_apart_entry')
+            ("Nro Casa o Apartamento:", crear_entry, {"width":220}, 1, self, 'casa_apart_entry'),
+            ("Tipo de Dirección:", crear_option_menu, {"values":["residencia", "trabajo",'otro'], "command": lambda v: setattr(self.tipo_direccion_menu, '_current_value',v)}, 1, self, 'tipo_direccion_menu', lambda w: w.set("residencia") )
         ])
         # CAMPOS DE TELÉFONO ELIMINADOS DE ESTA SECCIÓN
 
