@@ -87,7 +87,7 @@ class AdminBase(VistaBase):
 
         for texto, archivo, comando in menu_items:
             if texto == "Estudiantes":
-                menu_opciones = ['Registrar Estudiante', 'Modificar Estudiante', 'Eliminar Estudiante', 'Consultar Estudiante']
+                menu_opciones = ['Registrar Estudiante', 'Listar Estudiantes', 'Modificar Estudiante', 'Eliminar Estudiante']
                 # Crear el menú desplegable
                 menu = ctk.CTkOptionMenu(
                     self.menu_lateral,
@@ -131,8 +131,10 @@ class AdminBase(VistaBase):
     def opcion_seleccionada(self, opcion):
         if opcion == "Registrar Estudiante":
             self.estudiantes()
+        elif opcion == "Listar Estudiantes":
+            self.list_estudiante()
         else:
-            print("Demas opciones no implementadas")
+            print(f"Opción seleccionada: {opcion}")
 
 
     def crear_contenido_especifico(self, opcion):
@@ -141,6 +143,9 @@ class AdminBase(VistaBase):
         pass
 
     def estudiantes(self):
+        pass
+
+    def list_estudiante(self):
         pass
 
     def _mostrar_ayuda(self):

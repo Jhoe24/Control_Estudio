@@ -51,6 +51,8 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
             exito = self.controlador.master_controlador.estudiantes.procesar_guardado_estudiante(datos, self)
             if exito:
                 self.controlador.master_controlador.estudiantes.limpiar_formulario_completo(self)
+            else:
+                pass
 
     def limpiar_formulario_completo(self):
         self.controlador.master_controlador.estudiantes.limpiar_formulario_completo(self)

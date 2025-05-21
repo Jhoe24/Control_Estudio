@@ -35,13 +35,13 @@ class DatosPersonalesFrame(SectionFrameBase):
 
         self.nro_documento_entry = crear_entry(self.frame_tipo_numero_doc, width=170, validate="key", validatecommand=(self.vcmd_num, "%S"))
         self.nro_documento_entry.grid(row=0, column=3, sticky="ew", padx=PADX_ENTRY)
-        self.frame_tipo_numero_doc.grid_columnconfigure(3, weight=1) # Permitir que el entry se expanda
+        self.frame_tipo_numero_doc.grid_columnconfigure(1, weight=100) # Permitir que el entry se expanda
         self._actualizar_estado_nro_doc() # Llamada inicial para configurar el estado
         # --- Fin Fila Documento ---
 
         self._crear_fila_widgets([
-            ("Nombres:", crear_entry, {"width":200}, 2, self, 'nombre_entry'),
-            ("Apellidos:", crear_entry, {"width":200}, 2, self, 'apellido_entry')
+            ("Nombres:", crear_entry, {"width":300}, 1, self, 'nombre_entry'),
+            ("Apellidos:", crear_entry, {"width":300}, 1, self, 'apellido_entry')
         ])
         self._crear_fila_widgets([
             ("Género:", crear_option_menu, {"values":["M", "F"], "command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu', lambda w: w.set("M")),
@@ -52,11 +52,11 @@ class DatosPersonalesFrame(SectionFrameBase):
         ])
         self._crear_fila_widgets([
             ("F. Nacimiento:", crear_entry, {"width":120, "validate":"key", "validatecommand":(self.vcmd_fecha, "%S"), "placeholder_text":"dd/mm/aaaa"}, 1, self, 'fnac_entry'),
-            ("Lugar Nacimiento:", crear_entry, {"width":200}, 2, self, 'lugar_nac_entry'),
+            ("Lugar Nacimiento:", crear_entry, {"width":300}, 1, self, 'lugar_nac_entry'),
             ("F. Ingreso:", crear_entry, {"width":120, "validate":"key", "validatecommand":(self.vcmd_fecha, "%S"), "placeholder_text":"dd/mm/aaaa"}, 1, self, 'fingreso_entry')
         ])
         self._crear_fila_widgets([
-            ("Correo Electrónico:", crear_entry, {"width":200}, 2, self, 'correo_electronico_entry')
+            ("Correo Electrónico:", crear_entry, {"width":300}, 1, self, 'correo_electronico_entry')
         ])
         self._crear_fila_widgets([
             ("Tipo de Telefono", crear_option_menu, {"values":['movil', 'casa', 'trabajo', 'otro'], "command": lambda v: setattr(self.tipo_telefono_p, '_current_value',v)}, 1, self, 'tipo_telefono_p', lambda w: w.set("movil")),
@@ -79,10 +79,10 @@ class DatosPersonalesFrame(SectionFrameBase):
         elif tipo_doc == "Sin Documento":
             self.label_nro_doc.configure(text="") # Ocultar o vaciar label
             self.nro_documento_entry.delete(0, 'end')
-            self.nro_documento_entry.configure(state="disabled", placeholder_text="")
+            self.nro_documento_entry.configure(state="normal", placeholder_text="")
         else: # Estado por defecto o inesperado
             self.label_nro_doc.configure(text="Número:")
-            self.nro_documento_entry.configure(state="disabled", placeholder_text="")
+            self.nro_documento_entry.configure(state="normal", placeholder_text="")
 
     def _crear_fila_widgets(self, widgets_info_list_of_tuples):
         for widgets_info_tuple in widgets_info_list_of_tuples:

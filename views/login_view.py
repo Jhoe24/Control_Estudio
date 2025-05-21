@@ -35,7 +35,7 @@ class VistaInicioSesion(VistaBase):
         # Crear enlace para registro
         self.registrarU = self.crear_boton_texto(
             self.frame_contenido,
-            ' No tines cuenta?',
+            ' No tienes cuenta?',
             "Registrate Aqui",
             self.controlador.mostrar_vista_registro
         )

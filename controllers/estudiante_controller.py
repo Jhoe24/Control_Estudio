@@ -41,19 +41,15 @@ class EstudianteController:
         print(f"DEBUG: EstudianteController - Solicitud para cargar estudiante ID: {id_estudiante}")
         pass  # Implementar cuando tengas la lista y el modelo
 
-    def obtener_lista_estudiantes(self, criterios_busqueda=None):
-        """
-        Obtiene una lista de estudiantes del modelo, posiblemente filtrada.
-        (Para una vista que muestre una tabla de estudiantes)
+    def obtener_lista_estudiantes(self,desde):
+        #Obtener 10 registro de estudiantes
+        nmin = 0
+        nmax = self.modelo.obtener_id_ultimo()
+        if desde < nmin : desde = nmin
+        if desde > (nmax-3) : desde = nmax-3
+        resultado = self.modelo.lista_Estudiantes(desde)
+        return resultado
 
-        Args:
-            criterios_busqueda (dict, optional): Diccionario con criterios para filtrar. Defaults to None.
-
-        Returns:
-            list: Lista de objetos/diccionarios de estudiantes.
-        """
-        print(f"DEBUG: EstudianteController - Obteniendo lista de estudiantes. Criterios: {criterios_busqueda}")
-        return []  # Simulación
 
     def _solo_numeros(self, char_input):
         return char_input.isdigit()
@@ -71,56 +67,61 @@ class EstudianteController:
         return False
 
     def validar_campos_obligatorios(self, datos_estudiante, vista_formulario):
-        tipo_doc_seleccionado = datos_estudiante.get("tipo_documento")
-        nro_doc_valor = datos_estudiante.get("nro_documento", "").strip()
+        try:
+                
+            tipo_doc_seleccionado = datos_estudiante.get("tipo_documento")
+            nro_doc_valor = datos_estudiante.get("nro_documento", "").strip()
 
-        if tipo_doc_seleccionado == "Cédula":
-            if not nro_doc_valor:
-                messagebox.showwarning("Campo Vacío", "El campo 'Nro. Cédula' es obligatorio.", parent=vista_formulario)
-                return False
-        elif tipo_doc_seleccionado == "Pasaporte":
-            if not nro_doc_valor:
-                messagebox.showwarning("Campo Vacío", "El campo 'Nro. Pasaporte' es obligatorio.", parent=vista_formulario)
-                return False
-
-        campos_a_validar = [
-            ("nombre", "Nombre"),
-            ("apellido", "Apellido"),
-            ("nacionalidad", "Nacionalidad"),
-            ("f_nacimiento", "Fecha de Nacimiento"),
-            ("lugar_nacimiento", "Lugar de Nacimiento"),
-            ("f_ingreso", "Fecha de Ingreso"),
-            ("correo_electronico", "Correo Electrónico"),
-            ("telefono_principal", "Teléfono Principal"),
-            ("condicion", "Condición"),
-            ("institucion", "Institución"),
-            ("titulo_obtenido", "Título Obtenido"),
-            ("f_grado", "Fecha Grado"),
-            ("promedio_bachiller", "Promedio Bachillerato"),
-            ("codigo_sni", "Código SNI"),
-            ("anio_sni", "Año SNI"),
-            ("estado", "Estado"),
-            ("municipio", "Municipio"),
-            ("parroquia", "Parroquia"),
-            ("sector", "Sector"),
-            ("calle", "Calle"),
-            ("casa_apart", "Casa o Apartamento"),
-            
-        ]   
-
-        for campo, nombre_campo in campos_a_validar:
-            valor_campo = datos_estudiante.get(campo, "").strip()
-
-            if nombre_campo == "Correo Electrónico" and valor_campo:
-                if "@" not in valor_campo or "." not in valor_campo.split("@")[-1] or len(valor_campo.split("@")[-1].split(".")[-1]) < 2:
-                    messagebox.showwarning("Campo Inválido", f"El formato del '{nombre_campo}' no es válido.", parent=vista_formulario)
+            if tipo_doc_seleccionado == "Cédula":
+                if not nro_doc_valor:
+                    messagebox.showwarning("Campo Vacío", "El campo 'Nro. Cédula' es obligatorio.", parent=vista_formulario)
+                    return False
+            elif tipo_doc_seleccionado == "Pasaporte":
+                if not nro_doc_valor:
+                    messagebox.showwarning("Campo Vacío", "El campo 'Nro. Pasaporte' es obligatorio.", parent=vista_formulario)
                     return False
 
-            if not valor_campo:
-                messagebox.showwarning("Campo Vacío", f"El campo '{nombre_campo}' es obligatorio.", parent=vista_formulario)
-                return False
+            campos_a_validar = [
+                ("nombre", "Nombre"),
+                ("apellido", "Apellido"),
+                ("nacionalidad", "Nacionalidad"),
+                ("f_nacimiento", "Fecha de Nacimiento"),
+                ("lugar_nacimiento", "Lugar de Nacimiento"),
+                ("f_ingreso", "Fecha de Ingreso"),
+                ("correo_electronico", "Correo Electrónico"),
+                ("telefono_principal", "Teléfono Principal"),
+                ("condicion", "Condición"),
+                ("institucion", "Institución"),
+                ("titulo_obtenido", "Título Obtenido"),
+                ("f_grado", "Fecha Grado"),
+                ("promedio_bachiller", "Promedio Bachillerato"),
+                ("codigo_sni", "Código SNI"),
+                ("anio_sni", "Año SNI"),
+                ("estado", "Estado"),
+                ("municipio", "Municipio"),
+                ("parroquia", "Parroquia"),
+                ("sector", "Sector"),
+                ("calle", "Calle"),
+                ("casa_apart", "Casa o Apartamento"),
+                
+            ]   
 
-        return True
+            for campo, nombre_campo in campos_a_validar:
+                valor_campo = datos_estudiante.get(campo, "").strip()
+
+                if nombre_campo == "Correo Electrónico" and valor_campo:
+                    if "@" not in valor_campo or "." not in valor_campo.split("@")[-1] or len(valor_campo.split("@")[-1].split(".")[-1]) < 2:
+                        messagebox.showwarning("Campo Inválido", f"El formato del '{nombre_campo}' no es válido.", parent=vista_formulario)
+                        return False
+
+                if not valor_campo:
+                    messagebox.showwarning("Campo Vacío", f"El campo '{nombre_campo}' es obligatorio.", parent=vista_formulario)
+                    return False
+
+            return True
+        
+        except Exception as e:
+            print(e)
 
     def obtener_todos_los_datos(self, vista_formulario):
         datos = {
@@ -182,14 +183,14 @@ class EstudianteController:
             vista_formulario.datos_ubicacion_frame.casa_apart_entry,
         ]
         option_menus_a_resetear = {
-            vista_formulario.datos_personales_frame.genero_menu: "Masculino",
+            vista_formulario.datos_personales_frame.genero_menu: "M",
             vista_formulario.datos_personales_frame.edo_civil_menu: "Soltero",
             vista_formulario.datos_personales_frame.nacionalidad_menu: "Venezolano",
             vista_formulario.informacion_academica_frame.tipo_inst_menu: "Pública",
             vista_formulario.datos_personales_frame.condicion_menu: "Regular",
-            vista_formulario.datos_personales_frame.tipo_telefono_p: "Movil",
-            vista_formulario.datos_personales_frame.tipo_telefono_s: "Movil",
-            vista_formulario.datos_ubicacion_frame.tipo_direccion_menu: "Residencial",
+            vista_formulario.datos_personales_frame.tipo_telefono_p: "movil",
+            vista_formulario.datos_personales_frame.tipo_telefono_s: "movil",
+            vista_formulario.datos_ubicacion_frame.tipo_direccion_menu: "residencia",
         }
 
         for entry in entries_a_limpiar:

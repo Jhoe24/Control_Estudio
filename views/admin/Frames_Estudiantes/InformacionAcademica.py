@@ -11,7 +11,7 @@ class InformacionAcademicaFrame(SectionFrameBase):
             ("Tipo Institución:", crear_option_menu, {"values":["Pública", "Privada"], "command": lambda v: setattr(self.tipo_inst_menu, '_current_value',v)}, 1, self, 'tipo_inst_menu', lambda w: w.set("Pública"))
         ])
         self._crear_fila_widgets([
-            ("Institución:", crear_entry, {"width":250}, 2, self, 'institucion_entry'),
+            ("Institución:", crear_entry, {"width":300}, 1, self, 'institucion_entry'),
             ("Fecha Grado:", crear_entry, {"width":120, "validate":"key", "validatecommand":(vcmd_fecha, "%S"), "placeholder_text":"dd/mm/aaaa"}, 1, self, 'fgrado_entry'),
             ("Promedio Bachillerato:", crear_entry, {
                 "width":120,
@@ -20,7 +20,7 @@ class InformacionAcademicaFrame(SectionFrameBase):
             }, 1, self, 'promedio_entry')
         ])
         self._crear_fila_widgets([
-            ("Título Obtenido:", crear_entry, {"width":220}, 2, self, 'titulo_entry')
+            ("Título Obtenido:", crear_entry, {"width":300}, 1, self, 'titulo_entry')
         ])
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets

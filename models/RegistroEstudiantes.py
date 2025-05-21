@@ -1,5 +1,6 @@
 import sqlite3 as sql
 import os
+from pprint import pprint
 
 class RegistroEstudiantes:
     
@@ -29,6 +30,7 @@ class RegistroEstudiantes:
                                'estudiante'
                            ))
             persona_id = cursor.lastrowid
+
             
             # Insertar datos en la tabla estudiante
             
@@ -98,3 +100,117 @@ class RegistroEstudiantes:
             print(f"Error al registrar estudiantes: {e}") 
             return False
     
+    def lista_Estudiantes(self, registro_inicio = 0):
+        
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+
+            #Estraer los datos de informacion personal
+            # cursor.execute('''
+            #                 SELECT * FROM informacion 
+            #                 WHERE tipo = 'estudiante'
+            #                 LIMIT 10
+            #                 OFFSET {registro_inicio}
+            #                ''')
+
+
+            #Extraer de la tabla informacion personal y esrudiantes
+            cursor.execute('''
+                           SELECT ip.*, e.*
+                           FROM informacion_personal ip
+                           JOIN estudiantes e ON ip.id= e.persona_id
+                           WHERE ip.tipo='estudiante'
+                           LIMIT 3
+                           OFFSET ?
+                           ''',(registro_inicio,))
+            resultados = cursor.fetchall()
+                        
+            nombres_columnas = [descripcion[0] for descripcion in cursor.description]
+            
+            # Telefonos
+            
+            cursor.execute('''
+                           SELECT persona_id, GROUP_CONCAT(numero, ',') as numeros
+                           FROM telefonos
+                           GROUP BY persona_id''')
+            
+            telefonos = cursor.fetchall()
+            
+            telefonos_dict = {t[0]: t[1].split(',') for t in telefonos}
+         
+            # direcciones
+            cursor.execute('''
+                           SELECT persona_id, direccion_completa
+                           FROM direcciones
+                           ''')
+            direcciones = cursor.fetchall()
+            direcciones_dict = {d[0]: d[1] for d in direcciones}
+            
+            
+            con.close()
+            
+            informacion_estudiantes = []
+            
+            for resultado in resultados:
+                
+                estudiante = dict(zip(nombres_columnas, resultado))
+                
+                persona_id = estudiante['id']
+                
+                estudiante['telefonos'] = telefonos_dict.get(persona_id, [])
+                
+                estudiante['direccion_completa'] = direcciones_dict.get(persona_id, '')
+                
+                informacion_estudiantes.append(estudiante)
+
+            return informacion_estudiantes
+            
+           
+        except Exception as e:
+             print(f"Error al realizar la consulta: {e}") 
+             return False
+        
+    def obtener_id_ultimo(self):
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+
+            cursor.execute('''
+                            SELECT id FROM informacion_personal 
+                            WHERE tipo = 'estudiante'
+                            ''')
+            resultado = cursor.fetchall()
+            con.close()
+            dato = resultado[-1]
+            return dato[0]
+        
+        except Exception as e:
+             print(f"Error al realizar la ultima consulta: {e}") 
+             return False
+
+    # def obtener_campo(self, table, columna, value):
+    #     try:
+    #         con = sql.connect(self.db_ruta)
+    #         cursor = con.cursor()
+
+    #         #Estraer los datos de informacion perosonal
+    #         cursor.execute('''
+    #                         SELECT FROM {table} 
+    #                         WHERE {columna} = ?
+    #                        ''',(value))
+    #         resultado = cursor.fetchone()
+    #         con.close()
+    #         return resultado   
+
+    #     except Exception as e:
+    #         print(f"Error en la consulta {table}: {e}") 
+    #         return False
+        
+              
+# test = RegistroEstudiantes()
+# estudiantes = test.lista_Estudiantes()
+
+# for estudiantes in estudiantes:
+#     print(estudiantes)
+#     print('\n\n\n\n\n\n\n')
