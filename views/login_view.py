@@ -48,6 +48,9 @@ class VistaInicioSesion(VistaBase):
             self.abrir_pdf
         )
         
+        self.LoginUsuario.bind("<Return>", lambda event: self.Loginpassword.focus())
+        self.Loginpassword.bind("<Return>", lambda event: self.login())
+        
     def login(self):
         # Obtener los datos de entrada
         nombre_usuario = self.LoginUsuario.get()
@@ -59,7 +62,7 @@ class VistaInicioSesion(VistaBase):
             # Llamar al método del controlador
             resultado = self.controlador.login_controlador.login(nombre_usuario, contraseña)
             if resultado:
-                CustomMessageBox(self.master, "Mensaje", "   Datos Correctos  ", 'info')
+                #CustomMessageBox(self.master, "Mensaje", "   Datos Correctos  ", 'info')
                 id_usuario = self.controlador.login_controlador.obtener_idUsuario(nombre_usuario)
                 self.controlador.mostrar_vista_master(id_usuario)
             else:

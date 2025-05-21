@@ -6,38 +6,41 @@ from views.admin.list_estudiante_view import ListEstudiantesView
 
 class VistaMaster(AdminBase):
     def __init__(self, master, controlador, id_usuario):
-        super().__init__(master, controlador, id_usuario, titulo="Panel de usuario")
         self.master = master
         self.controlador = controlador
         self.id_usuario = id_usuario 
+        
+        self.vistas = {}
+        
+        super().__init__(master, controlador, id_usuario, titulo="Panel de usuario")
+
+        self.vistas['inicio'] = ctk.CTkLabel(self.cuerpo_principal, text="Dashboard de administración", fg_color="black", font=("Roboto",24))
+        self.vistas['estudiantes'] = FormularioEstudianteView(self.cuerpo_principal, self.controlador)
+        self.vistas['list_estudiante'] = ListEstudiantesView(self.cuerpo_principal, self.controlador)
+        self.vistas['configuracion'] = ctk.CTkLabel(self.cuerpo_principal, text="Configuración de usuario", fg_color="black", font=("Roboto",24))
+
+        self.mostrar_vista('inicio')
+
+    def mostrar_vista(self, nombre):
+        # Oculta todo
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+        # Muestra la vista deseada
+        vista = self.vistas.get(nombre)
+        if vista:
+            vista.pack(fill="both", expand=True, padx=10, pady=10)
 
     def crear_contenido_especifico(self):
-        # Por defecto, mostrar inicio
-        self.inicio()
-
+        self.mostrar_vista('inicio')
+    
     def inicio(self):
-        # Limpiar cuerpo y mostrar bienvenida o dashboard
-        for w in self.cuerpo_principal.winfo_children(): w.destroy()
-        ctk.CTkLabel(self.cuerpo_principal, text="Dashboard de administración",fg_color="black", font=("Roboto",24)).pack(pady=20)
-
+        self.mostrar_vista('inicio')
+        
     def estudiantes(self):
-        # Limpia el cuerpo principal y muestra la vista del formulario de estudiantes. 
-        for widget in self.cuerpo_principal.winfo_children():
-            widget.destroy()
-            
-        self.formulario_estudiante_view = FormularioEstudianteView(self.cuerpo_principal, self.controlador)
-        self.formulario_estudiante_view.pack(fill="both", expand=True, padx=10, pady=10)
+        self.mostrar_vista('estudiantes')
 
     def Configuracion(self):
-        for w in self.cuerpo_principal.winfo_children(): w.destroy()
-
-        frame = self.cuerpo_principal
-        ctk.CTkLabel(frame, text="Configuración de usuario", fg_color="black", font=("Roboto",24)).pack(pady=10)
+        self.mostrar_vista('configuracion')
         
     def list_estudiante(self):
-        # Limpia el cuerpo principal y muestra la vista del formulario de estudiantes. 
-        for widget in self.cuerpo_principal.winfo_children():
-            widget.destroy()
-        
-        self.list_estudiante_view = ListEstudiantesView(self.cuerpo_principal, self.controlador)
-        self.list_estudiante_view.pack(fill="both", expand=True, padx=10, pady=10)
+        self.mostrar_vista('list_estudiante')
