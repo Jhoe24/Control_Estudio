@@ -12,3 +12,19 @@ class SistemaIngresoFrame(SectionFrameBase):
             ("Año:", crear_entry, {"width":100, "validate":"key", "validatecommand":(vcmd_num, "%S"), "placeholder_text":"aaaa"}, 1, self, 'anio_entry')
         ])
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
+
+    def set_datos(self, estudiante):
+        self.codigo_entry.configure(state="normal")
+        self.codigo_entry.delete(0, 'end')
+        self.codigo_entry.insert(0, estudiante.get("codigo_unico", ""))
+        self.codigo_entry.configure(state="disabled")    
+
+        self.anio_entry.configure(state="normal")
+        self.anio_entry.delete(0, 'end')
+        self.anio_entry.insert(0, "0000")
+        self.anio_entry.configure(state="disabled")
+
+    #metodo para habilitar la edicion de los campos sin eliminar el contenido
+    def habilitar_edicion(self):
+        self.codigo_entry.configure(state="normal")
+        self.anio_entry.configure(state="normal")

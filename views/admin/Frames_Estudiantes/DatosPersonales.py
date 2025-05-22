@@ -109,3 +109,100 @@ class DatosPersonalesFrame(SectionFrameBase):
             if widget_span > 0:
                 for i in range(widget_span):
                     frame_fila.grid_columnconfigure(col_index - widget_span + i, weight=1 if widget_span > 1 else 0)
+
+    
+
+    def set_datos(self, estudiante):
+        # Asignar valores y deshabilitar campos
+        tipo_doc = estudiante.get("tipo_documento", "Cédula")
+        self.radio_cedula.configure(state="disabled")
+        self.radio_pasaporte.configure(state="disabled")
+        self.radio_sindoc.configure(state="disabled")
+        
+        self.nro_documento_entry.configure(state="normal")
+        self.nro_documento_entry.delete(0, 'end')
+        self.nro_documento_entry.insert(0, str(estudiante.get("documento_identidad", "")))
+        self.nro_documento_entry.configure(state="disabled")
+
+        self.nombre_entry.configure(state="normal")
+        self.nombre_entry.delete(0, 'end')
+        self.nombre_entry.insert(0, estudiante.get("nombres", ""))
+        self.nombre_entry.configure(state="disabled")
+
+        self.apellido_entry.configure(state="normal")
+        self.apellido_entry.delete(0, 'end')
+        self.apellido_entry.insert(0, estudiante.get("apellidos", ""))
+        self.apellido_entry.configure(state="disabled")
+
+        self.genero_menu.set(estudiante.get("sexo", "M"))
+        self.genero_menu.configure(state="disabled")
+
+        self.edo_civil_menu.set(estudiante.get("estado_civil"))
+        self.edo_civil_menu.configure(state="disabled")
+
+        self.nacionalidad_menu.set(estudiante.get("nacionalidad"))
+        self.nacionalidad_menu.configure(state="disabled")
+
+        self.fnac_entry.configure(state="normal")
+        self.fnac_entry.delete(0, 'end')
+        self.fnac_entry.insert(0, str(estudiante["fecha_nacimiento"]))
+        self.fnac_entry.configure(state="disabled")
+
+        self.lugar_nac_entry.configure(state="normal")
+        self.lugar_nac_entry.delete(0, 'end')
+        self.lugar_nac_entry.insert(0, estudiante["lugar_nacimiento"])
+        self.lugar_nac_entry.configure(state="disabled")
+        print(estudiante["fecha_ingreso"])
+        print(estudiante["fecha_nacimiento"])
+
+        self.fingreso_entry.configure(state="normal")
+        self.fingreso_entry.delete(0, 'end')
+
+        fecha_ingreso = str(estudiante.get("fecha_ingreso", ""))
+        self.fingreso_entry.insert(0, fecha_ingreso)
+        self.fingreso_entry.configure(state="disabled")
+
+        self.correo_electronico_entry.configure(state="normal")
+        self.correo_electronico_entry.delete(0, 'end')
+        self.correo_electronico_entry.insert(0, estudiante.get("correo_electronico", ""))
+        self.correo_electronico_entry.configure(state="disabled")
+
+        self.tipo_telefono_p.set(estudiante.get("tipo_telefono_principal", "movil"))
+        self.tipo_telefono_p.configure(state="disabled")
+
+        self.telefono_principal_entry.configure(state="normal")
+        self.telefono_principal_entry.delete(0, 'end')
+
+        telefonos = estudiante['telefonos']
+
+        self.telefono_principal_entry.insert(0, telefonos[0])
+        self.telefono_principal_entry.configure(state="disabled")
+
+        self.tipo_telefono_s.set(estudiante.get("tipo_telefono_secundario", "movil"))
+        self.tipo_telefono_s.configure(state="disabled")
+
+        self.telefono_secundario_entry.configure(state="normal")
+        self.telefono_secundario_entry.delete(0, 'end')
+        self.telefono_secundario_entry.insert(0, telefonos[1])
+        self.telefono_secundario_entry.configure(state="disabled")
+
+        self.condicion_menu.set(estudiante.get("condicion"))
+        self.condicion_menu.configure(state="disabled")
+
+    #metodo para habilitar la edicion de los campos sin eliminar el contenido
+    def habilitar_edicion(self):
+        # Habilitar campos de entrada
+        self.nombre_entry.configure(state="normal")
+        self.apellido_entry.configure(state="normal")
+        self.genero_menu.configure(state="normal")
+        self.edo_civil_menu.configure(state="normal")
+        self.nacionalidad_menu.configure(state="normal")
+        self.fnac_entry.configure(state="normal")
+        self.lugar_nac_entry.configure(state="normal")
+        self.fingreso_entry.configure(state="normal")
+        self.correo_electronico_entry.configure(state="normal")
+        self.telefono_principal_entry.configure(state="normal")
+        self.telefono_secundario_entry.configure(state="normal")
+        self.tipo_telefono_p.configure(state="normal")
+        self.tipo_telefono_s.configure(state="normal")
+        self.condicion_menu.configure(state="normal")

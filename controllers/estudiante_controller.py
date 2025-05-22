@@ -29,26 +29,33 @@ class EstudianteController:
             messagebox.showerror("Error", "Hubo un error al registrar el estudiante.", parent=vista_formulario)
             return False
 
-    def cargar_estudiante_para_edicion(self, id_estudiante, vista_formulario):
-        """
-        Carga los datos de un estudiante por su ID y le dice a la vista que llene los campos.
-        (Esta función es para cuando tengas una lista de estudiantes y selecciones uno para editar)
-
-        Args:
-            id_estudiante: El ID del estudiante a cargar.
-            vista_formulario (FormularioEstudianteView): La instancia de la vista.
-        """
-        print(f"DEBUG: EstudianteController - Solicitud para cargar estudiante ID: {id_estudiante}")
-        pass  # Implementar cuando tengas la lista y el modelo
+    def cargar_estudiante_para_edicion(self, id_estudiante, dic_estudiante, vista_formulario):
+        existo = self.modelo.update_estudiante(id_estudiante, dic_estudiante)
+        if existo:
+            messagebox.showinfo("Info", "Exito al actualizar los datos del estudiante")
+            return True
+        else:
+            messagebox.showerror("Error", "Hubo un error al actualizar los datos del estudiante.", parent=vista_formulario)
+            return False
 
     def obtener_lista_estudiantes(self,desde):
         #Obtener 10 registro de estudiantes
         nmin = 0
         nmax = self.modelo.obtener_id_ultimo()
         if desde < nmin : desde = nmin
-        if desde > (nmax-3) : desde = nmax-3
+        if desde > (nmax) : desde = nmax-1
         resultado = self.modelo.lista_Estudiantes(desde)
         return resultado
+
+    def buscar_estudiante(self, tipo_doc, nro_doc):
+        
+        registro = self.modelo.buscar_estudiante(tipo_doc, nro_doc)
+
+        if registro:
+            return registro
+        else:
+            messagebox.showerror("Error", "No se encontró el estudiante con los datos proporcionados.")
+            return None
 
 
     def _solo_numeros(self, char_input):

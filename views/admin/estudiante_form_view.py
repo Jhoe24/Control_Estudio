@@ -14,7 +14,11 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
         super().__init__(master, fg_color=COLOR_FONDO_FORMULARIO, label_text="")
         self.master = master
         self.controlador = controlador
-        
+        self.btn_actualizar = None
+        self.datos_personales_frame = None
+        self.informacion_academica_frame = None
+        self.sistema_ingreso_frame = None
+        self.datos_ubicacion_frame = None
         self.evento_mouse()
 
         # Registrar funciones de validación
@@ -35,7 +39,8 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
         self.informacion_academica_frame = InformacionAcademicaFrame(self, self.vcmd_fecha_val, self.vcmd_decimal_val)
         self.sistema_ingreso_frame = SistemaIngresoFrame(self, self.vcmd_num_val)
         self.datos_ubicacion_frame = DatosUbicacionFrame(self, self.vcmd_num_val)
-
+        
+        # Empacar los frames
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.pack(pady=(25, 20))
 
@@ -80,3 +85,72 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
         else:  # Windows/Mac
             canvas.yview_scroll(int(-1*(event.delta/5)), "units")
 
+    # Formulario de actualizacion
+    def ver_datos_completos(self, estudiante):
+        """
+        Muestra una ventana emergente con los datos completos de un estudiante, en formato similar al formulario.
+        """
+        ventana = ctk.CTkToplevel(self)
+        ventana.title("Datos Completos del Estudiante")
+        ventana.geometry("850x700") 
+        ventana.grab_set() # Bloquea la ventana principal
+
+        # Crear un contenedor scrollable para la ventana emergente
+        contenedor_scroll = ctk.CTkScrollableFrame(ventana, fg_color=COLOR_FONDO_FORMULARIO)
+        contenedor_scroll.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Instanciando los frames en la ventana emergente
+        self.datos_personales_frame = DatosPersonalesFrame(contenedor_scroll, self.vcmd_num_val, self.vcmd_fecha_val)
+        self.informacion_academica_frame = InformacionAcademicaFrame(contenedor_scroll, self.vcmd_fecha_val, self.vcmd_decimal_val)
+        self.sistema_ingreso_frame = SistemaIngresoFrame(contenedor_scroll, self.vcmd_num_val)
+        self.datos_ubicacion_frame = DatosUbicacionFrame(contenedor_scroll, self.vcmd_num_val)
+
+        # Empacar para que se muestren
+        self.datos_personales_frame.pack(fill="x", pady=5, padx=5)
+        self.informacion_academica_frame.pack(fill="x", pady=5, padx=5)
+        self.sistema_ingreso_frame.pack(fill="x", pady=5, padx=5)
+        self.datos_ubicacion_frame.pack(fill="x", pady=5, padx=5)
+
+        # Cargar datos y bloquear campos
+        #for frame in [self.datos_personales_frame, self.informacion_academica_frame, self.sistema_ingreso_frame, self.datos_ubicacion_frame]:
+        #   frame.set_datos(estudiante)
+        #     frame.set_estado_campos(modo_lectura=True)
+        self.datos_personales_frame.set_datos(estudiante)
+        self.datos_ubicacion_frame.set_datos(estudiante)
+        self.informacion_academica_frame.set_datos(estudiante)
+        self.sistema_ingreso_frame.set_datos(estudiante)
+
+        # Botones
+        botones_frame = ctk.CTkFrame(contenedor_scroll, fg_color="transparent")
+        botones_frame.pack(pady=10)
+
+        # Botón para actualizar datos
+        estudiante_id = estudiante['id']
+        self.btn_actualizar = ctk.CTkButton(
+            botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.update(estudiante_id)  # Cambia el comando aquí
+        )
+        self.btn_actualizar.pack(side="left", padx=10)
+
+        # Botón para editar campos
+        ctk.CTkButton(botones_frame, text="Editar Campos", command=self._editar_datos).pack(side="left", padx=10)
+        ctk.CTkButton(botones_frame, text="Cerrar", command=ventana.destroy).pack(side="left", padx=10)
+
+    def _editar_datos(self):
+        # Cambia el estado de los botones y habilita la edición de los campos
+        self.btn_actualizar.configure(state="normal")
+        self.datos_personales_frame.habilitar_edicion()
+        self.informacion_academica_frame.habilitar_edicion()
+        self.sistema_ingreso_frame.habilitar_edicion()
+        self.datos_ubicacion_frame.habilitar_edicion()
+    
+    def update(self,id):
+        # Obtener los datos de los frames para actualizarlos
+        datos = self.controlador.master_controlador.estudiantes.obtener_todos_los_datos(self)
+        if self.controlador.master_controlador.estudiantes.validar_campos_obligatorios(datos, self):
+            exito = self.controlador.master_controlador.estudiantes.cargar_estudiante_para_edicion(id,datos, self)
+            print(datos)
+            if exito:
+                self.controlador.master_controlador.estudiantes.limpiar_formulario_completo(self)
+            else:
+                pass
+    
