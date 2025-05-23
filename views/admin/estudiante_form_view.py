@@ -148,7 +148,6 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
         datos = self.controlador.master_controlador.estudiantes.obtener_todos_los_datos(self)
         if self.controlador.master_controlador.estudiantes.validar_campos_obligatorios(datos, self):
             exito = self.controlador.master_controlador.estudiantes.cargar_estudiante_para_edicion(id,datos, self)
-            print(datos)
             if exito:
                 self.controlador.master_controlador.estudiantes.limpiar_formulario_completo(self)
             else:

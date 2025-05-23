@@ -121,7 +121,7 @@ class RegistroEstudiantes:
                            FROM informacion_personal ip
                            JOIN estudiantes e ON ip.id= e.persona_id
                            WHERE ip.tipo='estudiante'
-                           LIMIT 3
+                           LIMIT 10
                            OFFSET ?
                            ''',(registro_inicio,))
             resultados = cursor.fetchall()
@@ -131,14 +131,12 @@ class RegistroEstudiantes:
             # Telefonos
             
             cursor.execute('''
-                           SELECT persona_id, GROUP_CONCAT(numero, ',') as numeros
-                           FROM telefonos
-                           GROUP BY persona_id''')
-            
+                            SELECT persona_id, tipo_telefono, numero, principal
+                            FROM telefonos
+                            ''')
             telefonos = cursor.fetchall()
             
-            telefonos_dict = {t[0]: t[1].split(',') for t in telefonos}
-         
+            
             # direcciones
             cursor.execute('''
                            SELECT persona_id, direccion_completa,tipo_direccion

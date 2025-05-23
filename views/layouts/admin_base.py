@@ -87,7 +87,7 @@ class AdminBase(VistaBase):
 
         for texto, archivo, comando in menu_items:
             if texto == "Estudiantes":
-                menu_opciones = ['Registrar Estudiante', 'Listar Estudiantes', 'Modificar Estudiante', 'Eliminar Estudiante']
+                menu_opciones = ['Registrar Estudiante', 'Listar Estudiantes']
                 # Crear el menú desplegable
                 menu = ctk.CTkOptionMenu(
                     self.menu_lateral,

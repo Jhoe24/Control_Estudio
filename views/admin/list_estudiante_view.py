@@ -17,8 +17,7 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         self.pagina_actual = 1
         self.primer_id_table = self.controlador.master_controlador.estudiantes.modelo.obtener_primer_id()
         self.estudiantes = self.controlador.master_controlador.estudiantes.obtener_lista_estudiantes(0)
-        self.registros_por_pagina = 3
-
+        self.registros_por_pagina = 10
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_estudiantes // self.registros_por_pagina) + (1 if self.cantidad_estudiantes % self.registros_por_pagina > 0 else 0)
        

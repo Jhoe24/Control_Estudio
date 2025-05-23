@@ -17,7 +17,7 @@ class VistaBase(ctk.CTkFrame, Utilidades):
         self.master.iconbitmap("./src/logo.ico")
         self.configure(fg_color='#2e2e2e')
         self.pack(fill="both", expand=True, pady=10, padx=10)
-        self.centrar_ventana(self.master, 900, 600)
+        self.centrar_ventana(self.master, 1200, 800)
         
         # Carga de imágenes comunes
         self.logoLogin = self.leer_imagen("./src/upt.jpg", (500, 600))

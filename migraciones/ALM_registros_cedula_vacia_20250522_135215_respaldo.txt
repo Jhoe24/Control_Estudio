@@ -1,0 +1,60 @@
+Registros con cédula vacía:
+==================================================
+
+Registro 592:
+  A_ID: 
+  A_NOMBRE: CARLOS DANIEL
+  A_APELLIDO: RINCON BURGOS
+  A_FINGRESO: 2022-01-24 00:00:00
+  A_FNACIMIE: 2004-03-05 00:00:00
+  A_SEXO: True
+  A_ECIVIL: SOLTERO
+  A_NACIONAL: VENEZOLANO
+  A_LNACIMIE: SOCOPO
+  A_INSPROCE: True
+  A_MENCIBAC: BACHILLER
+  A_FGRABACH: 2021-06-30 00:00:00
+  A_TEL1: (0412)5731263
+  A_TEL2: (    )
+  A_TEL3: (    )
+  A_EDORESID: BARINAS
+  A_MUNRESID: AJS
+  A_DIRECCIO: DANIELRINCON2004DANIEL@GMAIL.COM
+  A_PROFESIO: False
+  A_FGRAPROF: 
+  A_CONDICIO: 
+  A_OYENTE: False
+  EDAD: 0
+  ESTADO: False
+  A_PASSPORT: False
+  A_INGRESO: 2022.0
+  A_PENSUM: 
+  A_EVALUACI: 
+  PREVIO: False
+  A_GRAING: False
+  A_GRAINGCO: 
+  A_GRAINGFE: 
+  A_GRAINGPO: 
+  A_GRAINGRA: 
+  A_GRAINGPR: False
+  A_GRAINGIA: 0
+  A_GRAINGDI: 
+  A_GRAINGPN: 
+  A_GRAINGTI: 
+  A_GRATSU: False
+  A_GRATSUCO: 
+  A_GRATSUFE: 
+  A_GRATSUPO: 
+  A_GRATSURA: 
+  A_GRATSUPR: False
+  A_GRATSUIA: 0
+  A_GRATSUDI: 
+  A_GRATSUPN: 
+  A_GRATSUTI: 
+  RUSNIEU: 
+  RUSNIEU_AN: 
+  A_NOMINSTI: LICE JUAN PABLO I
+  A_SITUACIO: 
+  _numero_fila: 592
+  _razon: cedula_vacia
+------------------------------
