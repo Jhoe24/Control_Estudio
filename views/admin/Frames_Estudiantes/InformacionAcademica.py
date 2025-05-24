@@ -30,27 +30,28 @@ class InformacionAcademicaFrame(SectionFrameBase):
         self.tipo_mencion_menu.set("Bachiller")
         self.tipo_mencion_menu.configure(state="disabled")
 
-        self.tipo_inst_menu.set(estudiante.get("institucion", "Pública"))
+        self.tipo_inst_menu.set(("Pública"))
         self.tipo_inst_menu.configure(state="disabled")
 
-        self.institucion_entry.configure(state="normal")
-        self.institucion_entry.delete(0, 'end')
-        self.institucion_entry.insert(0, estudiante.get("institucion_procedencia", ""))
+        self.institucion_entry.delete(0, ctk.END)
+        if estudiante.get('institucion_procedencia') != None and estudiante.get('institucion_procedencia') != "":
+            self.institucion_entry.insert(0, estudiante.get("institucion_procedencia")) 
         self.institucion_entry.configure(state="disabled")
 
-        self.fgrado_entry.configure(state="normal")
-        self.fgrado_entry.delete(0, 'end')
-        self.fgrado_entry.insert(0, str(estudiante["fecha_grado_bachiller"]))
+        #Configuracion fecha de grado
+        self.fgrado_entry.delete(0, ctk.END)
+        if estudiante.get('fecha_grado_bachiller') != None and estudiante.get('fecha_grado_bachiller') != "":
+            self.fgrado_entry.insert(0, estudiante.get("fecha_grado_bachiller")) 
         self.fgrado_entry.configure(state="disabled")
 
-        self.promedio_entry.configure(state="normal")
-        self.promedio_entry.delete(0, 'end')
-        self.promedio_entry.insert(0, str(estudiante.get("000")))
+        #Configuaracion de promedio
+        self.promedio_entry.delete(0, ctk.END)
+        self.promedio_entry.insert(0,"000")
         self.promedio_entry.configure(state="disabled")
 
-        self.titulo_entry.configure(state="normal")
-        self.titulo_entry.delete(0, 'end')
-        self.titulo_entry.insert(0, estudiante.get("mencion_bachiller", ""))
+        self.titulo_entry.delete(0, ctk.END)
+        if estudiante.get('mencion_bachiller') != None and estudiante.get('mencion_bachiller') != "":
+            self.titulo_entry.insert(0, estudiante.get("mencion_bachiller")) 
         self.titulo_entry.configure(state="disabled")
 
     #metodo para habilitar la edicion de los campos sin eliminar el contenido

@@ -62,7 +62,7 @@ class EstudianteController:
         return char_input.isdigit()
 
     def _numeros_y_barras(self, char_input):
-        return char_input.isdigit() or char_input == '/'
+        return char_input.isdigit() or char_input in "-/"
 
     def _solo_decimal(self, valor_actual, char_input):
         if char_input in "0123456789":
@@ -96,20 +96,20 @@ class EstudianteController:
                 ("lugar_nacimiento", "Lugar de Nacimiento"),
                 ("f_ingreso", "Fecha de Ingreso"),
                 ("correo_electronico", "Correo Electrónico"),
-                ("telefono_principal", "Teléfono Principal"),
+                #("telefono_principal", "Teléfono Principal"),
                 ("condicion", "Condición"),
-                ("institucion", "Institución"),
-                ("titulo_obtenido", "Título Obtenido"),
-                ("f_grado", "Fecha Grado"),
-                ("promedio_bachiller", "Promedio Bachillerato"),
-                ("codigo_sni", "Código SNI"),
-                ("anio_sni", "Año SNI"),
-                ("estado", "Estado"),
-                ("municipio", "Municipio"),
-                ("parroquia", "Parroquia"),
-                ("sector", "Sector"),
-                ("calle", "Calle"),
-                ("casa_apart", "Casa o Apartamento"),
+                #("institucion", "Institución"),
+                #("titulo_obtenido", "Título Obtenido"),
+                #("f_grado", "Fecha Grado"),
+                #("promedio_bachiller", "Promedio Bachillerato"),
+                #("codigo_sni", "Código SNI"),
+                #("anio_sni", "Año SNI"),
+                #("estado", "Estado"),
+                #("municipio", "Municipio"),
+                #("parroquia", "Parroquia"),
+                #("sector", "Sector"),
+                #("calle", "Calle"),
+                #("casa_apart", "Casa o Apartamento"),
                 
             ]   
 

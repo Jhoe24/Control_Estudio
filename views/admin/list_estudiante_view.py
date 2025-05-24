@@ -88,7 +88,17 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         self.boton_anterior.configure(state="disabled" if self.pagina_actual == 1 else "normal")
         self.boton_siguiente.configure(state="disabled" if self.pagina_actual == self.cantidad_total_paginas else "normal")
 
-
+    def mostrar_resultado_busqueda(self, lista_estudiantes):
+        """
+        Muestra solo los estudiantes pasados en la lista (por ejemplo, el resultado de una búsqueda).
+        Deshabilita la paginación y actualiza la tabla.
+        """
+        self.pagina_actual = 1  # <-- Reinicia la página actual
+        self.cargar_datos(lista_estudiantes)
+        self.boton_anterior.configure(state="disabled")
+        #self.boton_siguiente.configure(state="disabled")
+        self.label_pagina.configure(text="1 de 1")
+        
     def siguiente_pagina(self):
         """
         Avanza a la siguiente página de estudiantes.

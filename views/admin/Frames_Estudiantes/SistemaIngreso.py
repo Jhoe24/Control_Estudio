@@ -14,12 +14,12 @@ class SistemaIngresoFrame(SectionFrameBase):
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
     def set_datos(self, estudiante):
-        self.codigo_entry.configure(state="normal")
-        self.codigo_entry.delete(0, 'end')
-        self.codigo_entry.insert(0, estudiante.get("codigo_unico", ""))
-        self.codigo_entry.configure(state="disabled")    
 
-        self.anio_entry.configure(state="normal")
+        self.codigo_entry.delete(0, ctk.END)
+        if estudiante.get('codigo_unico') != None and estudiante.get('codigo_unico') != "":
+            self.codigo_entry.insert(0, estudiante.get("codigo_unico")) 
+        self.codigo_entry.configure(state="disabled")   
+
         self.anio_entry.delete(0, 'end')
         self.anio_entry.insert(0, "0000")
         self.anio_entry.configure(state="disabled")

@@ -99,6 +99,8 @@ class RegistroEstudiantes:
         except Exception as e:
             print(f"Error al registrar estudiantes: {e}") 
             return False
+        finally:
+            con.close()
     
     def lista_Estudiantes(self, registro_inicio = 0):
         
@@ -136,23 +138,35 @@ class RegistroEstudiantes:
                             ''')
             telefonos = cursor.fetchall()
             
-            
+            telefonos_dict = {}
+            for persona_id, tipo_telefono, numero, principal in telefonos:
+                if persona_id not in telefonos_dict:
+                    telefonos_dict[persona_id] = {}
+                if principal == 1:
+                    telefonos_dict[persona_id]['telefono_principal'] = numero
+                    telefonos_dict[persona_id]['tipo_telefono_p'] = tipo_telefono
+                else:
+                    telefonos_dict[persona_id]['telefono_secundario'] = numero
+                    telefonos_dict[persona_id]['tipo_telefono_s'] = tipo_telefono
             # direcciones
             cursor.execute('''
-                           SELECT persona_id, direccion_completa,tipo_direccion
-                           FROM direcciones
-                           ''')
+                                SELECT persona_id, estado, municipio, parroquia, sector, calle, casa_edificio, tipo_direccion
+                                FROM direcciones
+                            ''')
             direcciones = cursor.fetchall()
 
             direcciones_dict = {
-                                    d[0]: {
-                                        "direccion_completa": d[1],
-                                        "tipo_direccion": d[2]
-                                    }
-                                    for d in direcciones
+                                d[0]: {
+                                    "estado": d[1],
+                                    "municipio": d[2],
+                                    "parroquia": d[3],
+                                    "sector": d[4],
+                                    "calle": d[5],
+                                    "casa_edificio": d[6],
+                                    "tipo_direccion": d[7]
                                 }
-            
-            
+                                for d in direcciones
+                            }                
             con.close()
             
             informacion_estudiantes = []
@@ -162,12 +176,23 @@ class RegistroEstudiantes:
                 estudiante = dict(zip(nombres_columnas, resultado))
                 
                 persona_id = estudiante['id']
+
+                tel_info = telefonos_dict.get(persona_id, {})
+                estudiante['telefono_principal'] = tel_info.get('telefono_principal', '')
+                estudiante['tipo_telefono_p'] = tel_info.get('tipo_telefono_p', '')
+                estudiante['telefono_secundario'] = tel_info.get('telefono_secundario', '')
+                estudiante['tipo_telefono_s'] = tel_info.get('tipo_telefono_s', '')
                 
-                estudiante['telefonos'] = telefonos_dict.get(persona_id, [])
+                
                 direccion_info = direcciones_dict.get(persona_id, {})
-                estudiante['direccion_completa'] = direccion_info.get('direccion_completa', '')
+                estudiante['estado'] = direccion_info.get('estado', '')
+                estudiante['municipio'] = direccion_info.get('municipio', '')
+                estudiante['parroquia'] = direccion_info.get('parroquia', '')
+                estudiante['sector'] = direccion_info.get('sector', '')
+                estudiante['calle'] = direccion_info.get('calle', '')
+                estudiante['casa_apart'] = direccion_info.get('casa_edificio', '')
                 estudiante['tipo_direccion'] = direccion_info.get('tipo_direccion', '')
-                
+                    
                 
                 informacion_estudiantes.append(estudiante)
 
@@ -177,8 +202,10 @@ class RegistroEstudiantes:
         except Exception as e:
              print(f"Error al realizar la consulta: {e}") 
              return False
+        finally:
+            con.close()
     
-    def buscar_estudiante(self,tipo_documento, nro_documento):
+    def buscar_estudiante(self, tipo_documento, nro_documento):
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
@@ -192,31 +219,57 @@ class RegistroEstudiantes:
                 LIMIT 1
             ''', (tipo_documento, nro_documento))
             resultado = cursor.fetchone()
-            nombres_columnas = [desc[0] for desc in cursor.description]
-
             if not resultado:
                 con.close()
-                return None
+                return None  # No encontrado
 
+            nombres_columnas = [desc[0] for desc in cursor.description]
             estudiante = dict(zip(nombres_columnas, resultado))
             persona_id = estudiante['id']
 
-            # Telefonos solo del estudiante
+            # Telefonos del estudiante
             cursor.execute('''
-                SELECT numero FROM telefonos
+                SELECT tipo_telefono, numero, principal FROM telefonos
                 WHERE persona_id = ?
             ''', (persona_id,))
-            telefonos = [t[0] for t in cursor.fetchall()]
-            estudiante['telefonos'] = telefonos
+            telefonos = cursor.fetchall()
+            tel_info = {}
+            for tipo_telefono, numero, principal in telefonos:
+                if principal == 1:
+                    tel_info['telefono_principal'] = numero
+                    tel_info['tipo_telefono_p'] = tipo_telefono
+                else:
+                    tel_info['telefono_secundario'] = numero
+                    tel_info['tipo_telefono_s'] = tipo_telefono
+            estudiante['telefono_principal'] = tel_info.get('telefono_principal', '')
+            estudiante['tipo_telefono_p'] = tel_info.get('tipo_telefono_p', '')
+            estudiante['telefono_secundario'] = tel_info.get('telefono_secundario', '')
+            estudiante['tipo_telefono_s'] = tel_info.get('tipo_telefono_s', '')
 
-            # Direccion solo del estudiante
+            # Direccion del estudiante
             cursor.execute('''
-                SELECT direccion_completa FROM direcciones
-                WHERE persona_id = ?
+                SELECT estado, municipio, parroquia, sector, calle, casa_edificio, tipo_direccion
+                FROM direcciones
+                WHERE persona_id = ? AND principal=1
                 LIMIT 1
             ''', (persona_id,))
             dir_row = cursor.fetchone()
-            estudiante['direccion_completa'] = dir_row[0] if dir_row else ''
+            if dir_row:
+                estudiante['estado'] = dir_row[0]
+                estudiante['municipio'] = dir_row[1]
+                estudiante['parroquia'] = dir_row[2]
+                estudiante['sector'] = dir_row[3]
+                estudiante['calle'] = dir_row[4]
+                estudiante['casa_apart'] = dir_row[5]
+                estudiante['tipo_direccion'] = dir_row[6]
+            else:
+                estudiante['estado'] = ''
+                estudiante['municipio'] = ''
+                estudiante['parroquia'] = ''
+                estudiante['sector'] = ''
+                estudiante['calle'] = ''
+                estudiante['casa_apart'] = ''
+                estudiante['tipo_direccion'] = ''
 
             con.close()
             return estudiante
@@ -224,6 +277,8 @@ class RegistroEstudiantes:
         except Exception as e:
             print(f"Error al realizar la consulta: {e}")
             return False
+        finally:
+            con.close()
 
     def obtener_id_ultimo(self):
         try:
@@ -242,6 +297,8 @@ class RegistroEstudiantes:
         except Exception as e:
              print(f"Error al realizar la ultima consulta: {e}") 
              return False
+        finally:
+            con.close()
         
     def obtener_primer_id(self):
         try:
@@ -263,6 +320,8 @@ class RegistroEstudiantes:
         except Exception as e:
             print(f"Error al realizar la consulta: {e}") 
             return False
+        finally:
+            con.close()
             
     def obtener_cantidad_estudiantes(self):
         try:
@@ -278,6 +337,8 @@ class RegistroEstudiantes:
         except Exception as e:
             print(f"Error al realizar la consulta: {e}") 
             return False
+        finally:
+            con.close()
         
 
     def update_estudiante(self, id, datos_estudiantes):
@@ -362,6 +423,8 @@ class RegistroEstudiantes:
         except Exception as e:
             print(f"Error al actualizar estudiante: {e}") 
             return False
+        finally:
+            con.close()
                            
                            
     # def obtener_campo(self, table, columna, value):
@@ -383,3 +446,5 @@ class RegistroEstudiantes:
     #         return False
         
               
+# test = RegistroEstudiantes()
+# pprint(test.buscar_estudiante('cedula',287096490))

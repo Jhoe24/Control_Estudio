@@ -13,7 +13,7 @@ class Utilidades:
         x = int((pantall_ancho/2) - (aplicacion_ancho/2))
         y = int((pantall_largo/2) - (aplicacion_largo/2))
         return ventana.geometry(f"{aplicacion_ancho}x{aplicacion_largo}+{x}+{y}")
-
+    
     def alternar_visibilidad_clave(self, entryCampo, btn_verOcultar, icon, icon2):    
         if entryCampo.cget('show') == '*':
             entryCampo.configure(show='')

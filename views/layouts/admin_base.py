@@ -16,7 +16,6 @@ class AdminBase(VistaBase):
         super().__init__(master, controlador, titulo=titulo, es_login=False)
         # Usuario cargado por VistaBase
         self.usuario = self.controlador.master_controlador.obtener_Usuario(self.id_usuario)
-
     def crear_estructura_base(self, es_login):
         # montar layout admin
         self.barra_superior = ctk.CTkFrame(self, fg_color="#000000", height=40)

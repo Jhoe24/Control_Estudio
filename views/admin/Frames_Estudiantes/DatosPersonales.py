@@ -7,7 +7,7 @@ class DatosPersonalesFrame(SectionFrameBase):
     def __init__(self, master, vcmd_num, vcmd_fecha):
         super().__init__(master, header_text="Datos Personales")
 
-        self.tipo_documento_var = ctk.StringVar(value="Cédula") # Valor por defecto: Cédula
+        self.tipo_documento_var = ctk.StringVar(value="cedula") # Valor por defecto: Cédula
         self.vcmd_num = vcmd_num # Guardar para usar en nro_documento_entry y teléfonos
         self.vcmd_fecha = vcmd_fecha # Guardar para usar en fechas
 
@@ -21,13 +21,13 @@ class DatosPersonalesFrame(SectionFrameBase):
         radio_button_container = ctk.CTkFrame(self.frame_tipo_numero_doc, fg_color="transparent")
         radio_button_container.grid(row=0, column=1, sticky="w", padx=(0,15))
 
-        self.radio_cedula = crear_radio_button(radio_button_container, text="Cédula", variable=self.tipo_documento_var, value="Cédula", command=self._actualizar_estado_nro_doc)
+        self.radio_cedula = crear_radio_button(radio_button_container, text="Cédula", variable=self.tipo_documento_var, value="cedula", command=self._actualizar_estado_nro_doc)
         self.radio_cedula.pack(side="left", padx=(0, 5), pady=0)
 
-        self.radio_pasaporte = crear_radio_button(radio_button_container, text="Pasaporte", variable=self.tipo_documento_var, value="Pasaporte", command=self._actualizar_estado_nro_doc)
+        self.radio_pasaporte = crear_radio_button(radio_button_container, text="Pasaporte", variable=self.tipo_documento_var, value="pasaporte", command=self._actualizar_estado_nro_doc)
         self.radio_pasaporte.pack(side="left", padx=(0, 5), pady=0)
 
-        self.radio_sindoc = crear_radio_button(radio_button_container, text="Sin Doc.", variable=self.tipo_documento_var, value="Sin Documento", command=self._actualizar_estado_nro_doc)
+        self.radio_sindoc = crear_radio_button(radio_button_container, text="Sin Doc.", variable=self.tipo_documento_var, value="sin documento", command=self._actualizar_estado_nro_doc)
         self.radio_sindoc.pack(side="left", padx=(0, 0), pady=0)
 
         self.label_nro_doc = ctk.CTkLabel(self.frame_tipo_numero_doc, text="Nro. Cédula:", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL, anchor="w")
@@ -48,6 +48,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.var_nacionalidad =ctk.StringVar(value='Venezolano')
         self.var_telefono_p = ctk.StringVar(value='movil')
         self.var_telefono_s = ctk.StringVar(value='movil')
+        self.var_condicion = ctk.StringVar(value='Regular')
         self._crear_fila_widgets([
             ("Género:", crear_option_menu, {"values":["M", "F"],'variable': self.var_sexo,"command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu'),
             ("Edo Civil:", crear_option_menu, {"values":["Soltero", "Casado", "Divorciado"],"variable":self.var_estadoCivil ,"command": lambda v: setattr(self.edo_civil_menu, '_current_value',v)}, 1, self, 'edo_civil_menu')
@@ -56,9 +57,9 @@ class DatosPersonalesFrame(SectionFrameBase):
             ("Nacionalidad",crear_option_menu, {"values":["Venezolano", "Extranjero"] ,"variable":self.var_nacionalidad,"command": lambda v: setattr(self.nacionalidad_menu, '_current_value',v)}, 1, self, 'nacionalidad_menu'),
         ])
         self._crear_fila_widgets([
-            ("F. Nacimiento:", crear_entry, {"width":120, "validate":"key", "validatecommand":(self.vcmd_fecha, "%S"), "placeholder_text":"dd/mm/aaaa"}, 1, self, 'fnac_entry'),
+            ("F. Nacimiento:", crear_entry, {"width":120, "placeholder_text":"yyyy/mm/dd"}, 1, self, 'fnac_entry'),
             ("Lugar Nacimiento:", crear_entry, {"width":300}, 1, self, 'lugar_nac_entry'),
-            ("F. Ingreso:", crear_entry, {"width":120, "validate":"key", "validatecommand":(self.vcmd_fecha, "%S"), "placeholder_text":"dd/mm/aaaa"}, 1, self, 'fingreso_entry')
+            ("F. Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd/mm/aaaa"}, 1, self, 'fingreso_entry')
         ])
         self._crear_fila_widgets([
             ("Correo Electrónico:", crear_entry, {"width":300}, 1, self, 'correo_electronico_entry')
@@ -66,11 +67,11 @@ class DatosPersonalesFrame(SectionFrameBase):
         self._crear_fila_widgets([
             ("Tipo de Telefono", crear_option_menu, {"values":['movil', 'casa', 'trabajo', 'otro'],'variable':self.var_telefono_p, "command": lambda v: setattr(self.tipo_telefono_p, '_current_value',v)}, 1, self, 'tipo_telefono_p'),
             ("Tel. Principal:", crear_entry, {"width":150, "validate":"key", "validatecommand":(self.vcmd_num, "%S")}, 1, self, 'telefono_principal_entry'),
-            ('Tipo de Telefono', crear_option_menu, {"values":['movil', 'casa', 'trabajo', 'otro'],'variable':self.var_telefono_s "command": lambda v: setattr(self.tipo_telefono_s, '_current_value',v)}, 1, self, 'tipo_telefono_s'),
+            ('Tipo de Telefono', crear_option_menu, {"values":['movil', 'casa', 'trabajo', 'otro'],'variable':self.var_telefono_s,"command": lambda v: setattr(self.tipo_telefono_s, '_current_value',v)}, 1, self, 'tipo_telefono_s'),
             ("Tel. Secundario:", crear_entry, {"width":150, "validate":"key", "validatecommand":(self.vcmd_num, "%S")}, 1, self, 'telefono_secundario_entry')
         ])
         self._crear_fila_widgets([
-            ("Condición:", crear_option_menu, {"values":["Regular", "Repitiente", "Reingreso", "Transferencia"], "command": lambda v: setattr(self.condicion_menu, '_current_value',v)}, 1, self, 'condicion_menu', lambda w: w.set("Regular"))
+            ("Condición:", crear_option_menu, {"values":["Regular", "Repitiente", "Reingreso", "Transferencia"],"variable":self.var_condicion, "command": lambda v: setattr(self.condicion_menu, '_current_value',v)}, 1, self, 'condicion_menu')
         ])
 
     def _actualizar_estado_nro_doc(self, _=None): # Acepta un argumento opcional por el command
@@ -161,10 +162,13 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.nacionalidad_menu.configure(state="disabled")     
 
         #Configuracion de la fecha de nacimiento
-        self.fnac_entry.delete(0,ctk.END)
-        if estudiante.get('fecha_nacimiento') != None:
-            self.fnac_entry.insert(0,estudiante.get("fecha_nacimiento"))
-        self.nacionalidad_menu.configure(state="disabled")
+        self.fnac_entry.configure(state="normal")
+        self.fnac_entry.delete(0, ctk.END)
+        fecha_nacimiento = estudiante.get('fecha_nacimiento')
+        if fecha_nacimiento is not None and fecha_nacimiento != '':
+            self.fnac_entry.insert(0, str(fecha_nacimiento))
+            print(fecha_nacimiento)
+        self.fnac_entry.configure(state="disabled")
 
         #Configuracion del lugar de nacimiento
         self.lugar_nac_entry.delete(0, ctk.END)
@@ -175,43 +179,50 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.lugar_nac_entry.configure(state="disabled")
 
         #Configuracion de la fecha de ingreso
-        self.fingreso_entry.delete(0,ctk)
-        if estudiante.get('fecha_ingreso') != None:
-            fecha_ingreso = str(estudiante.get("fecha_ingreso"))
-            self.fingreso_entry.insert(0,fecha_ingreso)
-        self.fingreso_entry.configure(state='desabled')
+        self.fingreso_entry.configure(state="normal")
+        self.fingreso_entry.delete(0, ctk.END)
+        fecha_ingreso = estudiante.get('fecha_ingreso')
+        if fecha_ingreso is not None and fecha_ingreso != '':
+            self.fingreso_entry.insert(0, str(fecha_ingreso))
+            print(fecha_ingreso)
+        self.fingreso_entry.configure(state="disabled")
 
         #Configuaracion correoelectronico
-        self.correo_electronico_entry.configure(0,ctk.END)
-        if estudiante.get('correo_electronico') == None:
-            self.correo_electrinico_entry.insert(0,)
-        self.correo_electronico_entry.configure(state="desabled")
+        self.correo_electronico_entry.delete(0,ctk.END)
+        if estudiante.get('correo_electronico') != None:
+            self.correo_electronico_entry.insert(0,estudiante.get('correo_electronico'))
+        self.correo_electronico_entry.configure(state="disabled")
         
         #Configuracion tipo de telefono
+        if estudiante.get('tipo_telefono_p'):
+            self.var_telefono_p.set(estudiante.get('tipo_telefono_p'))
+        else:
+            self.var_telefono_p.set('movil')
+        self.tipo_telefono_p.configure(state="disabled")
+
+
+        if estudiante.get('tipo_telefono_s'):
+            self.var_telefono_s.set(estudiante.get('tipo_telefono_s'))
+        else:
+            self.var_telefono_s.set('movil')
+        self.tipo_telefono_s.configure(state="disabled")
+
+        #Configuracion de Telefonos
+        self.telefono_principal_entry.delete(0, ctk.END)
+        if estudiante.get("telefono_principal") != None and estudiante.get("telefono_principal") != '':
+            self.telefono_principal_entry.insert(0,estudiante.get("telefono_principal"))
+        self.telefono_principal_entry.configure(state="disabled")
         
-        if estudiante.
-        # self.tipo_telefono_p.set(estudiante.get("tipo_telefono_principal", "movil"))
-        # self.tipo_telefono_p.configure(state="disabled")
+        self.telefono_secundario_entry.delete(0, ctk.END)
+        if estudiante.get("telefono_secundario") != None and estudiante.get("telefono_secundario") != '':
+            self.telefono_secundario_entry.insert(0,estudiante.get("telefono_secundario"))
+        self.telefono_secundario_entry.configure(state="disabled")
 
-        # self.telefono_principal_entry.configure(state="normal")
-        # self.telefono_principal_entry.delete(0, 'end')
-
-        # telefonos = estudiante['telefonos']
-        
-
-        # self.telefono_principal_entry.insert(0, telefonos[0])
-        # self.telefono_principal_entry.configure(state="disabled")
-
-        # self.tipo_telefono_s.set(estudiante.get("tipo_telefono_secundario", "movil"))
-        # self.tipo_telefono_s.configure(state="disabled")
-
-        # self.telefono_secundario_entry.configure(state="normal")
-        # self.telefono_secundario_entry.delete(0, 'end')
-        # self.telefono_secundario_entry.insert(0, telefonos[1])
-        # self.telefono_secundario_entry.configure(state="disabled")
-
-        # self.condicion_menu.set(estudiante.get("condicion"))
-        # self.condicion_menu.configure(state="disabled")
+        if estudiante.get('condicion'):
+            self.var_condicion.set(estudiante.get('condicion'))
+        else:
+            self.var_condicion.set('Regular')
+        self.condicion_menu.configure(state="disabled")
 
     #metodo para habilitar la edicion de los campos sin eliminar el contenido
     def habilitar_edicion(self):

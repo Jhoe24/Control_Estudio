@@ -4,13 +4,15 @@ from views.layouts.SectionFrameBase import SectionFrameBase
 from views.admin.estudiante_form_view import FormularioEstudianteView
 
 
+
 class FiltradoBusquedaFrame(SectionFrameBase):
     def __init__(self, master,controlado ,vcmd_num):
         super().__init__(master, header_text="Filtrado y Búsqueda")
-        self.tipo_documento_var = ctk.StringVar(value="Cédula")
+        self.tipo_documento_var = ctk.StringVar(value="cedula")
         self.vcmd_num = vcmd_num
         self.controlador = controlado
         self.estudiante_form = FormularioEstudianteView(master, controlado)
+       
         
         self.frame_tipo_numero_doc = ctk.CTkFrame(self, fg_color="transparent")
         self.frame_tipo_numero_doc.pack(fill="x", pady=PADY_FILA, padx=15)
@@ -18,13 +20,13 @@ class FiltradoBusquedaFrame(SectionFrameBase):
         radio_button_container = ctk.CTkFrame(self.frame_tipo_numero_doc, fg_color="transparent")
         radio_button_container.grid(row=0, column=1, sticky="w", padx=(0,15))
         
-        self.radio_cedula = crear_radio_button(radio_button_container, text="Cédula", variable=self.tipo_documento_var, value="Cédula")
+        self.radio_cedula = crear_radio_button(radio_button_container, text="Cédula", variable=self.tipo_documento_var, value="cedula")
         self.radio_cedula.pack(side="left", padx=(0, 5), pady=0)
 
-        self.radio_pasaporte = crear_radio_button(radio_button_container, text="Pasaporte", variable=self.tipo_documento_var, value="Pasaporte")
+        self.radio_pasaporte = crear_radio_button(radio_button_container, text="Pasaporte", variable=self.tipo_documento_var, value="pasaporte")
         self.radio_pasaporte.pack(side="left", padx=(0, 5), pady=0)
 
-        self.radio_sindoc = crear_radio_button(radio_button_container, text="Sin Doc.", variable=self.tipo_documento_var, value="Sin Documento")
+        self.radio_sindoc = crear_radio_button(radio_button_container, text="Sin Doc.", variable=self.tipo_documento_var, value="sin documento")
         self.radio_sindoc.pack(side="left", padx=(0, 0), pady=0)
     
         self.nro_documento_entry = crear_entry(self.frame_tipo_numero_doc, width=120, validate="key", validatecommand=(self.vcmd_num, "%S"))
@@ -45,9 +47,11 @@ class FiltradoBusquedaFrame(SectionFrameBase):
         # Por ejemplo, podrías obtener el valor del Entry y hacer algo con él
         tipo_documento = self.tipo_documento_var.get()
         nro_documento = self.nro_documento_entry.get()
+        print(f"tipo de documeto {tipo_documento} : documento de identidad {nro_documento}")
         dic_estudiante=self.controlador.master_controlador.estudiantes.buscar_estudiante(tipo_documento, nro_documento)
         if dic_estudiante:
-            self.estudiante_form.ver_datos_completos(dic_estudiante)
+            self.master.mostrar_resultado_busqueda([dic_estudiante])
+        
             
 
     # def ver_datos_completos(self, estudiante):
