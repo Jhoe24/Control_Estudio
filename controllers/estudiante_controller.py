@@ -28,6 +28,7 @@ class EstudianteController:
         else:
             messagebox.showerror("Error", "Hubo un error al registrar el estudiante.", parent=vista_formulario)
             return False
+        print(datos_estudiante)
 
     def cargar_estudiante_para_edicion(self, id_estudiante, dic_estudiante, vista_formulario):
         existo = self.modelo.update_estudiante(id_estudiante, dic_estudiante)
@@ -131,6 +132,17 @@ class EstudianteController:
             print(e)
 
     def obtener_todos_los_datos(self, vista_formulario):
+        # Extrae los teléfonos de la vista dinámica
+        # telefonos = [
+        #     {
+        #         "tipo": tel[1].get(),
+        #         "numero": tel[3].get()
+        #     }
+        #     for tel in vista_formulario.datos_personales_frame.telefono_widgets
+        #     if tel[3].get().strip()
+        # ]
+        telefonos = vista_formulario.datos_personales_frame.obtener_telefonos()
+
         datos = {
             "tipo_documento": vista_formulario.datos_personales_frame.tipo_documento_var.get(),
             "nro_documento": vista_formulario.datos_personales_frame.nro_documento_entry.get(),
@@ -143,10 +155,11 @@ class EstudianteController:
             "lugar_nacimiento": vista_formulario.datos_personales_frame.lugar_nac_entry.get(),
             "f_ingreso": vista_formulario.datos_personales_frame.fingreso_entry.get(),
             "correo_electronico": vista_formulario.datos_personales_frame.correo_electronico_entry.get(),
-            "tipo_telefono_p": vista_formulario.datos_personales_frame.tipo_telefono_p.get(),
-            "telefono_principal": vista_formulario.datos_personales_frame.telefono_principal_entry.get(),
-            "tipo_telefono_s": vista_formulario.datos_personales_frame.tipo_telefono_s.get(),
-            "telefono_secundario": vista_formulario.datos_personales_frame.telefono_secundario_entry.get(),
+            # "tipo_telefono_p": telefonos[0]["tipo"] if len(telefonos) > 0 else "",
+            # "telefono_principal": telefonos[0]["numero"] if len(telefonos) > 0 else "",
+            # "tipo_telefono_s": telefonos[1]["tipo"] if len(telefonos) > 1 else "",
+            # "telefono_secundario": telefonos[1]["numero"] if len(telefonos) > 1 else "",
+            "lista_telefonos": telefonos,
             "condicion": vista_formulario.datos_personales_frame.condicion_menu.get(),
             "tipo_institucion": vista_formulario.informacion_academica_frame.tipo_inst_menu.get(),
             "institucion": vista_formulario.informacion_academica_frame.institucion_entry.get(),
@@ -174,8 +187,6 @@ class EstudianteController:
             vista_formulario.datos_personales_frame.lugar_nac_entry,
             vista_formulario.datos_personales_frame.fingreso_entry,
             vista_formulario.datos_personales_frame.correo_electronico_entry,
-            vista_formulario.datos_personales_frame.telefono_principal_entry,
-            vista_formulario.datos_personales_frame.telefono_secundario_entry,
             vista_formulario.informacion_academica_frame.institucion_entry,
             vista_formulario.informacion_academica_frame.titulo_entry,
             vista_formulario.informacion_academica_frame.fgrado_entry,
@@ -195,8 +206,6 @@ class EstudianteController:
             vista_formulario.datos_personales_frame.nacionalidad_menu: "Venezolano",
             vista_formulario.informacion_academica_frame.tipo_inst_menu: "Pública",
             vista_formulario.datos_personales_frame.condicion_menu: "Regular",
-            vista_formulario.datos_personales_frame.tipo_telefono_p: "movil",
-            vista_formulario.datos_personales_frame.tipo_telefono_s: "movil",
             vista_formulario.datos_ubicacion_frame.tipo_direccion_menu: "residencia",
         }
 
@@ -206,6 +215,9 @@ class EstudianteController:
         for menu, valor in option_menus_a_resetear.items():
             if hasattr(menu, 'set'):
                 menu.set(valor)
+
+        # Limpiar los campos de teléfono
+        vista_formulario.datos_personales_frame.limpiar_telefonos()
 
         vista_formulario.datos_personales_frame.tipo_documento_var.set("Cédula")
         vista_formulario.datos_personales_frame._actualizar_estado_nro_doc()

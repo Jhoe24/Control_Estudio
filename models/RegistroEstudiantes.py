@@ -49,29 +49,43 @@ class RegistroEstudiantes:
                            ))
             
             # Insertar datos en la tabla telefonos
+
+            telefonos = datos_estudiantes.get('telefonos', [])
+
+            for idx, (tipo, numero) in enumerate(telefonos):
+                cursor.execute('''
+                    INSERT INTO telefonos
+                    (persona_id, tipo_telefono, numero, principal)
+                    VALUES (?, ?, ?, ?)
+                ''', (
+                    persona_id,
+                    tipo,
+                    numero,
+                    1 if idx == 0 else 0  # El primero es principal, los demás secundarios
+                ))
             
-            cursor.execute('''
-                            INSERT INTO telefonos
-                            (persona_id, tipo_telefono, numero, principal)
-                            VALUES (?,?,?,?)
-                            ''',(
-                                persona_id,
-                                datos_estudiantes['tipo_telefono_p'],
-                                datos_estudiantes['telefono_principal'],
-                                1 # true
-                            ))
+            # cursor.execute('''
+            #                 INSERT INTO telefonos
+            #                 (persona_id, tipo_telefono, numero, principal)
+            #                 VALUES (?,?,?,?)
+            #                 ''',(
+            #                     persona_id,
+            #                     datos_estudiantes['tipo_telefono_p'],
+            #                     datos_estudiantes['telefono_principal'],
+            #                     1 # true
+            #                 ))
             
 
-            cursor.execute('''
-                            INSERT INTO telefonos
-                            (persona_id, tipo_telefono, numero, principal)
-                            VALUES (?,?,?,?)
-                            ''',(
-                                persona_id,
-                                datos_estudiantes['tipo_telefono_s'],
-                                datos_estudiantes['telefono_secundario'],
-                                0 # false
-                            ))
+            # cursor.execute('''
+            #                 INSERT INTO telefonos
+            #                 (persona_id, tipo_telefono, numero, principal)
+            #                 VALUES (?,?,?,?)
+            #                 ''',(
+            #                     persona_id,
+            #                     datos_estudiantes['tipo_telefono_s'],
+            #                     datos_estudiantes['telefono_secundario'],
+            #                     0 # false
+            #                 ))
             
             # Insertar datos en la tabla de direcciones
 
@@ -132,22 +146,48 @@ class RegistroEstudiantes:
             
             # Telefonos
             
-            cursor.execute('''
-                            SELECT persona_id, tipo_telefono, numero, principal
-                            FROM telefonos
-                            ''')
-            telefonos = cursor.fetchall()
+            # cursor.execute('''
+            #                 SELECT persona_id, tipo_telefono, numero, principal
+            #                 FROM telefonos
+            #                 ''')
+            # telefonos = cursor.fetchall()
             
+            # telefonos_dict = {}
+            # for persona_id, tipo_telefono, numero, principal in telefonos:
+            #     if persona_id not in telefonos_dict:
+            #         telefonos_dict[persona_id] = {}
+            #     if principal == 1:
+            #         telefonos_dict[persona_id]['telefono_principal'] = numero
+            #         telefonos_dict[persona_id]['tipo_telefono_p'] = tipo_telefono
+            #     else:
+            #         telefonos_dict[persona_id]['telefono_secundario'] = numero
+            #         telefonos_dict[persona_id]['tipo_telefono_s'] = tipo_telefono
+
+            # Después de obtener los teléfonos:
+            cursor.execute('''
+                SELECT persona_id, tipo_telefono, numero, principal
+                FROM telefonos
+            ''')
+            telefonos = cursor.fetchall()
+
+            # Agrupa todos los teléfonos por persona_id
             telefonos_dict = {}
             for persona_id, tipo_telefono, numero, principal in telefonos:
                 if persona_id not in telefonos_dict:
-                    telefonos_dict[persona_id] = {}
+                    telefonos_dict[persona_id] = {
+                        "todos": []  # Aquí guardaremos todos los teléfonos
+                    }
+                # Agrega cada teléfono a la lista 'todos'
+                telefonos_dict[persona_id]["todos"].append((tipo_telefono, numero, principal))
+                # (Opcional) sigue guardando principal/secundario si lo necesitas
                 if principal == 1:
                     telefonos_dict[persona_id]['telefono_principal'] = numero
                     telefonos_dict[persona_id]['tipo_telefono_p'] = tipo_telefono
                 else:
                     telefonos_dict[persona_id]['telefono_secundario'] = numero
                     telefonos_dict[persona_id]['tipo_telefono_s'] = tipo_telefono
+
+
             # direcciones
             cursor.execute('''
                                 SELECT persona_id, estado, municipio, parroquia, sector, calle, casa_edificio, tipo_direccion
@@ -178,11 +218,17 @@ class RegistroEstudiantes:
                 persona_id = estudiante['id']
 
                 tel_info = telefonos_dict.get(persona_id, {})
-                estudiante['telefono_principal'] = tel_info.get('telefono_principal', '')
-                estudiante['tipo_telefono_p'] = tel_info.get('tipo_telefono_p', '')
-                estudiante['telefono_secundario'] = tel_info.get('telefono_secundario', '')
-                estudiante['tipo_telefono_s'] = tel_info.get('tipo_telefono_s', '')
-                
+                # estudiante['telefono_principal'] = tel_info.get('telefono_principal', '')
+                # estudiante['tipo_telefono_p'] = tel_info.get('tipo_telefono_p', '')
+                # estudiante['telefono_secundario'] = tel_info.get('telefono_secundario', '')
+                # estudiante['tipo_telefono_s'] = tel_info.get('tipo_telefono_s', '')
+                # Agrega todos los teléfonos como array de tuplas según el id_persona
+                estudiante['telefonos'] = [
+                    (tipo_telefono, numero, principal)
+                    for tipo_telefono, numero, principal in [
+                        (t[0], t[1], t[2]) for t in tel_info.get('todos', [])
+                    ]
+                ]
                 
                 direccion_info = direcciones_dict.get(persona_id, {})
                 estudiante['estado'] = direccion_info.get('estado', '')
@@ -233,18 +279,7 @@ class RegistroEstudiantes:
                 WHERE persona_id = ?
             ''', (persona_id,))
             telefonos = cursor.fetchall()
-            tel_info = {}
-            for tipo_telefono, numero, principal in telefonos:
-                if principal == 1:
-                    tel_info['telefono_principal'] = numero
-                    tel_info['tipo_telefono_p'] = tipo_telefono
-                else:
-                    tel_info['telefono_secundario'] = numero
-                    tel_info['tipo_telefono_s'] = tipo_telefono
-            estudiante['telefono_principal'] = tel_info.get('telefono_principal', '')
-            estudiante['tipo_telefono_p'] = tel_info.get('tipo_telefono_p', '')
-            estudiante['telefono_secundario'] = tel_info.get('telefono_secundario', '')
-            estudiante['tipo_telefono_s'] = tel_info.get('tipo_telefono_s', '')
+            estudiante['telefonos'] = [(tipo_telefono, numero, principal) for tipo_telefono, numero, principal in telefonos]
 
             # Direccion del estudiante
             cursor.execute('''
@@ -447,4 +482,4 @@ class RegistroEstudiantes:
         
               
 # test = RegistroEstudiantes()
-# pprint(test.buscar_estudiante('cedula',287096490))
+# pprint(test.buscar_estudiante('cedula', '123'))

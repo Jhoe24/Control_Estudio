@@ -10,6 +10,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.tipo_documento_var = ctk.StringVar(value="cedula") # Valor por defecto: Cédula
         self.vcmd_num = vcmd_num # Guardar para usar en nro_documento_entry y teléfonos
         self.vcmd_fecha = vcmd_fecha # Guardar para usar en fechas
+        self.lista_telefonos = [] # Lista para guardar los teléfonos
 
         # --- Fila para Tipo y Número de Documento (Reemplaza Cédula entry) ---
         self.frame_tipo_numero_doc = ctk.CTkFrame(self, fg_color="transparent")
@@ -49,30 +50,111 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.var_telefono_p = ctk.StringVar(value='movil')
         self.var_telefono_s = ctk.StringVar(value='movil')
         self.var_condicion = ctk.StringVar(value='Regular')
+        # --- Fila para genero, estado civil ---
         self._crear_fila_widgets([
             ("Género:", crear_option_menu, {"values":["M", "F"],'variable': self.var_sexo,"command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu'),
             ("Edo Civil:", crear_option_menu, {"values":["Soltero", "Casado", "Divorciado"],"variable":self.var_estadoCivil ,"command": lambda v: setattr(self.edo_civil_menu, '_current_value',v)}, 1, self, 'edo_civil_menu')
         ])
+
+        # --- Fila para nacionalidad ---
         self._crear_fila_widgets([
             ("Nacionalidad",crear_option_menu, {"values":["Venezolano", "Extranjero"] ,"variable":self.var_nacionalidad,"command": lambda v: setattr(self.nacionalidad_menu, '_current_value',v)}, 1, self, 'nacionalidad_menu'),
         ])
+
+        # --- Fila para fecha de nacimiento, lugar de nacimiento y fecha de ingreso ---
         self._crear_fila_widgets([
             ("F. Nacimiento:", crear_entry, {"width":120, "placeholder_text":"yyyy/mm/dd"}, 1, self, 'fnac_entry'),
             ("Lugar Nacimiento:", crear_entry, {"width":300}, 1, self, 'lugar_nac_entry'),
             ("F. Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd/mm/aaaa"}, 1, self, 'fingreso_entry')
         ])
+
+        # --- Fila para correo electronico ---
         self._crear_fila_widgets([
             ("Correo Electrónico:", crear_entry, {"width":300}, 1, self, 'correo_electronico_entry')
         ])
-        self._crear_fila_widgets([
-            ("Tipo de Telefono", crear_option_menu, {"values":['movil', 'casa', 'trabajo', 'otro'],'variable':self.var_telefono_p, "command": lambda v: setattr(self.tipo_telefono_p, '_current_value',v)}, 1, self, 'tipo_telefono_p'),
-            ("Tel. Principal:", crear_entry, {"width":150, "validate":"key", "validatecommand":(self.vcmd_num, "%S")}, 1, self, 'telefono_principal_entry'),
-            ('Tipo de Telefono', crear_option_menu, {"values":['movil', 'casa', 'trabajo', 'otro'],'variable':self.var_telefono_s,"command": lambda v: setattr(self.tipo_telefono_s, '_current_value',v)}, 1, self, 'tipo_telefono_s'),
-            ("Tel. Secundario:", crear_entry, {"width":150, "validate":"key", "validatecommand":(self.vcmd_num, "%S")}, 1, self, 'telefono_secundario_entry')
-        ])
+
+        # --- Apartado dinámico de Teléfonos ---
+        self.frame_telefonos = ctk.CTkFrame(self, fg_color="transparent")
+        self.frame_telefonos.pack(fill="x", pady=PADY_FILA, padx=15)
+
+        self.btn_agregar_telefono = ctk.CTkButton(
+            self.frame_telefonos,
+            text="Agregar Teléfono",
+            command=self.agregar_telefono
+        )
+        self.btn_agregar_telefono.pack(anchor="w", pady=5)
+
+        self.telefono_widgets = []  # Lista para guardar las filas de teléfonos
+
         self._crear_fila_widgets([
             ("Condición:", crear_option_menu, {"values":["Regular", "Repitiente", "Reingreso", "Transferencia"],"variable":self.var_condicion, "command": lambda v: setattr(self.condicion_menu, '_current_value',v)}, 1, self, 'condicion_menu')
         ])
+
+    def agregar_telefono(self):
+        """
+        Agrega una fila dinámica de teléfono (tipo + número + eliminar).
+        """
+        fila = ctk.CTkFrame(self.frame_telefonos, fg_color="transparent")
+        fila.pack(fill="x", pady=2)
+
+        self.var_tipo = ctk.StringVar(value="movil")
+        tipo_menu = crear_option_menu(
+            fila,
+            values=['movil', 'casa', 'trabajo', 'otro'],
+            variable=self.var_tipo
+        )
+        tipo_menu.pack(side="left", padx=(0, 5))
+
+        self.entry_num = crear_entry(
+            fila,
+            width=150,
+            validate="key",
+            validatecommand=(self.vcmd_num, "%S")
+        )
+        self.entry_num.pack(side="left", padx=(0, 5))
+
+        btn_eliminar = ctk.CTkButton(
+            fila,
+            text="Eliminar",
+            width=70,
+            command=lambda: self.eliminar_telefono(fila)
+        )
+        btn_eliminar.pack(side="left", padx=(0, 5))
+        # Agregar teléfono a la lista
+        self.lista_telefonos.append((self.var_tipo.get(), self.entry_num.get()))
+
+        self.telefono_widgets.append((fila, self.var_tipo, tipo_menu, self.entry_num))
+
+    def obtener_telefonos(self):
+        telefonos = [
+            (tipo_var.get(), entry_num.get())
+            for _, tipo_var, _, entry_num in self.telefono_widgets
+            if entry_num.get().strip()  # Solo si el número no está vacío
+        ]
+        return telefonos
+
+    def eliminar_telefono(self, fila):
+        """
+        Elimina una fila de teléfono de la interfaz y de la lista.
+        """
+        fila.destroy()
+        self.telefono_widgets = [
+            t for t in self.telefono_widgets if t[0] != fila
+        ]
+
+        # eliminar el telefono de la lista
+        for i, (self.var_tipo, self.entry_num) in enumerate(self.lista_telefonos):
+            if self.entry_num.winfo_parent() == fila.winfo_parent():
+                del self.lista_telefonos[i]
+                break
+
+    def limpiar_telefonos(self):
+        """
+        Elimina todas las filas de teléfonos dinámicos.
+        """
+        for fila, _, _, _ in self.telefono_widgets:
+            fila.destroy()
+        self.telefono_widgets.clear()
 
     def _actualizar_estado_nro_doc(self, _=None): # Acepta un argumento opcional por el command
         tipo_doc = self.tipo_documento_var.get()
@@ -119,7 +201,10 @@ class DatosPersonalesFrame(SectionFrameBase):
     
 
     def set_datos(self, estudiante):
-        # Asignar valores y deshabilitar campos
+        """
+        Carga los datos del estudiante en los campos y deshabilita la edición.
+        Adapta los campos fijos de teléfono a la vista dinámica.
+        """
         tipo_doc = estudiante.get("tipo_documento", "Cédula")
         self.radio_cedula.configure(state="disabled")
         self.radio_pasaporte.configure(state="disabled")
@@ -193,30 +278,26 @@ class DatosPersonalesFrame(SectionFrameBase):
             self.correo_electronico_entry.insert(0,estudiante.get('correo_electronico'))
         self.correo_electronico_entry.configure(state="disabled")
         
-        #Configuracion tipo de telefono
-        if estudiante.get('tipo_telefono_p'):
-            self.var_telefono_p.set(estudiante.get('tipo_telefono_p'))
-        else:
-            self.var_telefono_p.set('movil')
-        self.tipo_telefono_p.configure(state="disabled")
+        self.correo_electronico_entry.insert(0, estudiante.get('correo_electronico'))
+        self.correo_electronico_entry.configure(state="disabled")
 
-
-        if estudiante.get('tipo_telefono_s'):
-            self.var_telefono_s.set(estudiante.get('tipo_telefono_s'))
-        else:
-            self.var_telefono_s.set('movil')
-        self.tipo_telefono_s.configure(state="disabled")
-
-        #Configuracion de Telefonos
-        self.telefono_principal_entry.delete(0, ctk.END)
-        if estudiante.get("telefono_principal") != None and estudiante.get("telefono_principal") != '':
-            self.telefono_principal_entry.insert(0,estudiante.get("telefono_principal"))
-        self.telefono_principal_entry.configure(state="disabled")
-        
-        self.telefono_secundario_entry.delete(0, ctk.END)
-        if estudiante.get("telefono_secundario") != None and estudiante.get("telefono_secundario") != '':
-            self.telefono_secundario_entry.insert(0,estudiante.get("telefono_secundario"))
-        self.telefono_secundario_entry.configure(state="disabled")
+         # --- Teléfonos dinámicos: mostrar todos los guardados ---
+        self.limpiar_telefonos()
+        telefonos = estudiante.get('telefonos', [])
+        for tipo, numero, principal in telefonos:
+            self.agregar_telefono()
+            fila, var_tipo, tipo_menu, entry_num = self.telefono_widgets[-1]
+            var_tipo.set(tipo)
+            entry_num.insert(0, numero)
+            entry_num.configure(state="disabled")
+            tipo_menu.configure(state="disabled")
+            # Deshabilitar botón eliminar
+            for widget in fila.winfo_children():
+                if isinstance(widget, ctk.CTkButton) and widget.cget("text") == "Eliminar":
+                    widget.configure(state="disabled")
+        # Deshabilita el botón agregar teléfono en modo solo lectura
+        self.btn_agregar_telefono.configure(state="disabled")
+            # --- Fin de la carga de teléfonos ---
 
         if estudiante.get('condicion'):
             self.var_condicion.set(estudiante.get('condicion'))
@@ -236,8 +317,12 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.lugar_nac_entry.configure(state="normal")
         self.fingreso_entry.configure(state="normal")
         self.correo_electronico_entry.configure(state="normal")
-        self.telefono_principal_entry.configure(state="normal")
-        self.telefono_secundario_entry.configure(state="normal")
-        self.tipo_telefono_p.configure(state="normal")
-        self.tipo_telefono_s.configure(state="normal")
         self.condicion_menu.configure(state="normal")
+        # Habilitar edición en los teléfonos dinámicos
+        for fila, _, tipo_menu, entry_num in self.telefono_widgets:
+            entry_num.configure(state="normal")
+            tipo_menu.configure(state="normal")
+            self.btn_agregar_telefono.configure(state="normal")
+            for widget in fila.winfo_children():
+                if isinstance(widget, ctk.CTkButton) and widget.cget("text") == "Eliminar":
+                    widget.configure(state="normal")
