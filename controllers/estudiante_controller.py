@@ -160,7 +160,7 @@ class EstudianteController:
             # "tipo_telefono_s": telefonos[1]["tipo"] if len(telefonos) > 1 else "",
             # "telefono_secundario": telefonos[1]["numero"] if len(telefonos) > 1 else "",
             "lista_telefonos": telefonos,
-            "condicion": vista_formulario.datos_personales_frame.condicion_menu.get(),
+            "condicion": vista_formulario.informacion_academica_frame.condicion_menu.get(),
             "tipo_institucion": vista_formulario.informacion_academica_frame.tipo_inst_menu.get(),
             "institucion": vista_formulario.informacion_academica_frame.institucion_entry.get(),
             "titulo_obtenido": vista_formulario.informacion_academica_frame.titulo_entry.get(),

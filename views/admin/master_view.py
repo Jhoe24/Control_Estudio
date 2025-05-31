@@ -3,6 +3,7 @@ from util.mensaje import CustomMessageBox
 from views.layouts.admin_base import AdminBase
 from views.admin.estudiante_form_view import FormularioEstudianteView
 from views.admin.list_estudiante_view import ListEstudiantesView
+from views.admin.docente_form_view import FormularioDocenteView
 
 class VistaMaster(AdminBase):
     def __init__(self, master, controlador, id_usuario):
@@ -16,6 +17,7 @@ class VistaMaster(AdminBase):
 
         self.vistas['inicio'] = ctk.CTkLabel(self.cuerpo_principal, text="Dashboard de administración", fg_color="black", font=("Roboto",24))
         self.vistas['estudiantes'] = FormularioEstudianteView(self.cuerpo_principal, self.controlador)
+        self.vistas['docentes'] = FormularioDocenteView(self.cuerpo_principal, self.controlador)
         self.vistas['list_estudiante'] = ListEstudiantesView(self.cuerpo_principal, self.controlador)
         self.vistas['configuracion'] = ctk.CTkLabel(self.cuerpo_principal, text="Configuración de usuario", fg_color="black", font=("Roboto",24))
 
@@ -38,6 +40,9 @@ class VistaMaster(AdminBase):
         
     def estudiantes(self):
         self.mostrar_vista('estudiantes')
+
+    def docente(self):
+        self.mostrar_vista('docentes')
 
     def Configuracion(self):
         self.mostrar_vista('configuracion')

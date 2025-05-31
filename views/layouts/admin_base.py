@@ -77,7 +77,8 @@ class AdminBase(VistaBase):
         # botones
         menu_items = [
             ("Inicio",       "home.png",          self.inicio),
-            ("Estudiantes",  "historial.png",     self.estudiantes),
+            ("Estudiantes",  "historial.png",     self.opcion_seleccionada),
+            ("Docentes",  "historial.png",     self.opcion_seleccionada),
             ("Ayuda",        "info.png",          self._mostrar_ayuda),
             ("Configuración","config.png",       self.Configuracion),
             ("Cerrar Sesión","cerrar-sesion.png", self.controlador.mostrar_vista_login)
@@ -85,8 +86,9 @@ class AdminBase(VistaBase):
 
 
         for texto, archivo, comando in menu_items:
-            if texto == "Estudiantes":
-                menu_opciones = ['Registrar Estudiante', 'Listar Estudiantes']
+            if texto == "Estudiantes" or texto == "Docentes":
+                if texto == "Estudiantes": menu_opciones = ['Registrar Estudiante', 'Listar Estudiantes']
+                elif texto == "Docentes": menu_opciones = ['Registrar Docentes', 'Listar Docentes']
                 # Crear el menú desplegable
                 menu = ctk.CTkOptionMenu(
                     self.menu_lateral,
@@ -94,7 +96,7 @@ class AdminBase(VistaBase):
                     anchor="w",
                     font=("Roboto",18),
                     #fg_color="white",
-                    command=self.opcion_seleccionada,
+                    command=comando,
                     dropdown_fg_color="#3556a3",
                     dropdown_text_color="white" 
                 )
@@ -132,6 +134,10 @@ class AdminBase(VistaBase):
             self.estudiantes()
         elif opcion == "Listar Estudiantes":
             self.list_estudiante()
+        elif opcion == "Registrar Docentes":
+            self.docente()
+        elif opcion == "Listar Docentes":
+            self.list_docente()
         else:
             print(f"Opción seleccionada: {opcion}")
 
@@ -140,11 +146,17 @@ class AdminBase(VistaBase):
         pass
     def inicio(self):
         pass
+        
+    def docente(self):
+        pass
 
     def estudiantes(self):
         pass
 
     def list_estudiante(self):
+        pass
+
+    def list_docente(self):
         pass
 
     def _mostrar_ayuda(self):

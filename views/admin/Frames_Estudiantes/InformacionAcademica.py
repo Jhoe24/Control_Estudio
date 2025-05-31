@@ -6,6 +6,7 @@ from .DatosPersonales import DatosPersonalesFrame
 class InformacionAcademicaFrame(SectionFrameBase):
     def __init__(self, master, vcmd_fecha, vcmd_decimal):
         super().__init__(master, header_text="Información Académica")
+        self.var_condicion = ctk.StringVar(value='Regular')
         self._crear_fila_widgets([
             ("Mención:", crear_option_menu, {"values":["Profesional", "Técnico Superior Universitario", "Bachiller"], "command": lambda v: setattr(self.tipo_mencion_menu, '_current_value',v)}, 1, self, 'tipo_mencion_menu', lambda w: w.set("Bachiller")),
             ("Tipo Institución:", crear_option_menu, {"values":["Pública", "Privada"], "command": lambda v: setattr(self.tipo_inst_menu, '_current_value',v)}, 1, self, 'tipo_inst_menu', lambda w: w.set("Pública"))
@@ -22,7 +23,9 @@ class InformacionAcademicaFrame(SectionFrameBase):
         self._crear_fila_widgets([
             ("Título Obtenido:", crear_entry, {"width":300}, 1, self, 'titulo_entry')
         ])
-
+        self._crear_fila_widgets([
+            ("Condición:", crear_option_menu, {"values":["Regular", "Repitente", "Reingreso", "Transferencia"],"variable":self.var_condicion, "command": lambda v: setattr(self.condicion_menu, '_current_value',v)}, 1, self, 'condicion_menu')
+        ])
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
     def set_datos(self, estudiante):
@@ -54,6 +57,12 @@ class InformacionAcademicaFrame(SectionFrameBase):
             self.titulo_entry.insert(0, estudiante.get("mencion_bachiller")) 
         self.titulo_entry.configure(state="disabled")
 
+        if estudiante.get('condicion'):
+            self.var_condicion.set(estudiante.get('condicion'))
+        else:
+            self.var_condicion.set('Regular')
+        self.condicion_menu.configure(state="disabled")
+
     #metodo para habilitar la edicion de los campos sin eliminar el contenido
     def habilitar_edicion(self):
         self.tipo_mencion_menu.configure(state="normal")
@@ -62,4 +71,5 @@ class InformacionAcademicaFrame(SectionFrameBase):
         self.fgrado_entry.configure(state="normal")
         self.promedio_entry.configure(state="normal")
         self.titulo_entry.configure(state="normal")
+        self.condicion_menu.configure(state="normal")
     

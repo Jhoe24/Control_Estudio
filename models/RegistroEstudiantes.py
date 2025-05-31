@@ -50,7 +50,7 @@ class RegistroEstudiantes:
             
             # Insertar datos en la tabla telefonos
 
-            telefonos = datos_estudiantes.get('telefonos', [])
+            telefonos = datos_estudiantes.get('lista_telefonos', [])
 
             for idx, (tipo, numero) in enumerate(telefonos):
                 cursor.execute('''
@@ -416,25 +416,40 @@ class RegistroEstudiantes:
                            ))
             
             # Actualizar telefonos
-            cursor.execute('''
-                            UPDATE telefonos
-                            SET tipo_telefono = ?, numero = ?
-                            WHERE persona_id = ? AND principal=1
-                            ''',(
-                                datos_estudiantes['tipo_telefono_p'],
-                                datos_estudiantes['telefono_principal'],
-                                id
-                            ))
+            # cursor.execute('''
+            #                 UPDATE telefonos
+            #                 SET tipo_telefono = ?, numero = ?
+            #                 WHERE persona_id = ? AND principal=1
+            #                 ''',(
+            #                     datos_estudiantes['tipo_telefono_p'],
+            #                     datos_estudiantes['telefono_principal'],
+            #                     id
+            #                 ))
             
-            cursor.execute('''
-                            UPDATE telefonos
-                            SET tipo_telefono = ?, numero = ?
-                            WHERE persona_id = ? AND principal=0
-                            ''',(
-                                datos_estudiantes['tipo_telefono_s'],
-                                datos_estudiantes['telefono_secundario'],
-                                id
-                            ))
+            # cursor.execute('''
+            #                 UPDATE telefonos
+            #                 SET tipo_telefono = ?, numero = ?
+            #                 WHERE persona_id = ? AND principal=0
+            #                 ''',(
+            #                     datos_estudiantes['tipo_telefono_s'],
+            #                     datos_estudiantes['telefono_secundario'],
+            #                     id
+            #                 ))
+
+            # Actualizar telefonos: eliminar los existentes y volver a insertar los nuevos
+            cursor.execute('DELETE FROM telefonos WHERE persona_id = ?', (id,))
+            telefonos = datos_estudiantes.get('lista_telefonos', [])
+            for idx, (tipo, numero) in enumerate(telefonos):
+                cursor.execute('''
+                    INSERT INTO telefonos (persona_id, tipo_telefono, numero, principal)
+                    VALUES (?, ?, ?, ?)
+                ''', (
+                    id,
+                    tipo,
+                    numero,
+                    1 if idx == 0 else 0  # El primero es principal, los demás secundarios
+                ))
+
             
             # Actualizar direcciones
             cursor.execute('''

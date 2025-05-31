@@ -49,7 +49,6 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.var_nacionalidad =ctk.StringVar(value='Venezolano')
         self.var_telefono_p = ctk.StringVar(value='movil')
         self.var_telefono_s = ctk.StringVar(value='movil')
-        self.var_condicion = ctk.StringVar(value='Regular')
         # --- Fila para genero, estado civil ---
         self._crear_fila_widgets([
             ("Género:", crear_option_menu, {"values":["M", "F"],'variable': self.var_sexo,"command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu'),
@@ -63,7 +62,7 @@ class DatosPersonalesFrame(SectionFrameBase):
 
         # --- Fila para fecha de nacimiento, lugar de nacimiento y fecha de ingreso ---
         self._crear_fila_widgets([
-            ("F. Nacimiento:", crear_entry, {"width":120, "placeholder_text":"yyyy/mm/dd"}, 1, self, 'fnac_entry'),
+            ("F. Nacimiento:", crear_entry, {"width":120, "placeholder_text":"dd/mm/aaaa"}, 1, self, 'fnac_entry'),
             ("Lugar Nacimiento:", crear_entry, {"width":300}, 1, self, 'lugar_nac_entry'),
             ("F. Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd/mm/aaaa"}, 1, self, 'fingreso_entry')
         ])
@@ -86,9 +85,7 @@ class DatosPersonalesFrame(SectionFrameBase):
 
         self.telefono_widgets = []  # Lista para guardar las filas de teléfonos
 
-        self._crear_fila_widgets([
-            ("Condición:", crear_option_menu, {"values":["Regular", "Repitiente", "Reingreso", "Transferencia"],"variable":self.var_condicion, "command": lambda v: setattr(self.condicion_menu, '_current_value',v)}, 1, self, 'condicion_menu')
-        ])
+        
 
     def agregar_telefono(self):
         """
@@ -141,12 +138,6 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.telefono_widgets = [
             t for t in self.telefono_widgets if t[0] != fila
         ]
-
-        # eliminar el telefono de la lista
-        for i, (self.var_tipo, self.entry_num) in enumerate(self.lista_telefonos):
-            if self.entry_num.winfo_parent() == fila.winfo_parent():
-                del self.lista_telefonos[i]
-                break
 
     def limpiar_telefonos(self):
         """
@@ -299,11 +290,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.btn_agregar_telefono.configure(state="disabled")
             # --- Fin de la carga de teléfonos ---
 
-        if estudiante.get('condicion'):
-            self.var_condicion.set(estudiante.get('condicion'))
-        else:
-            self.var_condicion.set('Regular')
-        self.condicion_menu.configure(state="disabled")
+        
 
     #metodo para habilitar la edicion de los campos sin eliminar el contenido
     def habilitar_edicion(self):
@@ -317,12 +304,13 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.lugar_nac_entry.configure(state="normal")
         self.fingreso_entry.configure(state="normal")
         self.correo_electronico_entry.configure(state="normal")
-        self.condicion_menu.configure(state="normal")
+        
+
+        self.btn_agregar_telefono.configure(state="normal")    
         # Habilitar edición en los teléfonos dinámicos
         for fila, _, tipo_menu, entry_num in self.telefono_widgets:
             entry_num.configure(state="normal")
             tipo_menu.configure(state="normal")
-            self.btn_agregar_telefono.configure(state="normal")
             for widget in fila.winfo_children():
                 if isinstance(widget, ctk.CTkButton) and widget.cget("text") == "Eliminar":
                     widget.configure(state="normal")
