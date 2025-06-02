@@ -1,18 +1,16 @@
 import customtkinter as ctk
 from util.widget_utils import *
 from views.layouts.SectionFrameBase import SectionFrameBase
-from views.admin.estudiante_form_view import FormularioEstudianteView
+
 
 
 
 class FiltradoBusquedaFrame(SectionFrameBase):
-    def __init__(self, master,controlado ,vcmd_num):
+    def __init__(self, master,controlador ,vcmd_num):
         super().__init__(master, header_text="Filtrado y Búsqueda")
         self.tipo_documento_var = ctk.StringVar(value="cedula")
         self.vcmd_num = vcmd_num
-        self.controlador = controlado
-        self.estudiante_form = FormularioEstudianteView(master, controlado)
-       
+        self.controlador = controlador
         
         self.frame_tipo_numero_doc = ctk.CTkFrame(self, fg_color="transparent")
         self.frame_tipo_numero_doc.pack(fill="x", pady=PADY_FILA, padx=15)
@@ -38,13 +36,12 @@ class FiltradoBusquedaFrame(SectionFrameBase):
         self.boton_buscar = ctk.CTkButton(
             self.frame_tipo_numero_doc,
             text="Buscar",
-            command=self.ejecutar_busqueda  # Este método lo defines tú
+            command=self.ejecutar_busqueda  
         )
         self.boton_buscar.grid(row=0, column=4, padx=10)
 
     def ejecutar_busqueda(self):
-        # Aquí puedes implementar la lógica para ejecutar la búsqueda
-        # Por ejemplo, podrías obtener el valor del Entry y hacer algo con él
+        
         tipo_documento = self.tipo_documento_var.get()
         nro_documento = self.nro_documento_entry.get()
         print(f"tipo de documeto {tipo_documento} : documento de identidad {nro_documento}")

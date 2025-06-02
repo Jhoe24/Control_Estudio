@@ -2,55 +2,57 @@ import sqlite3 as sql
 import os
 from pprint import pprint
 
-class RegistroEstudiantes:
+class ModeloDocente:
     
     def __init__(self):
         self.db_ruta = os.path.join('db', 'sistema_academico.db')
     
-    def registrar_estudiante(self, datos_estudiantes):
-        
+    def registrar_docente(self, datos_docentes):
+        print('es aca?')
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
+            
             # insertar datos en la tabla de informacion_personal
             cursor.execute(''' INSERT INTO informacion_personal
                            (documento_identidad, tipo_documento, nombres, apellidos, fecha_nacimiento, sexo, estado_civil, nacionalidad, lugar_nacimiento, correo_electronico, tipo)
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                            ''',(
-                               datos_estudiantes['nro_documento'],
-                               datos_estudiantes['tipo_documento'],
-                               datos_estudiantes['nombre'],
-                               datos_estudiantes['apellido'],
-                               datos_estudiantes['f_nacimiento'],
-                               datos_estudiantes['genero'],
-                               datos_estudiantes['edo_civil'],
-                               datos_estudiantes['nacionalidad'],
-                               datos_estudiantes['lugar_nacimiento'],
-                               datos_estudiantes['correo_electronico'],
-                               'estudiante'
+                               datos_docentes['nro_documento'],
+                               datos_docentes['tipo_documento'],
+                               datos_docentes['nombre'],
+                               datos_docentes['apellido'],
+                               datos_docentes['f_nacimiento'],
+                               datos_docentes['genero'],
+                               datos_docentes['edo_civil'],
+                               datos_docentes['nacionalidad'],
+                               datos_docentes['lugar_nacimiento'],
+                               datos_docentes['correo_electronico'],
+                               'docente'
                            ))
             persona_id = cursor.lastrowid
-
             
             # Insertar datos en la tabla estudiante
             
             cursor.execute('''
-                           INSERT INTO estudiantes
-                           (persona_id, codigo_unico, institucion_procedencia, mencion_bachiller, fecha_grado_bachiller, fecha_ingreso, condicion)
-                           VALUES (?, ?, ?, ?, ?, ?, ?)
+                           INSERT INTO docentes
+                           (persona_id, abreviatura_titulo, especialidad, fecha_ingreso, tipo_contrato, categoria, auxiliar, dedicacion, estado)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                            ''', (
                             persona_id,
-                            datos_estudiantes['codigo_sni'],
-                            datos_estudiantes['institucion'],
-                            datos_estudiantes['titulo_obtenido'],
-                            datos_estudiantes['f_grado'],
-                            datos_estudiantes['f_ingreso'],
-                            datos_estudiantes['condicion']
+                            datos_docentes.get('abreviatura_titulo', ''),
+                            datos_docentes.get('especialidad', ''),
+                            datos_docentes.get('fecha_ingreso', ''),
+                            datos_docentes.get('tipo_contrato', ''),
+                            datos_docentes.get('categoria', ''),
+                            datos_docentes.get('auxiliar', ''),
+                            datos_docentes.get('dedicacion', ''),
+                            datos_docentes.get('estado_doc', '')
                            ))
             
             # Insertar datos en la tabla telefonos
 
-            telefonos = datos_estudiantes.get('lista_telefonos', [])
+            telefonos = datos_docentes.get('lista_telefonos', [])
 
             for idx, (tipo, numero) in enumerate(telefonos):
                 cursor.execute('''
@@ -70,8 +72,8 @@ class RegistroEstudiantes:
             #                 VALUES (?,?,?,?)
             #                 ''',(
             #                     persona_id,
-            #                     datos_estudiantes['tipo_telefono_p'],
-            #                     datos_estudiantes['telefono_principal'],
+            #                     datos_docentes['tipo_telefono_p'],
+            #                     datos_docentes['telefono_principal'],
             #                     1 # true
             #                 ))
             
@@ -82,8 +84,8 @@ class RegistroEstudiantes:
             #                 VALUES (?,?,?,?)
             #                 ''',(
             #                     persona_id,
-            #                     datos_estudiantes['tipo_telefono_s'],
-            #                     datos_estudiantes['telefono_secundario'],
+            #                     datos_docentes['tipo_telefono_s'],
+            #                     datos_docentes['telefono_secundario'],
             #                     0 # false
             #                 ))
             
@@ -95,14 +97,14 @@ class RegistroEstudiantes:
                             VALUES (?,?,?,?,?,?,?,?,?,?)
                            ''',(
                                persona_id,
-                               datos_estudiantes['estado'],
-                               datos_estudiantes['municipio'],
-                               datos_estudiantes['parroquia'],
-                               datos_estudiantes['sector'],
-                               datos_estudiantes['calle'],
-                               datos_estudiantes['casa_apart'],
-                               f"{datos_estudiantes['estado']}, {datos_estudiantes['municipio']}, {datos_estudiantes['parroquia']},{datos_estudiantes['sector']},{datos_estudiantes['calle']},{datos_estudiantes['casa_apart']}",
-                               datos_estudiantes['tipo_direccion'],
+                               datos_docentes['estado'],
+                               datos_docentes['municipio'],
+                               datos_docentes['parroquia'],
+                               datos_docentes['sector'],
+                               datos_docentes['calle'],
+                               datos_docentes['casa_apart'],
+                               f"{datos_docentes['estado']}, {datos_docentes['municipio']}, {datos_docentes['parroquia']},{datos_docentes['sector']},{datos_docentes['calle']},{datos_docentes['casa_apart']}",
+                               datos_docentes['tipo_direccion'],
                                1 #True
                            ))
 
@@ -111,12 +113,12 @@ class RegistroEstudiantes:
             return True   
 
         except Exception as e:
-            print(f"Error al registrar estudiantes: {e}") 
-            return False
+             print(f"Error al registrar docente: {e}") 
+             return False
         finally:
             con.close()
     
-    def lista_Estudiantes(self, registro_inicio = 0):
+    def lista_Docentes(self, registro_inicio = 0):
         
         try:
             con = sql.connect(self.db_ruta)
@@ -135,8 +137,8 @@ class RegistroEstudiantes:
             cursor.execute('''
                            SELECT ip.*, e.*
                            FROM informacion_personal ip
-                           JOIN estudiantes e ON ip.id= e.persona_id
-                           WHERE ip.tipo='estudiante'
+                           JOIN docentes e ON ip.id= e.persona_id
+                           WHERE ip.tipo='docente'
                            LIMIT 10
                            OFFSET ?
                            ''',(registro_inicio,))
@@ -246,74 +248,73 @@ class RegistroEstudiantes:
             
            
         except Exception as e:
-             print(f"Error al realizar la consulta: {e}") 
-             return False
-        finally:
-            con.close()
-    
-    def buscar_estudiante(self, tipo_documento, nro_documento):
-        try:
-            con = sql.connect(self.db_ruta)
-            cursor = con.cursor()
-
-            # Buscar estudiante
-            cursor.execute('''
-                SELECT ip.*, e.*
-                FROM informacion_personal ip
-                JOIN estudiantes e ON ip.id= e.persona_id
-                WHERE ip.tipo='estudiante' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
-                LIMIT 1
-            ''', (tipo_documento, nro_documento))
-            resultado = cursor.fetchone()
-            if not resultado:
-                con.close()
-                return None  # No encontrado
-
-            nombres_columnas = [desc[0] for desc in cursor.description]
-            estudiante = dict(zip(nombres_columnas, resultado))
-            persona_id = estudiante['id']
-
-            # Telefonos del estudiante
-            cursor.execute('''
-                SELECT tipo_telefono, numero, principal FROM telefonos
-                WHERE persona_id = ?
-            ''', (persona_id,))
-            telefonos = cursor.fetchall()
-            estudiante['telefonos'] = [(tipo_telefono, numero, principal) for tipo_telefono, numero, principal in telefonos]
-
-            # Direccion del estudiante
-            cursor.execute('''
-                SELECT estado, municipio, parroquia, sector, calle, casa_edificio, tipo_direccion
-                FROM direcciones
-                WHERE persona_id = ? AND principal=1
-                LIMIT 1
-            ''', (persona_id,))
-            dir_row = cursor.fetchone()
-            if dir_row:
-                estudiante['estado'] = dir_row[0]
-                estudiante['municipio'] = dir_row[1]
-                estudiante['parroquia'] = dir_row[2]
-                estudiante['sector'] = dir_row[3]
-                estudiante['calle'] = dir_row[4]
-                estudiante['casa_apart'] = dir_row[5]
-                estudiante['tipo_direccion'] = dir_row[6]
-            else:
-                estudiante['estado'] = ''
-                estudiante['municipio'] = ''
-                estudiante['parroquia'] = ''
-                estudiante['sector'] = ''
-                estudiante['calle'] = ''
-                estudiante['casa_apart'] = ''
-                estudiante['tipo_direccion'] = ''
-
-            con.close()
-            return estudiante
-
-        except Exception as e:
-            print(f"Error al realizar la consulta: {e}")
+            print(f"Error al realizar la consulta: {e}") 
             return False
-        finally:
-            con.close()
+       
+    
+    # def buscar_estudiante(self, tipo_documento, nro_documento):
+    #     try:
+    #         con = sql.connect(self.db_ruta)
+    #         cursor = con.cursor()
+
+    #         # Buscar estudiante
+    #         cursor.execute('''
+    #             SELECT ip.*, e.*
+    #             FROM informacion_personal ip
+    #             JOIN estudiantes e ON ip.id= e.persona_id
+    #             WHERE ip.tipo='estudiante' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
+    #             LIMIT 1
+    #         ''', (tipo_documento, nro_documento))
+    #         resultado = cursor.fetchone()
+    #         if not resultado:
+    #             con.close()
+    #             return None  # No encontrado
+
+    #         nombres_columnas = [desc[0] for desc in cursor.description]
+    #         estudiante = dict(zip(nombres_columnas, resultado))
+    #         persona_id = estudiante['id']
+
+    #         # Telefonos del estudiante
+    #         cursor.execute('''
+    #             SELECT tipo_telefono, numero, principal FROM telefonos
+    #             WHERE persona_id = ?
+    #         ''', (persona_id,))
+    #         telefonos = cursor.fetchall()
+    #         estudiante['telefonos'] = [(tipo_telefono, numero, principal) for tipo_telefono, numero, principal in telefonos]
+
+    #         # Direccion del estudiante
+    #         cursor.execute('''
+    #             SELECT estado, municipio, parroquia, sector, calle, casa_edificio, tipo_direccion
+    #             FROM direcciones
+    #             WHERE persona_id = ? AND principal=1
+    #             LIMIT 1
+    #         ''', (persona_id,))
+    #         dir_row = cursor.fetchone()
+    #         if dir_row:
+    #             estudiante['estado'] = dir_row[0]
+    #             estudiante['municipio'] = dir_row[1]
+    #             estudiante['parroquia'] = dir_row[2]
+    #             estudiante['sector'] = dir_row[3]
+    #             estudiante['calle'] = dir_row[4]
+    #             estudiante['casa_apart'] = dir_row[5]
+    #             estudiante['tipo_direccion'] = dir_row[6]
+    #         else:
+    #             estudiante['estado'] = ''
+    #             estudiante['municipio'] = ''
+    #             estudiante['parroquia'] = ''
+    #             estudiante['sector'] = ''
+    #             estudiante['calle'] = ''
+    #             estudiante['casa_apart'] = ''
+    #             estudiante['tipo_direccion'] = ''
+
+    #         con.close()
+    #         return estudiante
+
+    #     except Exception as e:
+    #         print(f"Error al realizar la consulta: {e}")
+    #         return False
+    #     finally:
+    #         con.close()
 
     def obtener_id_ultimo(self):
         try:
@@ -322,7 +323,7 @@ class RegistroEstudiantes:
 
             cursor.execute('''
                             SELECT id FROM informacion_personal 
-                            WHERE tipo = 'estudiante'
+                            WHERE tipo = 'docente'
                             ''')
             resultado = cursor.fetchall()
             con.close()
@@ -341,7 +342,7 @@ class RegistroEstudiantes:
             cursor = con.cursor()
             cursor.execute('''
                             SELECT id FROM informacion_personal
-                            WHERE tipo = 'estudiante'
+                            WHERE tipo = 'docente'
                             ORDER BY id ASC
                             LIMIT 1;
                             ''')
@@ -358,13 +359,13 @@ class RegistroEstudiantes:
         finally:
             con.close()
             
-    def obtener_cantidad_estudiantes(self):
+    def obtener_cantidad_docente(self):
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
             cursor.execute('''
                             SELECT COUNT(*) FROM informacion_personal
-                            WHERE tipo = 'estudiante'
+                            WHERE tipo = 'docente'
                             ''')
             resultado = cursor.fetchone()
             con.close()
@@ -376,105 +377,105 @@ class RegistroEstudiantes:
             con.close()
         
 
-    def update_estudiante(self, id, datos_estudiantes):
-        try:
-            con = sql.connect(self.db_ruta)
-            cursor = con.cursor()
+    # def update_estudiante(self, id, datos_docentes):
+    #     try:
+    #         con = sql.connect(self.db_ruta)
+    #         cursor = con.cursor()
 
-            # Actualizar datos en la tabla de informacion_personal
-            cursor.execute('''
-                           UPDATE informacion_personal
-                           SET documento_identidad = ?, tipo_documento = ?, nombres = ?, apellidos = ?, fecha_nacimiento = ?, sexo = ?, estado_civil = ?, nacionalidad = ?, lugar_nacimiento = ?, correo_electronico = ?
-                           WHERE id = ?
-                           ''',(
-                               datos_estudiantes['nro_documento'],
-                               datos_estudiantes['tipo_documento'],
-                               datos_estudiantes['nombre'],
-                               datos_estudiantes['apellido'],
-                               datos_estudiantes['f_nacimiento'],
-                               datos_estudiantes['genero'],
-                               datos_estudiantes['edo_civil'],
-                               datos_estudiantes['nacionalidad'],
-                               datos_estudiantes['lugar_nacimiento'],
-                               datos_estudiantes['correo_electronico'],
-                               id
-                           ))
+    #         # Actualizar datos en la tabla de informacion_personal
+    #         cursor.execute('''
+    #                        UPDATE informacion_personal
+    #                        SET documento_identidad = ?, tipo_documento = ?, nombres = ?, apellidos = ?, fecha_nacimiento = ?, sexo = ?, estado_civil = ?, nacionalidad = ?, lugar_nacimiento = ?, correo_electronico = ?
+    #                        WHERE id = ?
+    #                        ''',(
+    #                            datos_docentes['nro_documento'],
+    #                            datos_docentes['tipo_documento'],
+    #                            datos_docentes['nombre'],
+    #                            datos_docentes['apellido'],
+    #                            datos_docentes['f_nacimiento'],
+    #                            datos_docentes['genero'],
+    #                            datos_docentes['edo_civil'],
+    #                            datos_docentes['nacionalidad'],
+    #                            datos_docentes['lugar_nacimiento'],
+    #                            datos_docentes['correo_electronico'],
+    #                            id
+    #                        ))
 
-            # Actualizar datos en la tabla estudiantes
-            cursor.execute('''
-                           UPDATE estudiantes
-                           SET codigo_unico = ?, institucion_procedencia = ?, mencion_bachiller = ?, fecha_grado_bachiller = ?, fecha_ingreso = ?, condicion = ?
-                           WHERE persona_id = ?
-                           ''', (
-                            datos_estudiantes['codigo_sni'],
-                            datos_estudiantes['institucion'],
-                            datos_estudiantes['titulo_obtenido'],
-                            datos_estudiantes['f_grado'],
-                            datos_estudiantes['f_ingreso'],
-                            datos_estudiantes['condicion'],
-                            id
-                           ))
+    #         # Actualizar datos en la tabla estudiantes
+    #         cursor.execute('''
+    #                        UPDATE estudiantes
+    #                        SET codigo_unico = ?, institucion_procedencia = ?, mencion_bachiller = ?, fecha_grado_bachiller = ?, fecha_ingreso = ?, condicion = ?
+    #                        WHERE persona_id = ?
+    #                        ''', (
+    #                         datos_docentes['codigo_sni'],
+    #                         datos_docentes['institucion'],
+    #                         datos_docentes['titulo_obtenido'],
+    #                         datos_docentes['f_grado'],
+    #                         datos_docentes['f_ingreso'],
+    #                         datos_docentes['condicion'],
+    #                         id
+    #                        ))
             
-            # Actualizar telefonos
-            # cursor.execute('''
-            #                 UPDATE telefonos
-            #                 SET tipo_telefono = ?, numero = ?
-            #                 WHERE persona_id = ? AND principal=1
-            #                 ''',(
-            #                     datos_estudiantes['tipo_telefono_p'],
-            #                     datos_estudiantes['telefono_principal'],
-            #                     id
-            #                 ))
+    #         # Actualizar telefonos
+    #         # cursor.execute('''
+    #         #                 UPDATE telefonos
+    #         #                 SET tipo_telefono = ?, numero = ?
+    #         #                 WHERE persona_id = ? AND principal=1
+    #         #                 ''',(
+    #         #                     datos_docentes['tipo_telefono_p'],
+    #         #                     datos_docentes['telefono_principal'],
+    #         #                     id
+    #         #                 ))
             
-            # cursor.execute('''
-            #                 UPDATE telefonos
-            #                 SET tipo_telefono = ?, numero = ?
-            #                 WHERE persona_id = ? AND principal=0
-            #                 ''',(
-            #                     datos_estudiantes['tipo_telefono_s'],
-            #                     datos_estudiantes['telefono_secundario'],
-            #                     id
-            #                 ))
+    #         # cursor.execute('''
+    #         #                 UPDATE telefonos
+    #         #                 SET tipo_telefono = ?, numero = ?
+    #         #                 WHERE persona_id = ? AND principal=0
+    #         #                 ''',(
+    #         #                     datos_docentes['tipo_telefono_s'],
+    #         #                     datos_docentes['telefono_secundario'],
+    #         #                     id
+    #         #                 ))
 
-            # Actualizar telefonos: eliminar los existentes y volver a insertar los nuevos
-            cursor.execute('DELETE FROM telefonos WHERE persona_id = ?', (id,))
-            telefonos = datos_estudiantes.get('lista_telefonos', [])
-            for idx, (tipo, numero) in enumerate(telefonos):
-                cursor.execute('''
-                    INSERT INTO telefonos (persona_id, tipo_telefono, numero, principal)
-                    VALUES (?, ?, ?, ?)
-                ''', (
-                    id,
-                    tipo,
-                    numero,
-                    1 if idx == 0 else 0  # El primero es principal, los demás secundarios
-                ))
+    #         # Actualizar telefonos: eliminar los existentes y volver a insertar los nuevos
+    #         cursor.execute('DELETE FROM telefonos WHERE persona_id = ?', (id,))
+    #         telefonos = datos_docentes.get('lista_telefonos', [])
+    #         for idx, (tipo, numero) in enumerate(telefonos):
+    #             cursor.execute('''
+    #                 INSERT INTO telefonos (persona_id, tipo_telefono, numero, principal)
+    #                 VALUES (?, ?, ?, ?)
+    #             ''', (
+    #                 id,
+    #                 tipo,
+    #                 numero,
+    #                 1 if idx == 0 else 0  # El primero es principal, los demás secundarios
+    #             ))
 
             
-            # Actualizar direcciones
-            cursor.execute('''
-                           UPDATE direcciones
-                           SET estado=?, municipio=?, parroquia=?, sector=?, calle=?, casa_edificio=?, direccion_completa=?, tipo_direccion=?
-                            WHERE persona_id = ? AND principal=1
-                            ''',(
-                                 datos_estudiantes['estado'],
-                                 datos_estudiantes['municipio'],
-                                 datos_estudiantes['parroquia'],
-                                 datos_estudiantes['sector'],
-                                 datos_estudiantes['calle'],
-                                 datos_estudiantes['casa_apart'],
-                                 f"{datos_estudiantes['estado']}, {datos_estudiantes['municipio']}, {datos_estudiantes['parroquia']},{datos_estudiantes['sector']},{datos_estudiantes['calle']},{datos_estudiantes['casa_apart']}",
-                                 datos_estudiantes['tipo_direccion'],
-                                 id
-                            ))
-            con.commit()
-            con.close()
-            return True
-        except Exception as e:
-            print(f"Error al actualizar estudiante: {e}") 
-            return False
-        finally:
-            con.close()
+    #         # Actualizar direcciones
+    #         cursor.execute('''
+    #                        UPDATE direcciones
+    #                        SET estado=?, municipio=?, parroquia=?, sector=?, calle=?, casa_edificio=?, direccion_completa=?, tipo_direccion=?
+    #                         WHERE persona_id = ? AND principal=1
+    #                         ''',(
+    #                              datos_docentes['estado'],
+    #                              datos_docentes['municipio'],
+    #                              datos_docentes['parroquia'],
+    #                              datos_docentes['sector'],
+    #                              datos_docentes['calle'],
+    #                              datos_docentes['casa_apart'],
+    #                              f"{datos_docentes['estado']}, {datos_docentes['municipio']}, {datos_docentes['parroquia']},{datos_docentes['sector']},{datos_docentes['calle']},{datos_docentes['casa_apart']}",
+    #                              datos_docentes['tipo_direccion'],
+    #                              id
+    #                         ))
+    #         con.commit()
+    #         con.close()
+    #         return True
+    #     except Exception as e:
+    #         print(f"Error al actualizar estudiante: {e}") 
+    #         return False
+    #     finally:
+    #         con.close()
                            
                            
     # def obtener_campo(self, table, columna, value):
@@ -495,4 +496,6 @@ class RegistroEstudiantes:
     #         print(f"Error en la consulta {table}: {e}") 
     #         return False
         
-            
+              
+test = ModeloDocente()
+pprint(test.lista_Docentes())

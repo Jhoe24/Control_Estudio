@@ -62,9 +62,9 @@ class DatosPersonalesFrame(SectionFrameBase):
 
         # --- Fila para fecha de nacimiento, lugar de nacimiento y fecha de ingreso ---
         self._crear_fila_widgets([
-            ("F. Nacimiento:", crear_entry, {"width":120, "placeholder_text":"dd/mm/aaaa"}, 1, self, 'fnac_entry'),
+            ("F. Nacimiento:", crear_entry, {"width":120, "placeholder_text":"dd-mm-aaaa"}, 1, self, 'fnac_entry'),
             ("Lugar Nacimiento:", crear_entry, {"width":300}, 1, self, 'lugar_nac_entry'),
-            ("F. Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd/mm/aaaa"}, 1, self, 'fingreso_entry')
+            ("F. Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd-mm-aaaa"}, 1, self, 'fingreso_entry')
         ])
 
         # --- Fila para correo electronico ---

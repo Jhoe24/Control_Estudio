@@ -4,13 +4,14 @@ from datetime import datetime
 from util.mensaje import CustomMessageBox
 
 from controllers.estudiante_controller import EstudianteController
+from controllers.docente_controller import DocenteController
 
 class ControladorMaster:
     def __init__(self, master):
         self.modelo = ModeloMaster()
         self.master = master
         
-        
+        self.docente = DocenteController()
         self.estudiantes = EstudianteController()
         
     

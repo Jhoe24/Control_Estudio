@@ -1,63 +1,30 @@
 
 import tkinter.messagebox as messagebox
 
-from models.RegistroEstudiantes import RegistroEstudiantes
+from models.modeloDocente import ModeloDocente
 
-class EstudianteController:
+class DocenteController:
     def __init__(self):
-        self.modelo = RegistroEstudiantes()
+        self.modelo_docente = ModeloDocente()
 
-    def procesar_guardado_estudiante(self, datos_estudiante, vista_formulario):
-        """
-        Procesa la solicitud de guardar (crear o actualizar) un estudiante.
-        Este método será llamado desde FormularioEstudianteView.
-
-        Args:
-            datos_estudiante (dict): Un diccionario con todos los datos del formulario.
-            vista_formulario (FormularioEstudianteView): La instancia de la vista del formulario,
-                                                        para poder interactuar con ella (ej. mostrar errores específicos).
-        """
-    
-        # registrar estudiantes en la base de datos
-        # funcion de procesar_guardado_de_datos
-        exito = self.modelo.registrar_estudiante(datos_estudiante)
+    def registrar_docente(self, dic_docentes, vista_formulario):
         
-        if exito:
-            messagebox.showinfo("Info", "Exito al registrar al nuevo estudiante")
-            return True
+        resultado = self.modelo_docente.registrar_docente(dic_docentes)
+        if resultado:
+            messagebox.showinfo("Registro Exitoso", "El docente ha sido registrado exitosamente.", parent=vista_formulario)
+            self.limpiar_formulario_completo(vista_formulario)
         else:
-            messagebox.showerror("Error", "Hubo un error al registrar el estudiante.", parent=vista_formulario)
-            return False
-        print(datos_estudiante)
+            messagebox.showerror("Error de Registro", "No se pudo registrar el docente. Por favor, intente nuevamente.", parent=vista_formulario)
 
-    def cargar_estudiante_para_edicion(self, id_estudiante, dic_estudiante, vista_formulario):
-        existo = self.modelo.update_estudiante(id_estudiante, dic_estudiante)
-        if existo:
-            messagebox.showinfo("Info", "Exito al actualizar los datos del estudiante")
-            return True
-        else:
-            messagebox.showerror("Error", "Hubo un error al actualizar los datos del estudiante.", parent=vista_formulario)
-            return False
-
-    def obtener_lista_estudiantes(self,desde):
-        #Obtener 10 registro de estudiantes
+    def obtener_lista_docentes(self,desde=0):
+        #Obtener 10 registro de docentes
         nmin = 0
-        nmax = self.modelo.obtener_id_ultimo()
+        nmax = self.modelo_docente.obtener_id_ultimo()
         if desde < nmin : desde = nmin
         if desde > (nmax) : desde = nmax-1
-        resultado = self.modelo.lista_Estudiantes(desde)
+        resultado = self.modelo_docente.lista_Docentes(desde)
+        print(resultado)
         return resultado
-
-    def buscar_estudiante(self, tipo_doc, nro_doc):
-        
-        registro = self.modelo.buscar_estudiante(tipo_doc, nro_doc)
-
-        if registro:
-            return registro
-        else:
-            messagebox.showerror("Error", "No se encontró el estudiante con los datos proporcionados.")
-            return None
-
 
     def _solo_numeros(self, char_input):
         return char_input.isdigit()
@@ -155,19 +122,20 @@ class EstudianteController:
             "lugar_nacimiento": vista_formulario.datos_personales_frame.lugar_nac_entry.get(),
             "f_ingreso": vista_formulario.datos_personales_frame.fingreso_entry.get(),
             "correo_electronico": vista_formulario.datos_personales_frame.correo_electronico_entry.get(),
-            # "tipo_telefono_p": telefonos[0]["tipo"] if len(telefonos) > 0 else "",
-            # "telefono_principal": telefonos[0]["numero"] if len(telefonos) > 0 else "",
-            # "tipo_telefono_s": telefonos[1]["tipo"] if len(telefonos) > 1 else "",
-            # "telefono_secundario": telefonos[1]["numero"] if len(telefonos) > 1 else "",
             "lista_telefonos": telefonos,
-            "condicion": vista_formulario.informacion_academica_frame.condicion_menu.get(),
-            "tipo_institucion": vista_formulario.informacion_academica_frame.tipo_inst_menu.get(),
-            "institucion": vista_formulario.informacion_academica_frame.institucion_entry.get(),
-            "titulo_obtenido": vista_formulario.informacion_academica_frame.titulo_entry.get(),
-            "promedio_bachiller": vista_formulario.informacion_academica_frame.promedio_entry.get(),
-            "f_grado": vista_formulario.informacion_academica_frame.fgrado_entry.get(),
-            "codigo_sni": vista_formulario.sistema_ingreso_frame.codigo_entry.get(),
-            "anio_sni": vista_formulario.sistema_ingreso_frame.anio_entry.get(),
+            
+            #Datos del docente
+
+            "abreviatura_titulo": vista_formulario.datos_docente_frame.abreviatura_menu.get(),
+            "especialidad": vista_formulario.datos_docente_frame.especialidad_entry.get(),
+            "fecha_ingreso": vista_formulario.datos_docente_frame.fecha_ingreso_entry.get(), #comentarle de esto a andy
+            "tipo_contrato": vista_formulario.datos_docente_frame.tipo_contrato_menu.get(),
+            "categoria": vista_formulario.datos_docente_frame.categoria_entry.get(),
+            "auxiliar": vista_formulario.datos_docente_frame.auxiliar_menu.get(),
+            "dedicacion": vista_formulario.datos_docente_frame.dedicacion_menu.get(),
+            "estado_doc": vista_formulario.datos_docente_frame.estado_doc_menu.get(),  
+            
+
             "estado": vista_formulario.datos_ubicacion_frame.estado_entry.get(),
             "municipio": vista_formulario.datos_ubicacion_frame.municipio_entry.get(),
             "parroquia": vista_formulario.datos_ubicacion_frame.parroquia_entry.get(),
@@ -187,12 +155,9 @@ class EstudianteController:
             vista_formulario.datos_personales_frame.lugar_nac_entry,
             vista_formulario.datos_personales_frame.fingreso_entry,
             vista_formulario.datos_personales_frame.correo_electronico_entry,
-            vista_formulario.informacion_academica_frame.institucion_entry,
-            vista_formulario.informacion_academica_frame.titulo_entry,
-            vista_formulario.informacion_academica_frame.fgrado_entry,
-            vista_formulario.informacion_academica_frame.promedio_entry,
-            vista_formulario.sistema_ingreso_frame.codigo_entry,
-            vista_formulario.sistema_ingreso_frame.anio_entry,
+            vista_formulario.datos_docente_frame.especialidad_entry,
+            vista_formulario.datos_docente_frame.fecha_ingreso_entry, #comentarle de esto a andy
+            vista_formulario.datos_docente_frame.categoria_entry,
             vista_formulario.datos_ubicacion_frame.estado_entry,
             vista_formulario.datos_ubicacion_frame.municipio_entry,
             vista_formulario.datos_ubicacion_frame.parroquia_entry,
@@ -204,8 +169,11 @@ class EstudianteController:
             vista_formulario.datos_personales_frame.genero_menu: "M",
             vista_formulario.datos_personales_frame.edo_civil_menu: "Soltero",
             vista_formulario.datos_personales_frame.nacionalidad_menu: "Venezolano",
-            vista_formulario.informacion_academica_frame.tipo_inst_menu: "Pública",
-            vista_formulario.informacion_academica_frame.condicion_menu: "Regular",
+            vista_formulario.datos_docente_frame.abreviatura_menu: "Prof.",
+            vista_formulario.datos_docente_frame.tipo_contrato_menu: "Fijo",
+            vista_formulario.datos_docente_frame.auxiliar_menu: "Si",
+            vista_formulario.datos_docente_frame.dedicacion_menu: "Exclusiva",
+            vista_formulario.datos_docente_frame.estado_doc_menu: "Activo",
             vista_formulario.datos_ubicacion_frame.tipo_direccion_menu: "residencia",
         }
 

@@ -18,15 +18,16 @@ class FrameDocente(SectionFrameBase):
         self.vcmd_num = vcmd_num
         self.vcmd_fecha = vcmd_fecha
         self.var_abre_titulo = ctk.StringVar(value='Prof.')  # Valor por defecto para la abreviatura del título
-        
+        self.var_tipo_contrato = ctk.StringVar(value='Tiempo completo')  # Valor por defecto para el tipo de contrato
+        self.var_dedicacion = ctk.StringVar(value='Exclusiva')  # Valor por defecto para la dedicación
         self._crear_fila_widgets([
             ("Abreviatura de Título:", crear_option_menu, {"values":["Prof.", "Ing.", "Lic.", "Abog.", "TSU.", "Otros"],'variable': self.var_abre_titulo,"command": lambda v: setattr(self.abreviatura_menu, '_current_value',v)}, 1, self, 'abreviatura_menu'),
             ("Especialidad:", crear_entry, {"width":220}, 1, self, 'especialidad_entry')
         ])
         #("Cédula:", crear_entry, {"width":220, "validate":"key", "validatecommand":(vcmd_num, '%P')}, 1, self, 'cedula_entry')
         self._crear_fila_widgets([
-            ("Fecha Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd/mm/aaaa"}, 1, self, 'fecha_ingreso_entry'),
-            ("Tipo de Contrato:", crear_option_menu, {"values":["Fijo", "Indefinido", "Otro"], "command": lambda v: setattr(self.tipo_contrato_menu, '_current_value',v)}, 1, self, 'tipo_contrato_menu')
+            ("Fecha Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd-mm-aaaa"}, 1, self, 'fecha_ingreso_entry'),
+            ("Tipo de Contrato:", crear_option_menu, {"values":["Tiempo completo","Medio tiempo", "Por horas", "Contratado"],"variable": self.var_tipo_contrato, "command": lambda v: setattr(self.tipo_contrato_menu, '_current_value',v)}, 1, self, 'tipo_contrato_menu')
         ])
 
         self._crear_fila_widgets([
@@ -35,7 +36,7 @@ class FrameDocente(SectionFrameBase):
         ])
 
         self._crear_fila_widgets([
-            ("Dedicación:", crear_option_menu, {"values":["Tiempo Completo", "Medio Tiempo", "Por Horas"], "command": lambda v: setattr(self.dedicacion_menu, '_current_value',v)}, 1, self, 'dedicacion_menu'),
+            ("Dedicación:", crear_option_menu, {"values":["Exclusiva", "Tiempo completo", "Medio tiempo", "Tiempo convencional"],"variable": self.var_dedicacion,"command": lambda v: setattr(self.dedicacion_menu, '_current_value',v)}, 1, self, 'dedicacion_menu'),
             ("Estado:", crear_option_menu, {"values":["Activo", "Inactivo", "Suspendido", "Renunciado", "Jubilado"], "command": lambda v: setattr(self.estado_doc_menu, '_current_value',v)}, 1, self, 'estado_doc_menu')
         ])
 
