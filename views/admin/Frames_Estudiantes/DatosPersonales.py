@@ -28,9 +28,6 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.radio_pasaporte = crear_radio_button(radio_button_container, text="Pasaporte", variable=self.tipo_documento_var, value="pasaporte", command=self._actualizar_estado_nro_doc)
         self.radio_pasaporte.pack(side="left", padx=(0, 5), pady=0)
 
-        self.radio_sindoc = crear_radio_button(radio_button_container, text="Sin Doc.", variable=self.tipo_documento_var, value="sin documento", command=self._actualizar_estado_nro_doc)
-        self.radio_sindoc.pack(side="left", padx=(0, 0), pady=0)
-
         self.label_nro_doc = ctk.CTkLabel(self.frame_tipo_numero_doc, text="Nro. Cédula:", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL, anchor="w")
         self.label_nro_doc.grid(row=0, column=2, sticky="w", padx=PADX_LABEL)
 
@@ -155,13 +152,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         elif tipo_doc == "Pasaporte":
             self.label_nro_doc.configure(text="Nro. Pasaporte:")
             self.nro_documento_entry.configure(state="normal", placeholder_text="Ingrese pasaporte")
-        elif tipo_doc == "Sin Documento":
-            self.label_nro_doc.configure(text="") # Ocultar o vaciar label
-            self.nro_documento_entry.delete(0, 'end')
-            self.nro_documento_entry.configure(state="normal", placeholder_text="")
-        else: # Estado por defecto o inesperado
-            self.label_nro_doc.configure(text="Número:")
-            self.nro_documento_entry.configure(state="normal", placeholder_text="")
+        
 
     def _crear_fila_widgets(self, widgets_info_list_of_tuples):
         for widgets_info_tuple in widgets_info_list_of_tuples:
@@ -199,7 +190,6 @@ class DatosPersonalesFrame(SectionFrameBase):
         tipo_doc = estudiante.get("tipo_documento", "Cédula")
         self.radio_cedula.configure(state="disabled")
         self.radio_pasaporte.configure(state="disabled")
-        self.radio_sindoc.configure(state="disabled")
         
         self.nro_documento_entry.configure(state="normal")
         self.nro_documento_entry.delete(0, 'end')

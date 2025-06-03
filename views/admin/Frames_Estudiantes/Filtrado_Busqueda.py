@@ -2,9 +2,7 @@ import customtkinter as ctk
 from util.widget_utils import *
 from views.layouts.SectionFrameBase import SectionFrameBase
 
-
-
-
+# Clase para el filtrado y búsqueda de estudiantes
 class FiltradoBusquedaFrame(SectionFrameBase):
     def __init__(self, master,controlador ,vcmd_num):
         super().__init__(master, header_text="Filtrado y Búsqueda")
@@ -23,9 +21,6 @@ class FiltradoBusquedaFrame(SectionFrameBase):
 
         self.radio_pasaporte = crear_radio_button(radio_button_container, text="Pasaporte", variable=self.tipo_documento_var, value="pasaporte")
         self.radio_pasaporte.pack(side="left", padx=(0, 5), pady=0)
-
-        self.radio_sindoc = crear_radio_button(radio_button_container, text="Sin Doc.", variable=self.tipo_documento_var, value="sin documento")
-        self.radio_sindoc.pack(side="left", padx=(0, 0), pady=0)
     
         self.nro_documento_entry = crear_entry(self.frame_tipo_numero_doc, width=120, validate="key", validatecommand=(self.vcmd_num, "%S"))
         self.nro_documento_entry.grid(row=0, column=3, sticky="ew", padx=PADX_ENTRY)

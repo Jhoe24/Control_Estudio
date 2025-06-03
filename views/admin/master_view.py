@@ -32,6 +32,8 @@ class VistaMaster(AdminBase):
         # Muestra la vista deseada
         vista = self.vistas.get(nombre)
         if vista:
+            if nombre == "list_docente":
+                vista.docente = self.controlador.master_controlador.docente.obtener_lista_docentes(0)
             vista.pack(fill="both", expand=True, padx=10, pady=10)
 
     def crear_contenido_especifico(self):

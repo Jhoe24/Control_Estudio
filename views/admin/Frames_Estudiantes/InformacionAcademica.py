@@ -13,7 +13,7 @@ class InformacionAcademicaFrame(SectionFrameBase):
         ])
         self._crear_fila_widgets([
             ("Institución:", crear_entry, {"width":300}, 1, self, 'institucion_entry'),
-            ("Fecha Grado:", crear_entry, {"width":120, "validate":"key", "validatecommand":(vcmd_fecha, "%S"), "placeholder_text":"dd-mm-aaaa"}, 1, self, 'fgrado_entry'),
+            ("Fecha Grado:", crear_entry, {"width":120, "placeholder_text":"dd-mm-aaaa", "validate":"key", "validatecommand":(vcmd_fecha, "%S"), "placeholder_text":"dd-mm-aaaa"}, 1, self, 'fgrado_entry'),
             ("Promedio Bachillerato:", crear_entry, {
                 "width":120,
                 "validate":"key",

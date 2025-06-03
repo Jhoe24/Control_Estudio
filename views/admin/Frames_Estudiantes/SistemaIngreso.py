@@ -9,7 +9,7 @@ class SistemaIngresoFrame(SectionFrameBase):
         super().__init__(master, header_text="Sistema Nacional de Ingreso")
         self._crear_fila_widgets([
             ("Código:", crear_entry, {"width":150}, 1, self, 'codigo_entry'),
-            ("Año:", crear_entry, {"width":100, "validate":"key", "validatecommand":(vcmd_num, "%S"), "placeholder_text":"aaaa"}, 1, self, 'anio_entry')
+            ("Año:", crear_entry, {"width":100, "placeholder_text":"dd-mm-aaaa", "validate":"key", "validatecommand":(vcmd_num, "%S"), "placeholder_text":"aaaa"}, 1, self, 'anio_entry')
         ])
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 

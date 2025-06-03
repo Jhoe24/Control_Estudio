@@ -41,7 +41,7 @@ class ListDocenteView(ctk.CTkScrollableFrame):
         self.busqueda_frame.grid(row=0, column=0, columnspan=6, padx=15, pady=(10, 0), sticky="ew")
 
         # --- ENCABEZADOS (FILA 1) ---
-        headers = ["Tipo Doc.", "Número Doc.", "Nombres", "Apellidos", "Código SNI", "Acción"]
+        headers = ["Tipo Doc.", "Número Doc.", "Nombres", "Apellidos", "Teléfono", "Acción"]
         for col, header in enumerate(headers):
             celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)
             celda.grid(row=1, column=col, padx=1, pady=1, sticky="nsew")

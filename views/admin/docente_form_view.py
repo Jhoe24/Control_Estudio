@@ -98,6 +98,7 @@ class FormularioDocenteView(ctk.CTkScrollableFrame):
 
         # Instanciando los frames en la ventana emergente
         self.datos_personales_frame = DatosPersonalesFrame(contenedor_scroll, self.vcmd_num_val, self.vcmd_fecha_val)
+        self.datos_docente_frame = FrameDocente(contenedor_scroll, self.vcmd_num_val, self.vcmd_fecha_val)
         self.datos_ubicacion_frame = DatosUbicacionFrame(contenedor_scroll, self.vcmd_num_val)
 
         # Empacar para que se muestren
@@ -109,6 +110,7 @@ class FormularioDocenteView(ctk.CTkScrollableFrame):
         #   frame.set_datos(estudiante)
         #     frame.set_estado_campos(modo_lectura=True)
         self.datos_personales_frame.set_datos(docente)
+        self.datos_docente_frame.set_datos(docente)
         self.datos_ubicacion_frame.set_datos(docente)
 
         # Botones
@@ -130,16 +132,16 @@ class FormularioDocenteView(ctk.CTkScrollableFrame):
         # Cambia el estado de los botones y habilita la edición de los campos
         self.btn_actualizar.configure(state="normal")
         self.datos_personales_frame.habilitar_edicion()
+        self.datos_docente_frame.habilitar_edicion()
         self.datos_ubicacion_frame.habilitar_edicion()
     
     def update(self,id,ventana):
         # Obtener los datos de los frames para actualizarlos
         datos = self.controlador.master_controlador.docente.obtener_todos_los_datos(self)
-        # if self.controlador.master_controlador.docente.validar_campos_obligatorios(datos, self):
-        #     exito = self.controlador.master_controlador.estudiantes.cargar_estudiante_para_edicion(id,datos, self)
-        #     if exito:
-        #         #self.controlador.master_controlador.estudiantes.limpiar_formulario_completo(self)
-        #         ventana.destroy()
-        #     else:
-        #         pass
+        if self.controlador.master_controlador.docente.validar_campos_obligatorios(datos, self):
+            exito = self.controlador.master_controlador.docente.cargar_docente_edicion(id, datos, self)
+            if exito:
+                ventana.destroy()
+            else:
+                pass
     

@@ -15,7 +15,7 @@ class DocenteController:
             self.limpiar_formulario_completo(vista_formulario)
         else:
             messagebox.showerror("Error de Registro", "No se pudo registrar el docente. Por favor, intente nuevamente.", parent=vista_formulario)
-
+        print(dic_docentes)
     def obtener_lista_docentes(self,desde=0):
         #Obtener 10 registro de docentes
         nmin = 0
@@ -23,8 +23,19 @@ class DocenteController:
         if desde < nmin : desde = nmin
         if desde > (nmax) : desde = nmax-1
         resultado = self.modelo_docente.lista_Docentes(desde)
-        print(resultado)
+        # print(resultado)
         return resultado
+
+    def cargar_docente_edicion(self,id,datos,ventana):
+        resultado = self.modelo_docente.update_docente(id,datos)
+
+        if resultado:
+            messagebox.showinfo("Info", "Exito al actualizar los datos del docente")
+            return True
+        else:
+            messagebox.showerror("Error", "Hubo un error al actualizar los datos del docente.", parent=ventana)
+            return False
+        #print(f"id: {id} '/n Datos: {datos}")
 
     def _solo_numeros(self, char_input):
         return char_input.isdigit()
@@ -64,20 +75,6 @@ class DocenteController:
                 ("lugar_nacimiento", "Lugar de Nacimiento"),
                 ("f_ingreso", "Fecha de Ingreso"),
                 ("correo_electronico", "Correo Electrónico"),
-                #("telefono_principal", "Teléfono Principal"),
-                ("condicion", "Condición"),
-                #("institucion", "Institución"),
-                #("titulo_obtenido", "Título Obtenido"),
-                #("f_grado", "Fecha Grado"),
-                #("promedio_bachiller", "Promedio Bachillerato"),
-                #("codigo_sni", "Código SNI"),
-                #("anio_sni", "Año SNI"),
-                #("estado", "Estado"),
-                #("municipio", "Municipio"),
-                #("parroquia", "Parroquia"),
-                #("sector", "Sector"),
-                #("calle", "Calle"),
-                #("casa_apart", "Casa o Apartamento"),
                 
             ]   
 
@@ -170,7 +167,7 @@ class DocenteController:
             vista_formulario.datos_personales_frame.edo_civil_menu: "Soltero",
             vista_formulario.datos_personales_frame.nacionalidad_menu: "Venezolano",
             vista_formulario.datos_docente_frame.abreviatura_menu: "Prof.",
-            vista_formulario.datos_docente_frame.tipo_contrato_menu: "Fijo",
+            vista_formulario.datos_docente_frame.tipo_contrato_menu: "Tiempo completo",
             vista_formulario.datos_docente_frame.auxiliar_menu: "Si",
             vista_formulario.datos_docente_frame.dedicacion_menu: "Exclusiva",
             vista_formulario.datos_docente_frame.estado_doc_menu: "Activo",
@@ -187,11 +184,14 @@ class DocenteController:
         # Limpiar los campos de teléfono
         vista_formulario.datos_personales_frame.limpiar_telefonos()
 
-        vista_formulario.datos_personales_frame.tipo_documento_var.set("Cédula")
-        vista_formulario.datos_personales_frame._actualizar_estado_nro_doc()
+        #vista_formulario.datos_personales_frame.tipo_documento_var.set("Cédula")
+        #vista_formulario.datos_personales_frame._actualizar_estado_nro_doc()
 
-        if vista_formulario.datos_personales_frame.tipo_documento_var.get() != "Sin Documento":
-            vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
-        else:
-            if vista_formulario.datos_personales_frame.nombre_entry:
-                vista_formulario.datos_personales_frame.nombre_entry.focus_set()
+        # if vista_formulario.datos_personales_frame.tipo_documento_var.get() != "Sin Documento":
+        #     vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
+        #     vista_formulario.datos_personales_frame.nro_documento_entry.configure(state = "normal")
+        # else:
+        #     if vista_formulario.datos_personales_frame.nombre_entry:
+        #         vista_formulario.datos_personales_frame.nombre_entry.focus_set()
+        vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
+        vista_formulario.datos_personales_frame.nro_documento_entry.configure(state="normal")

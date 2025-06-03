@@ -219,11 +219,13 @@ class EstudianteController:
         # Limpiar los campos de teléfono
         vista_formulario.datos_personales_frame.limpiar_telefonos()
 
-        vista_formulario.datos_personales_frame.tipo_documento_var.set("Cédula")
-        vista_formulario.datos_personales_frame._actualizar_estado_nro_doc()
+        # vista_formulario.datos_personales_frame.tipo_documento_var.set("Cédula")
+        # vista_formulario.datos_personales_frame._actualizar_estado_nro_doc()
 
-        if vista_formulario.datos_personales_frame.tipo_documento_var.get() != "Sin Documento":
-            vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
-        else:
-            if vista_formulario.datos_personales_frame.nombre_entry:
-                vista_formulario.datos_personales_frame.nombre_entry.focus_set()
+        # if vista_formulario.datos_personales_frame.tipo_documento_var.get() != "Sin Documento":
+        #     vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
+        # else:
+        #     if vista_formulario.datos_personales_frame.nombre_entry:
+        #         vista_formulario.datos_personales_frame.nombre_entry.focus_set()
+        vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
+        vista_formulario.datos_personales_frame.nro_documento_entry.configure(state="normal")
