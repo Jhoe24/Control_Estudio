@@ -118,7 +118,7 @@ class FormularioDocenteView(ctk.CTkScrollableFrame):
         botones_frame.pack(pady=10)
 
         # Botón para actualizar datos
-        docente_id = docente['id']
+        docente_id = docente['persona_id']
         self.btn_actualizar = ctk.CTkButton(
             botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.update(docente_id,ventana)  # Cambia el comando aquí
         )
