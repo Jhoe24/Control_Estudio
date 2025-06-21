@@ -10,7 +10,6 @@ class UnidadCurricular(SectionFrameBase):
         super().__init__(master, "Unidad Curricular PNF", "Formulario de Unidades Curriculares PNF")
         self.vcmd_num = vcmd_num # Guardar para usar en números
         self.vcmd_fecha = vcmd_fecha # Guardar para usar en fechas
-        self
         
         ventana = ctk.CTkToplevel()
         ventana.title("Formulario de Unidades Curriculares PNF")
@@ -49,10 +48,46 @@ class UnidadCurricular(SectionFrameBase):
              {'validate': 'key', 'validatecommand': (self.vcmd_num, '%P')}),
             ("Tipo de U.C:", crear_option_menu, {"values": ["Obligatoria", "Electiva"], "width":300}, 1, self, 'tipo_menu'),
             ("Carácter:", crear_option_menu, {"values": ["Teórico", "Práctico", "Teórico-Práctico"], "width":300}, 1, self, 'caracter_menu'),
-            ("Modalidad de Evaluación:", crear_option_menu, {"values": ["Presencial", "Semi-presencial", "A distancia"], "width":300}, 1, self, 'modalidad_evaluacion_menu'),
-            ("Modalidad:", crear_combobox, {"values": ["Presencial", "Semi-presencial", "A distancia"], "width":300}, 1, self, 'modalidad_combobox'),
-            ("Nivel:", crear_combobox, {"values": ["Básico", "Intermedio", "Avanzado"], "width":300}, 1, self, 'nivel_combobox'),
+            ("Modalidad de Evaluación:", crear_option_menu, {"values": ["Presencial", "Semi-presencial", "A distancia"], "width":300}, 1, self, 'modalidad_menu'),
+            ("Complejidad:", crear_option_menu, {"values": ["Baja", "Media", "Alta"], "width":300}, 1, self, 'complejidad_menu'),
+            ("Prelaciones:", crear_entry, {"width": 300, "placeholder_text": "Ingrese prelaciones"}, 1, self, 'prelaciones_entry'),
         ])
+
+        # Fila para competencias y saberes
+        self._crear_fila_widgets([
+            ("Competencias Genéricas:", crear_entry, {"width": 300, "placeholder_text": "Ingrese competencias genéricas"}, 1, self, 'competencias_genericas_entry'),
+            ("Competencias Específicas:", crear_entry, {"width": 300, "placeholder_text": "Ingrese competencias específicas"}, 1, self, 'competencias_especificas_entry'),
+        ])
+        self._crear_fila_widgets([
+            ("Saberes Cognitivos:", crear_entry, {"width": 300, "placeholder_text": "Ingrese saberes cognitivos"}, 1, self, 'saberes_cognitivos_entry'),
+            ("Saberes Procedimentales:", crear_entry, {"width": 300, "placeholder_text": "Ingrese saberes procedimentales"}, 1, self, 'saberes_procedimentales_entry'),
+            ("Saberes Actitudinales:", crear_entry, {"width": 300, "placeholder_text": "Ingrese saberes actitudinales"}, 1, self, 'saberes_actitudinales_entry'),
+        ])
+
+        # Fila para estrategias, recursos y evaluación
+        self._crear_fila_widgets([
+            ("Estrategias de Enseñanza:", crear_entry, {"width": 300, "placeholder_text": "Ingrese estrategias de enseñanza"}, 1, self, 'estrategias_ensenanza_entry'),
+            ("Recursos Didácticos:", crear_entry, {"width": 300, "placeholder_text": "Ingrese recursos didácticos"}, 1, self, 'recursos_didacticos_entry'),
+            ("Evaluación:", crear_entry, {"width": 300, "placeholder_text": "Ingrese criterios de evaluación"}, 1, self, 'evaluacion_entry'),
+        ])
+
+        # Fila para bibliografía, homologación y clave especial
+        self._crear_fila_widgets([
+            ("Bibliografía:", crear_entry, {"width": 300, "placeholder_text": "Ingrese bibliografía"}, 1, self, 'bibliografia_entry'),
+            ("Homologación Clave:", crear_entry, {"width": 300, "placeholder_text": "Ingrese clave de homologación"}, 1, self, 'homologacion_clave_entry'),
+            ("Clave Especial:", crear_entry, {"width": 300, "placeholder_text": "Ingrese clave especial"}, 1, self, 'clave_especial_entry'),
+        ])
+
+        # Fila para estado y fechas
+        self._crear_fila_widgets([
+            ("Estado:", crear_option_menu, {"values": ["Activo", "Inactivo"], "width": 300}, 1, self, 'estado_menu'),
+            ("Fecha de Creación:", crear_entry, {"width": 300, "placeholder_text": "YYYY-MM-DD"}, 1, self, 'fecha_creacion_entry',
+             {'validate': 'key', 'validatecommand': (self.vcmd_fecha, '%P')}),
+            ("Fecha de Actualización:", crear_entry, {"width": 300, "placeholder_text": "YYYY-MM-DD"}, 1, self, 'fecha_actualizacion_entry',
+             {'validate': 'key', 'validatecommand': (self.vcmd_fecha, '%P')}),
+        ])
+
+        _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
         # Crear un contenedor scrollable para la ventana emergente
         contenedor_scroll = ctk.CTkScrollableFrame(ventana, fg_color=COLOR_FONDO_FORMULARIO)
