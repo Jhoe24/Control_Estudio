@@ -54,8 +54,8 @@ class MainWindow(ctk.CTk):
         # El servicio de usuario se inyecta en el controlador de autenticación, cuya funcion es manejar la lógica de autenticación y autorización de usuarios. 
         
         # Mostramos la vista de login al iniciar la aplicación
-        self.mostrar_vista_login()
-        #self.mostrar_vista_dashboardd("Master", "admin")  # Por defecto mostramos el dashboard de admin, pero esto se puede cambiar dependiendo del rol del usuario que inicie sesión.
+        #self.mostrar_vista_login()
+        self.mostrar_vista_dashboardd("Master", "admin")  # Por defecto mostramos el dashboard de admin, pero esto se puede cambiar dependiendo del rol del usuario que inicie sesión.
     
     def limpiar_vista_actual(self):
         if self.vista_actual:
@@ -81,8 +81,9 @@ class MainWindow(ctk.CTk):
         
         ancho_pantalla = self.winfo_screenwidth()  
         alto_pantalla = self.winfo_screenheight()
-        tamano_ventana = str(ancho_pantalla)+"x"+str(alto_pantalla)
+        tamano_ventana = (str(ancho_pantalla)+"x"+str(alto_pantalla))
         # Cambiamos el titulo de la ventana a Dashboard
+
         self.title(self.titulo + "  -  " + "Dashboard")
         
         # self.geometry(str(ancho_pantalla)+"x"+str(alto_pantalla))

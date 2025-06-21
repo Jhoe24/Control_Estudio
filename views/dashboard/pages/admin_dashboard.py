@@ -11,7 +11,7 @@ from views.dashboard.modules.tables.Estudiantes.ListarEstudiantes import ListEst
 
 from views.dashboard.modules.RegistrarDocentes import FormularioDocenteView
 from views.dashboard.modules.tables.Docentes.ListarDocentes import ListDocenteView
-from views.dashboard.modules.PNF import DatosPNFPensumFrame
+from views.dashboard.modules.PNF import FormularioPNFPensumView
 
 
 class AdminDashboardView(BaseDashboardView):
@@ -86,6 +86,6 @@ class AdminDashboardView(BaseDashboardView):
     def pnf(self):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
-        
-        pnf = DatosPNFPensumFrame(self.cuerpo_principal, None, None)
+
+        pnf = FormularioPNFPensumView(self.cuerpo_principal, self.controller['Docentes'])
         pnf.pack(fill="both", expand=True, padx=10, pady=10)

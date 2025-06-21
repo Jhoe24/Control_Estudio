@@ -12,7 +12,7 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         self.furmulario_estudiante = FormularioEstudianteView(master, controlador)
         self.master = master
         self.controlador = controlador
-        self.color_texto = "#222222"
+        
         self.filas_datos = []
         self.cantidad_estudiantes = self.controlador.modelo.obtener_cantidad_estudiantes()
         self.pagina_actual = 1
@@ -49,7 +49,7 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         for col, header in enumerate(headers):
             celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)
             celda.grid(row=1, column=col, padx=1, pady=1, sticky="nsew")
-            label = ctk.CTkLabel(celda, text=header, font=ctk.CTkFont(weight="bold"), text_color=self.color_texto)
+            label = ctk.CTkLabel(celda, text=header, font=ctk.CTkFont(weight="bold"), text_color=COLOR_TEXTO_PRINCIPAL)
             label.pack(padx=10, pady=5)
         for i in range(len(headers)):
             self.grid_columnconfigure(i, weight=1)
@@ -66,7 +66,7 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         self.frame_paginacion.grid_columnconfigure(4, weight=1) # Columna vacía a la derecha
 
         self.boton_anterior = ctk.CTkButton(self.frame_paginacion, text="Anterior", command=self.anterior_pagina)
-        self.label_pagina = ctk.CTkLabel(self.frame_paginacion, text=f"{self.pagina_actual} de {self.cantidad_total_paginas}", text_color=self.color_texto)
+        self.label_pagina = ctk.CTkLabel(self.frame_paginacion, text=f"{self.pagina_actual} de {self.cantidad_total_paginas}", text_color=COLOR_TEXTO_PRINCIPAL)
         self.boton_siguiente = ctk.CTkButton(self.frame_paginacion, text="Siguiente", command=self.siguiente_pagina)
         
         # Posicionar los botones y el label en las columnas centrales del frame de paginación
@@ -169,7 +169,7 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
             celda_btn.grid(row=i, column=5, padx=1, pady=1, sticky="nsew")
             boton = ctk.CTkButton(
                 celda_btn, text="Ver datos", width=100,
-                text_color=self.color_texto,
+                text_color=COLOR_ENTRY_BG,
                 command=lambda est=estudiante: self.furmulario_estudiante.ver_datos_completos(est)
             )
             boton.pack(padx=10, pady=5)
@@ -188,7 +188,7 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         """
         celda = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
         celda.grid(row=row, column=col, padx=1, pady=1, sticky="nsew")
-        label = ctk.CTkLabel(celda, text=texto, text_color=self.color_texto)
+        label = ctk.CTkLabel(celda, text=texto, text_color=COLOR_TEXTO_PRINCIPAL)
         label.pack(padx=10, pady=5)
         return celda
 

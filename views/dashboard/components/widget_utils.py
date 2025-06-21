@@ -1,3 +1,4 @@
+from tkcalendar import Calendar
 import customtkinter as ctk
 import tkinter as tk
 from tkcalendar import Calendar
@@ -41,3 +42,26 @@ def crear_check_box(master, **kwargs):
 
 def crear_radio_button(master, **kwargs):
     return ctk.CTkRadioButton(master, font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL, border_color=COLOR_ENTRY_BORDER, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, **kwargs)
+
+def seleccionar_fecha(ventana, x=0 ,y=0):
+    
+
+    fecha_dict = {'fecha': ''}
+    frame = ctk.CTkFrame(ventana, fg_color="transparent")
+    label = ctk.CTkLabel(frame, text="Selecciona una fecha", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
+    cal = Calendar(frame, locale='es_ES', date_pattern='yyyy-mm-dd')
+
+    def mostrar_fecha(date):
+        label.configure(text=f"Fecha seleccionada: {date}")
+
+    def guardar_fecha():
+        fecha_dict['fecha'] = cal.get_date()
+        frame.destroy()
+
+    frame.pack(anchor="e", pady=20, padx=20)
+    label.pack(pady=10)
+    cal.pack(pady=20)
+    cal.bind("<<CalendarSelected>>", lambda e: mostrar_fecha(cal.get_date()))
+    boton_guardar = ctk.CTkButton(frame, text="Guardar Fecha", command=guardar_fecha)
+    boton_guardar.pack(pady=10)
+    return fecha_dict['fecha']

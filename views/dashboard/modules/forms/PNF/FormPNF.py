@@ -11,8 +11,8 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.tipo_documento_var = ctk.StringVar(value="cedula") # Valor por defecto: Cédula
         self.vcmd_num = self.register(self.solo_numeros) 
         self.vcmd_fecha = vcmd_fecha # Guardar para usar en fechas
-        self.lista_telefonos = [] # Lista para guardar los teléfonos
-        
+       
+        self.fecha_resolucion = None  # Inicializar la variable fecha_resolucion
         # --- Fila para codigo del PNF ---
         self._crear_fila_widgets([
             ("Código:", crear_entry, {"width":300,"placeholder_text":"Ingrese código"}, 1, self, 'codigo_entry'),
@@ -54,35 +54,38 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.label_duracion_contenedor.pack(anchor="w", pady=(0, 5))
 
         # 3. Crear los entries dentro del mismo frame
+        self.var_cantidad_trayectos = ctk.StringVar(value="I")  # Valor por defecto para trayectos
+
         self.label_trayectos = ctk.CTkLabel(self.duracion_contenedor, text="Trayectos",text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 12, "bold"))
         self.label_trayectos.pack(side="left", padx=(0, 15))
-        self.duracion_trayectos_entry = crear_entry(
-            self.duracion_contenedor,
-            width=180,
-            placeholder_text="Duración Trayectos",
-            validate="key",
-            validatecommand=(self.vcmd_num, '%S')  # Validación para solo números
 
+        self.duracion_trayectos_entry = crear_option_menu(
+            self.duracion_contenedor,
+            width=40,
+            values=["I", "II", "III", "IV", "V"],
+            variable=self.var_cantidad_trayectos,
+            command=self.on_trayecto_selected
+            
         )
         self.duracion_trayectos_entry.pack(side="left", padx=(0, 10))
 
         self.label_semanas = ctk.CTkLabel(self.duracion_contenedor, text="Semanas", text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 12, "bold"))
         self.label_semanas.pack(side="left", padx=(0, 15))
 
-        self.duracion_semanas_entry = crear_entry(
+        self.duracion_semanas_entry = crear_option_menu(
             self.duracion_contenedor,
-            width=180,
-            placeholder_text="Duración Semanas",
-            validate="key",
-            validatecommand=(self.vcmd_num, '%S')  # Validación para solo números
+            width=40,
+            values=['12', '16', '20', '24', '28', '32', '36', '40', '44', '48'],
+            command=lambda v: setattr(self.duracion_semanas_entry, '_current_value', v)
         )
         self.duracion_semanas_entry.pack(side="left")
 
-        self.label_creditos = ctk.CTkLabel(self.duracion_contenedor, text="Créditos", text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 12, "bold"))
+        self.label_creditos = ctk.CTkLabel(self.duracion_contenedor, text=" Créditos", text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 12, "bold"))
         self.label_creditos.pack(side="left", padx=(0, 15))
+
         self.duracion_creditos_entry = crear_entry(
             self.duracion_contenedor,
-            width=180,
+            width=100,
             placeholder_text="Duración Créditos",
             validate="key",
             validatecommand=(self.vcmd_num, '%S')  # Validación para solo números
@@ -95,42 +98,116 @@ class DatosPNFPensumFrame(SectionFrameBase):
 
         self.duracion_horas_entry = crear_entry(
             self.duracion_contenedor,
-            width=180,
+            width=100,
             placeholder_text="Duración Horas",
             validate="key",
             validatecommand=(self.vcmd_num, '%S')  # Validación para solo números
         )
         self.duracion_horas_entry.pack(side="left")
 
-        self.modalidad_var = ctk.StringVar(value="Presencial")  # Valor por defecto: Presencial
-        
-        # --- Fila para modalidad del PNF ---
-        self._crear_fila_widgets([
-            ("Modalidad:", crear_option_menu, {
-                "values": ["Virtual", "Mixta"],
-                'variable': self.modalidad_var,
-                "command": lambda v: setattr(self.modalidad_menu, '_current_value', v)
-            }, 1, self, 'modalidad_menu')
-        ])
+       
         # --- Fila para datos del PNF ---
         self._crear_fila_widgets([
             ('Titulo a Otorgar:', crear_entry, {"width":300,"placeholder_text":"Ingrese titulo"}, 1, self, 'titulo_otorga_entry'),
             ("Perfil Egresado:", crear_entry, {"width":300,"placeholder_text":"Ingrese perfil del egresado"}, 1, self, 'perfil_egreso_entry'),
-            ("Campo Ocupacional:", crear_entry, {"width":300,"placeholder_text":"Ingrese campo ocupacional"}, 1, self, 'campo_ocupacional_entry'),
+            #("Campo Ocupacional:", crear_entry, {"width":300,"placeholder_text":"Ingrese campo ocupacional"}, 1, self, 'campo_ocupacional_entry'),
             ("Resolución - Creación:", crear_entry, {"width":300,"placeholder_text":"Ingrese resolución"}, 1, self, 'resolucion_entry'),
-            ("Fecha Resolución:", crear_entry, {"width":300, "placeholder_text": "dd-mm-aaaa", "validatecommand": (self.vcmd_fecha, '%S')}, 1, self, 'fecha_resolucion_entry'),
-            ('Fecha de Creación:', crear_entry, {"width":300, "placeholder_text": "dd-mm-aaaa", "validatecommand": (self.vcmd_fecha, '%S')}, 1, self, 'fecha_creacion_entry'),
-            ("Fecha de Actualización:", crear_entry, {"width":300, "placeholder_text": "dd-mm-aaaa", "validatecommand": (self.vcmd_fecha, '%S')}, 1, self, 'fecha_actualizacion_entry'),
         ])
+
+        self.registrar_fecha(self.set_fecha_resolucion,"Fecha Resolución")  # Registrar la fecha de resolución
+        #label para mostrar la fecha de resolución
+        self.fecha_resolucion_label = ctk.CTkLabel(self, text="Fecha de Resolución: No seleccionada", text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 14, "bold"))
+        self.fecha_resolucion_label.pack(pady=(10, 0), padx=10, anchor="w")
+        # Actualizar el label de fecha de resolución cuando se seleccione una fecha
+
         # --- Fila para datos del pensum ---
+
         self._crear_fila_widgets([
             ("Versión del Pensum:", crear_entry, {"width":300,"placeholder_text":"Ingrese versión"}, 1, self, 'version_pensum_entry'),
             ("Coordinador Nacional:", crear_entry, {"width":300,"placeholder_text":"Ingrese nombre del coordinador"}, 1, self, 'coordinador_nacional_entry'),
-            ("Estado:", crear_entry, {"width":300,"placeholder_text":"Ingrese estado"}, 1, self, 'estado_entry'),
+            ("Estado:", crear_option_menu, {"values":["Activo", "Inactivo"], "command": lambda v: setattr(self.estado_menu, '_current_value',v)}, 1, self, 'estado_menu')
         ])
+        
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
+
+    def registrar_fecha(self,callback,titulo_btn="Seleccionar Fecha"):
+       
+        def calendario():
+            top = ctk.CTkToplevel(self, fg_color="White")
+            top.title("Seleccionar Fecha")
+
+            # Tamaño deseado de la ventana emergente
+            ancho = 350
+            alto = 350
+
+            # Obtén el tamaño de la pantalla
+            top.update_idletasks()  # Asegura que winfo_screenwidth/height sean correctos
+            screen_width = top.winfo_screenwidth()
+            screen_height = top.winfo_screenheight()
+
+            # Calcula la posición centrada
+            x = (screen_width // 2) - (ancho // 2)
+            y = (screen_height // 2) - (alto // 2)
+
+            top.geometry(f"{ancho}x{alto}+{x}+{y}")
+            top.lift()
+            top.focus_force()
+            top.grab_set()
+            label = ctk.CTkLabel(top, text="Seleccione Fecha", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
+            label.pack(pady=10)
+            cal = Calendar(top, locale='es_ES', date_pattern='yyyy-mm-dd')
+            cal.pack(pady=20)
+
+            def mostrar_fecha(date):
+                label.configure(text=f"Fecha seleccionada: {date}")
+
+            def guardar_fecha():
+                fecha = cal.get_date()
+                callback(fecha)  # Llama al callback con la fecha seleccionada
+                top.destroy()
+
+            cal.bind("<<CalendarSelected>>", lambda e: mostrar_fecha(cal.get_date()))
+            boton_guardar = ctk.CTkButton(top, text="Guardar Fecha", command=guardar_fecha)
+            boton_guardar.pack(pady=10)
+             # Crea una ventana emergente
+        frame_fecha = ctk.CTkFrame(self, fg_color="transparent")
+        frame_fecha.pack(fill="x", pady=(10, 0), padx=10)
+        self.btn_fecha = ctk.CTkButton(
+            frame_fecha,
+            text=titulo_btn,
+            command=calendario,
+            width=100,
+            font=FUENTE_BOTON,
+            fg_color=COLOR_BOTON_PRIMARIO_FG,
+            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
+            text_color=COLOR_BOTON_PRIMARIO_TEXT
+        )
+        self.btn_fecha.pack(side="left", pady=(10, 0), anchor="w")
 
     def solo_numeros(self, char_input):
         """Validación para permitir solo números en los campos de entrada."""
         return char_input.isdigit()
+
+    def on_trayecto_selected(self, value):
+      
+        print("Seleccion: ", value)
+        #print("Fecha Resolución: ", self.fecha_resolucion)
+    
+    def get_trayecto(self):
+        """Obtener el valor del trayecto seleccionado."""
+        dict_trayectos = {
+            "I": 1,
+            "II": 2,
+            "III": 3,
+            "IV": 4,
+            "V": 5
+        }
+        return dict_trayectos.get(self.var_cantidad_trayectos.get(), 1)
+    
+    #Crear un método para establecer la fecha de resolución
+    def set_fecha_resolucion(self,fecha):
+        if fecha:
+            self.fecha_resolucion = fecha
+            print("Fecha de resolución establecida:", self.fecha_resolucion)
+            self.fecha_resolucion_label.configure(text=f"Fecha de Resolución: {self.fecha_resolucion}")

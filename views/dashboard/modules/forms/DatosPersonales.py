@@ -46,6 +46,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.var_nacionalidad =ctk.StringVar(value='Venezolano')
         self.var_telefono_p = ctk.StringVar(value='movil')
         self.var_telefono_s = ctk.StringVar(value='movil')
+        
         # --- Fila para genero, estado civil ---
         self._crear_fila_widgets([
             ("Género:", crear_option_menu, {"values":["M", "F"],'variable': self.var_sexo,"command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu'),

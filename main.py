@@ -3,7 +3,7 @@ Sistema de Control de Estudio para la Universidad Politecnica Territorial "Jose 
 
 Aplicacion Principal para la gestion de los datos de los estudiantes, profesores, cursos Y mas ...
 
-Autores:
+Desarrolladores:
 # - 
 # - 
 # -
