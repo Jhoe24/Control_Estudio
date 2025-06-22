@@ -11,12 +11,14 @@ class BaseAuthVisualView(BaseView):
 
         self.controller = controller
         
-        self.pack(fill="both", expand=True, padx=10, pady=10)
+        # La vista base (BaseView) ya maneja el empaquetado.
+        # El padding (padx, pady) se aplicará cuando esta vista sea empaquetada en la MainWindow.
         
         self.update_idletasks()  # Asegúrate de que el frame esté renderizado
-        ancho = self.winfo_width()
         
-        imagen_cintillo = self.leer_imagen("resources/images/cintillo.png", (ancho, 48))
+        # Usamos solo la altura (48) para que la imagen mantenga su proporción.
+        # La función leer_imagen calculará el ancho automáticamente.
+        imagen_cintillo = self.leer_imagen("resources/images/cintillo.png", 48)
         cintillo = ctk.CTkLabel(self, image=imagen_cintillo, text='', fg_color="transparent")
         cintillo.pack(side="top", fill="x", expand=False)
 
@@ -24,21 +26,27 @@ class BaseAuthVisualView(BaseView):
         self.crear_estructura_base(es_login)
         self.crear_contenido_especifico()
 
-    def cargar_imagen(self):
-        self.update_idletasks()
+    def cargar_imagen_logo(self, event=None):
+        # Obtenemos el tamaño actual del frame del logo
         ancho = self.frame_logo.winfo_width()
         alto = self.frame_logo.winfo_height()
+        
+        # Evitamos recargar si el tamaño es inválido (inicialización)
+        if ancho <= 1 or alto <= 1:
+            return
+            
         logo = self.leer_imagen(Settings().rutas_imagenes.get("logo", "resources/images/logo.jpg"), (ancho, alto))
         self.label_logo = ctk.CTkLabel(self.frame_logo, text='', image=logo)
         self.label_logo.place(x=0, y=0, relwidth=1, relheight=1)
+        # Desvinculamos el evento para que no se ejecute repetidamente si la ventana se redimensiona
+        self.frame_logo.unbind("<Configure>")
 
     def crear_estructura_base(self, es_login):
         # Panel izquierdo (logo)
         self.frame_logo = ctk.CTkFrame(self, width=400)
         self.frame_logo.pack(side='left', expand=ctk.YES, fill=ctk.BOTH)
-        
-        self.after(100, self.cargar_imagen)  # Asegúrate de que el frame esté renderizado
-        # Aquí puedes cargar tu logo institucional
+        # Vinculamos el evento <Configure> para cargar la imagen cuando el frame tenga tamaño
+        self.frame_logo.bind("<Configure>", self.cargar_imagen_logo)
         
         # Panel derecho (contenido)
         self.frame_derecho = ctk.CTkFrame(self, width=400, fg_color='#2e2e2e')

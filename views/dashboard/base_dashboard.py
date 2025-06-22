@@ -24,9 +24,8 @@ class BaseDashboardView(BaseView):
 
     def topbar(self):
         
-        ancho = self.winfo_screenwidth()
-        
-        cintillo = self.leer_imagen(Settings().rutas_imagenes.get("cintillo", "resources/images/cintillo.png"), (ancho, 40))
+        # Le pasamos solo la altura (40) para que la imagen se redimensione sin deformarse.
+        cintillo = self.leer_imagen(Settings().rutas_imagenes.get("cintillo", "resources/images/cintillo.png"), 40)
         logo = self.leer_imagen(Settings().rutas_imagenes.get("logo2", "resources/images/logo2.png"), (32,32))
         icon_menu = self.leer_imagen(Settings().rutas_iconos.get("icono_menu", "resources/icons/menu.png"), (32,32))
         

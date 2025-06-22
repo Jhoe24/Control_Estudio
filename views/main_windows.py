@@ -28,7 +28,7 @@ class MainWindow(ctk.CTk):
         
         tamano = AppConfig().evaluar_tamano_pantalla(ancho_pantalla, alto_pantalla)  # Evaluamos el tamaño de la pantalla
         self.tamano_ventana =  tamano
-        
+        #print(type(self.tamano_ventana))
         
         self.icono = AppConfig().icono
         self.tema = AppConfig().tema
@@ -41,7 +41,7 @@ class MainWindow(ctk.CTk):
         # Configuración del tema y colores
         ctk.set_appearance_mode(self.tema)
         
-        AppConfig().centrar_ventana(self, *self.tamano_ventana.split("x"))  # Centramos la ventana en la pantalla
+        # AppConfig().centrar_ventana(self, *self.tamano_ventana.split("x"))  # Centramos la ventana en la pantalla
         
         self.vista_actual = None # Declaramos una variable para la vista actual
         
@@ -68,45 +68,48 @@ class MainWindow(ctk.CTk):
     def mostrar_vista_login(self):
         self.limpiar_vista_actual()
         self.title(self.titulo + "  -  " + "Inicio de Sesion ")  # Cambiamos el titulo de la ventana a Login
-        self.vista_actual = LoginView(self, self.auth_controller)  # Pasamos el controlador de autenticación a la vista de login
-        self.vista_actual.pack(fill="both", expand=True)   
+        self.vista_actual = LoginView(self, self.auth_controller)
+        self.vista_actual.pack(fill="both", expand=True, padx=10, pady=10) # Aplicamos el padding aquí
+    
+        AppConfig().centrar_ventana(self, *self.tamano_ventana.split("x"))  # Centramos la ventana en la pantalla
+   
 
     def mostrar_vista_registro(self):
         self.limpiar_vista_actual()
         self.title(self.titulo + "  -  " + "Registro de Usuario")
         self.vista_actual = RegisterView(self, self.auth_controller)
-        self.vista_actual.pack(fill="both", expand=True)    
+        self.vista_actual.pack(fill="both", expand=True, padx=10, pady=10) # Aplicamos el padding aquí
+        
+        
+        # nuevo_tamano = str(self.winfo_screenmmwidth())+"x"+str(self.winfo_screenmmheight())
+        # AppConfig().centrar_ventana(self, nuevo_tamano.split("x"))  
 
     def mostrar_vista_dashboardd(self, username, user_rol):
         # Limpiamos la vista actual antes de mostrar el dashboard
         self.limpiar_vista_actual()
         self.resizable(True, True)
-        
-        ancho_pantalla = self.winfo_screenwidth()  
-        alto_pantalla = self.winfo_screenheight()
-        tamano_ventana = (str(ancho_pantalla)+"x"+str(alto_pantalla))
-        # Cambiamos el titulo de la ventana a Dashboard
-
+    
         self.title(self.titulo + "  -  " + "Dashboard")
         
-        # self.geometry(str(ancho_pantalla)+"x"+str(alto_pantalla))
-        # AppConfig().centrar_ventana(self, *tamano_ventana.split("x"))
-        # self.update_idletasks()
-        
+        # 1. Maximizar la ventana ANTES de crear la vista.
         self.state('zoomed') 
-        # Dependiendo del rol del usuario, mostramos la vista correspondiente
-        if user_rol == "admin":
-            from views.dashboard.pages.admin_dashboard import AdminDashboardView
-            self.vista_actual = AdminDashboardView(self, self.dashboard_controller, username, user_rol)
-            ancho = self.winfo_width()
-            alto = self.winfo_height()
-            
+        # 2. Forzar la actualización para que el tamaño maximizado se aplique
+        # y esté disponible para los widgets que se crearán.
+        self.update_idletasks()
+        self.after(50, lambda: self._create_dashboard_view(username, user_rol)) # Pequeño retraso para asegurar que 'zoomed' se aplique
         
+        # 3. Traer la ventana al frente.
         self.lift()
         self.attributes("-topmost", True) # Esto asegura que la ventana esté en primer plano
         self.after(100, lambda: self.attributes("-topmost", False)) # Esto quita el atributo de estar siempre en primer plano después de 100ms
         self.focus_force()  # Aseguramos que la ventana esté en primer plano
-        
+
+    def _create_dashboard_view(self, username, user_rol):
+        """Método auxiliar para crear la vista del dashboard después de un pequeño retraso."""
+        # Dependiendo del rol del usuario, mostramos la vista correspondiente
+        if user_rol == "admin":
+            self.vista_actual = AdminDashboardView(self, self.dashboard_controller, username, user_rol)
+
 
     def run(self):
         self.mainloop()

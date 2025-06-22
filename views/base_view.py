@@ -44,17 +44,27 @@ class BaseView(ctk.CTkFrame):
         raise NotImplementedError("La funcion create_widgets debe ser implementada en las vistas hijas")
 
     def leer_imagen(self, ruta, tamano=None):
+        """
+        Lee una imagen y la redimensiona.
+        - Si tamano es una tupla (ancho, alto), redimensiona a ese tamaño (puede deformar).
+        - Si tamano es un entero, lo usa como altura y calcula el ancho para mantener la proporción.
+        """
         try:
-            if tamano is None:
-                # Asegúrate de que el widget ya esté renderizado para obtener el tamaño correcto
-                self.update_idletasks()
-                ancho = self.winfo_width()
-                alto = self.winfo_height()
-                # Si el tamaño aún es 1 (no renderizado), usa un valor por defecto
-                if ancho <= 1 or alto <= 1:
-                    ancho, alto = 100, 100
-                tamano = (ancho, alto)
-            return ctk.CTkImage(light_image=Image.open(ruta), dark_image=Image.open(ruta), size=tamano)
+            imagen_pil = Image.open(ruta)
+            
+            if isinstance(tamano, int):
+                # Redimensionar manteniendo la proporción basado en la altura
+                altura_deseada = tamano
+                proporcion = imagen_pil.width / imagen_pil.height
+                ancho_calculado = int(altura_deseada * proporcion)
+                tamano_final = (ancho_calculado, altura_deseada)
+                imagen_pil = imagen_pil.resize(tamano_final, Image.Resampling.LANCZOS)
+
+            elif isinstance(tamano, tuple):
+                # Usar tamaño fijo (comportamiento anterior)
+                tamano_final = tamano
+            
+            return ctk.CTkImage(light_image=imagen_pil, dark_image=imagen_pil, size=tamano_final)
         except Exception as e:
             print(f"Error al leer la imagen {ruta}: {e}")
             return None
