@@ -20,7 +20,7 @@ class ControllerPNF:
         dic_trayectos = {
             "numero": vista_trayectos.numero_entry.get(),
             "nombre": vista_trayectos.nombre_entry.get(),
-            "tipo": vista_trayectos.tipo_option_menu.get(),
+            "tipo": vista_trayectos.tipo_trayecto,
             "duracion_semanas": vista_trayectos.duracion_semanas_entry.get(),
             "duracion_horas": vista_trayectos.duracion_horas_entry.get(),
             "creditos_minimos": vista_trayectos.creditos_minimos_entry.get(),

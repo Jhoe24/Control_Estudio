@@ -5,6 +5,7 @@ from views.dashboard.modules.forms.DatosPersonales import DatosPersonalesFrame
 from views.dashboard.modules.forms.DatosUbicacion import DatosUbicacionFrame
 from views.dashboard.modules.forms.PNF.FormPNF import DatosPNFPensumFrame
 from views.dashboard.modules.forms.PNF.frameTrayecto import FrameTrayecto
+import pprint
 
 
 from config.app_config import AppConfig
@@ -52,7 +53,7 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.pack(pady=(25, 20))
 
-        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.procesar_datos,
+        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.obtener_datos_trayecto,
                                         font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT)
         self.btn_guardar.pack(side="left", padx=10)
 
@@ -99,13 +100,11 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         self.button_frame.pack_forget()
         self.button_frame.pack(pady=(25, 20))
     
-    def procesar_datos(self):
+    def obtener_datos_trayecto(self):
         list_dic_trayectos = []
         if self.listado_trayectos:
-            for frame_trayectos in self.listado_trayectos: 
-                list_dic_trayectos.append(frame_trayectos.procesar_datos())
-        datos_completos = self.controlador(self,list_dic_trayectos)
-        if datos_completos:
-            print(datos_completos) 
-        else:
-            print("Error")
+            for frame_trayectos in self.listado_trayectos:
+                list_dic_trayectos.append(frame_trayectos.obtener_datos_trayectos())
+        
+        dato_completos = self.controlador.getPNF(self.datos_pnf,list_dic_trayectos)
+        return

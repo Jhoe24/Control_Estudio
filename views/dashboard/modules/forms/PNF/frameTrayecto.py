@@ -4,7 +4,7 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from views.dashboard.modules.forms.PNF.frameTramos import FrameTramos
 from ..DatosPersonales import DatosPersonalesFrame
-
+import re
 class FrameTrayecto(SectionFrameBase):
     def __init__(self, master,controlador,vcmd_num, vcmd_fecha,titulo = "Trayecto"):
         super().__init__(master, titulo )
@@ -25,12 +25,12 @@ class FrameTrayecto(SectionFrameBase):
         # self.var6.set("Si")  # Valor por defecto para estado
         self.vcmd_fecha = vcmd_fecha # Guardar para usar en fechas
         self.lista_tramos = []
-        
+        self.lista_datos_tramos = []
+        self.tipo_trayecto = int(re.search(r'\d+', titulo).group(0))
         # --- Fila para los datos de Trayecto ---
         self._crear_fila_widgets([
             ("Número:", crear_entry, {"width":300,"placeholder_text":"Ingrese número"}, 1, self, 'numero_entry'),
             ("Nombre:", crear_entry, {"width":360,"placeholder_text":"Ingrese nombre"}, 1, self, 'nombre_entry'),
-            ("Tipo:", crear_option_menu, {"values":["Trayectos de IV", "Trayectos de V"], "command": lambda v: setattr(self.tipo_menu, '_current_value',v)}, 1, self, 'tipo_menu'),
         ])
 
         # --- Fila para información de Trayecto ---
@@ -48,7 +48,7 @@ class FrameTrayecto(SectionFrameBase):
             ("Perfil de Egreso:", crear_option_menu, {"values":["Técnico Superior Universitario", "Ingeniería", "Licenciatura", "Doctorado", "Especialista"], "command": lambda v: setattr(self.perfil_egreso_menu, '_current_value',v)}, 1, self, 'perfil_egreso_menu'),
             ("Obligatorio:", crear_option_menu, {"values":["Si", "No"], "command": lambda v: setattr(self.obligatorio_menu, '_current_value',v)}, 1, self, 'obligatorio_menu'),
             ("Secuencial:", crear_option_menu, {"values":["Si", "No"], "command": lambda v: setattr(self.secuencial_menu, '_current_value',v)}, 1, self, 'secuencial_menu'),
-            ("Estado:", crear_option_menu, {"values":["Activo", "Inactivo"], "command": lambda v: setattr(self.estado_menu, '_current_value',v)}, 1, self, 'estado_menu')
+            ("Estado:", crear_option_menu, {"values":["Activo", "Inactivo"], "command": lambda v: setattr(self.estado_option_menu, '_current_value',v)}, 1, self, 'estado_option_menu')
         ])
         
         self.btn_tramos = ctk.CTkButton(
@@ -62,6 +62,7 @@ class FrameTrayecto(SectionFrameBase):
             command=self.agregar_tramos
         )
         self.btn_tramos.pack(pady=(20, 0), ancho="w")
+
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
@@ -114,17 +115,18 @@ class FrameTrayecto(SectionFrameBase):
            self.lista_tramos[i].pack(fill="x", padx=10, pady=10)
 
         # Botón para cerrar la ventana de tramos
-        btn_cerrar = ctk.CTkButton(
-            scrollable_frame,
-            text="Cerrar",
-            width=140,
-            font=FUENTE_BOTON,
-            fg_color=COLOR_BOTON_SECUNDARIO_FG,
-            hover_color=COLOR_BOTON_SECUNDARIO_HOVER,
-            text_color=COLOR_BOTON_SECUNDARIO_TEXT,
-            command=cerrar_top
-        )
-        btn_cerrar.pack(pady=(20, 0), ancho="w")
+        # Empacar los frames
+        self.button_frame = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
+        self.button_frame.pack(pady=(25, 20))
+
+        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.procesar_tramos,
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT)
+        self.btn_guardar.pack(side="left", padx=10)
+
+        self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Cerrar", width=140, command=cerrar_top,
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT)
+        self.btn_cancelar.pack(side="left", padx=10)
+        self.btn_guardar.configure(state="desabled")  # Deshabilitar el botón de guardar al inicio
         top.protocol("WM_DELETE_WINDOW", cerrar_top) # Para manejar el cierre de la ventana
         top.mainloop()
 
@@ -144,14 +146,17 @@ class FrameTrayecto(SectionFrameBase):
     def activar_scroll(self):
         self.master.bind_all("<MouseWheel>", self._on_mousewheel)
 
-    def procesar_datos(self):
-        list_dic_tramos = []
+    def procesar_tramos(self):
+        self.lista_datos_tramos = []
 
         if self.lista_tramos:
+            i = 0
             for frame in self.lista_tramos:
-                list_dic_tramos.append(frame.procesar_datos())
+                datos = frame.procesar_tramo()
+                self.lista_datos_tramos.append(datos)
+        return self.lista_datos_tramos
+    
+    def obtener_datos_trayectos(self):
+        return self.controlador.getTrayectos(self,self.lista_datos_tramos)
 
-        datos_trayecto = self.controlador.procesar_datos_trayecto(self, list_dic_tramos)
-        return datos_trayecto
-
-        
+            

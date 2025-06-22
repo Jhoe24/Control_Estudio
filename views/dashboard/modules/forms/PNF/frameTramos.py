@@ -31,22 +31,11 @@ class FrameTramos(SectionFrameBase):
             ("Estado:", crear_option_menu, {"values": ["Activo", "Inactivo"], "width":300}, 1, self, 'estado_option_menu')
         ])
 
-        self.btn = ctk.CTkButton(
-            self,
-            text="Grabar Tramo",
-            width=140,
-            font=FUENTE_BOTON,
-            fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-            text_color=COLOR_BOTON_PRIMARIO_TEXT, 
-            command=self.procesar_tramo 
-        ) 
-        self.btn.pack(pady=(20, 0))
 
 
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
     def procesar_tramo(self):
-        datos_tramo = self.controlador.getTramos(self)
-        return datos_tramo
+        return self.controlador.getTramos(self)
+        
