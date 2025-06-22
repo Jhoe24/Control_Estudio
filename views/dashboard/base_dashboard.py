@@ -91,7 +91,7 @@ class BaseDashboardView(BaseView):
                 ("Estudiantes", "estudiantes_icon", None, True),  # Submenú
                 ("Docentes", "docentes_icon", self.docentes, True),
                 ("Carga de Notas", "carga_notas_icon", self.carga_notas, False),
-                ("P.N.F", "pnf_icon", self.pnf, False),
+                ("P.N.F", "pnf_icon", self.pnf, True),
                 ("Sedes", "sedes_icon", self.sedes, False),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
                 ("Configuración", "configuracion_icon", self.configuracion, False),
@@ -166,6 +166,13 @@ class BaseDashboardView(BaseView):
                         submenu_items = [
                             ("Registrar Docentes", "registro_icon", self.docentes),
                             ("Listar Docentes", "list_estudiante_icon", self.list_docente),
+                        ]
+                elif texto == "P.N.F":
+                    if self.user_role.lower() in ["admin", "administrador"]:
+                        submenu_items= [
+                            ("Registrar P.N.F", "uc_icon", self.pnf),
+                            ("Listas de P.N.F", "uc_icon", self.unid_Curr),
+                            ("Unidades Curriculares", "uc_icon", self.unid_Curr),
                         ]
                 
                 # Crear botones del submenú
@@ -304,6 +311,7 @@ class BaseDashboardView(BaseView):
     def asignar_notas(self): pass
     def carga_notas(self): pass
     def pnf(self): pass
+    def unid_Curr(self): pass
     def sedes(self): pass
     def perfil(self): pass
     def notas(self): pass

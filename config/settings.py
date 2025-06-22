@@ -29,6 +29,8 @@ class Settings:
             
             "faces_icon": "resources/icons/face.png",
             
+            "uc_icon": "resources/icons/unidades.png"
+            
         }
         self.rutas_imagenes = {
             "logo": "resources/images/logo.jpg",

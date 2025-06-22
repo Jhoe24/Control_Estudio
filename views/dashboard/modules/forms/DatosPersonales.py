@@ -155,11 +155,13 @@ class DatosPersonalesFrame(SectionFrameBase):
             self.nro_documento_entry.configure(state="normal", placeholder_text="Ingrese pasaporte")
         
 
-    def _crear_fila_widgets(self, widgets_info_list_of_tuples):
+    def _crear_fila_widgets(self, widgets_info_list_of_tuples, es_scroll = False):
         for widgets_info_tuple in widgets_info_list_of_tuples:
             label_text, widget_creator_func, widget_creator_args, widget_span, target_object, attr_name, *optional_setter = widgets_info_tuple
-
-            frame_fila = ctk.CTkFrame(self, fg_color="transparent")
+            if es_scroll == False :
+                frame_fila = ctk.CTkFrame(self, fg_color="transparent")
+            else:
+                frame_fila = ctk.CTkFrame(target_object, fg_color="transparent")
             frame_fila.pack(fill="x", pady=PADY_FILA, padx=15)
 
             col_index = 0

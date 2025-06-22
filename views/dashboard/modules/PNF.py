@@ -5,7 +5,7 @@ from views.dashboard.modules.forms.DatosPersonales import DatosPersonalesFrame
 from views.dashboard.modules.forms.DatosUbicacion import DatosUbicacionFrame
 from views.dashboard.modules.forms.PNF.FormPNF import DatosPNFPensumFrame
 from views.dashboard.modules.forms.PNF.frameTrayecto import FrameTrayecto
-from views.dashboard.modules.forms.PNF.frameTramos import FrameTramos
+
 
 from config.app_config import AppConfig
 
@@ -52,7 +52,7 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.pack(pady=(25, 20))
 
-        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140,#command=self.procesar_formulario,
+        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.procesar_datos,
                                         font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT)
         self.btn_guardar.pack(side="left", padx=10)
 
@@ -91,14 +91,21 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
 
         if self.datos_cantidad_trayecto > 0:
             for i in range(self.datos_cantidad_trayecto):
-                self.listado_trayectos.append(FrameTrayecto(self, self.vcmd_num_val, self.vcmd_fecha_val, titulo=f"Trayecto #{i+1}"))
+                self.listado_trayectos.append(FrameTrayecto(self, self.controlador, self.vcmd_num_val, self.vcmd_fecha_val, titulo=f"Trayecto #{i+1}"))
                 self.listado_trayectos[i].pack(fill="x", padx=10, pady=(10, 0))
-
                 
-
         # SIEMPRE repack el frame de botones al final
         self.btn_guardar.configure(state="normal")
         self.button_frame.pack_forget()
         self.button_frame.pack(pady=(25, 20))
     
-    
+    def procesar_datos(self):
+        list_dic_trayectos = []
+        if self.listado_trayectos:
+            for frame_trayectos in self.listado_trayectos: 
+                list_dic_trayectos.append(frame_trayectos.procesar_datos())
+        datos_completos = self.controlador(self,list_dic_trayectos)
+        if datos_completos:
+            print(datos_completos) 
+        else:
+            print("Error")
