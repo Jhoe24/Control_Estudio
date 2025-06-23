@@ -13,6 +13,7 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.vcmd_fecha = vcmd_fecha # Guardar para usar en fechas
        
         self.fecha_resolucion = None  # Inicializar la variable fecha_resolucion
+        self.cal = None
         # --- Fila para codigo del PNF ---
         self._crear_fila_widgets([
             ("Código:", crear_entry, {"width":300,"placeholder_text":"Ingrese código"}, 1, self, 'codigo_entry'),
@@ -128,6 +129,20 @@ class DatosPNFPensumFrame(SectionFrameBase):
             ("Estado:", crear_option_menu, {"values":["Activo", "Inactivo"], "command": lambda v: setattr(self.estado_menu, '_current_value',v)}, 1, self, 'estado_menu')
         ])
         
+        self.entries_a_validar = [
+            self.codigo_entry,
+            self.codigo_nacional_entry,
+            self.nombre_entry,
+            self.siglas_entry,
+            self.area_conocimiento_entry,
+            self.duracion_creditos_entry,
+            self.duracion_horas_entry,
+            self.titulo_otorga_entry,
+            self.perfil_egreso_entry,
+            self.resolucion_entry,
+            self.version_pensum_entry,
+            self.coordinador_nacional_entry,
+        ]
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
@@ -156,18 +171,18 @@ class DatosPNFPensumFrame(SectionFrameBase):
             top.grab_set()
             label = ctk.CTkLabel(top, text="Seleccione Fecha", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
             label.pack(pady=10)
-            cal = Calendar(top, locale='es_ES', date_pattern='yyyy-mm-dd')
-            cal.pack(pady=20)
+            self.cal = Calendar(top, locale='es_ES', date_pattern='yyyy-mm-dd')
+            self.cal.pack(pady=20)
 
             def mostrar_fecha(date):
                 label.configure(text=f"Fecha seleccionada: {date}")
 
             def guardar_fecha():
-                fecha = cal.get_date()
+                fecha = self.cal.get_date()
                 callback(fecha)  # Llama al callback con la fecha seleccionada
                 top.destroy()
 
-            cal.bind("<<CalendarSelected>>", lambda e: mostrar_fecha(cal.get_date()))
+            self.cal.bind("<<CalendarSelected>>", lambda e: mostrar_fecha(self.cal.get_date()))
             boton_guardar = ctk.CTkButton(top, text="Guardar Fecha", command=guardar_fecha)
             boton_guardar.pack(pady=10)
              # Crea una ventana emergente
@@ -207,7 +222,26 @@ class DatosPNFPensumFrame(SectionFrameBase):
     
     #Crear un método para establecer la fecha de resolución
     def set_fecha_resolucion(self,fecha):
+        # if fecha:
+        #     self.fecha_resolucion = fecha
+        #     print("Fecha de resolución establecida:", self.fecha_resolucion)
+        #     self.fecha_resolucion_label.configure(text=f"Fecha de Resolución: {self.fecha_resolucion}")
         if fecha:
             self.fecha_resolucion = fecha
             print("Fecha de resolución establecida:", self.fecha_resolucion)
             self.fecha_resolucion_label.configure(text=f"Fecha de Resolución: {self.fecha_resolucion}")
+            # Llama a la validación en el formulario principal
+            if hasattr(self.master, "validar_campos_trayecto"):
+                self.master.validar_campos_trayecto()
+
+    def deshabilitar_campos(self):
+        # Deshabilita todos los entries a validar
+        for entry in self.entries_a_validar:
+            entry.configure(state="disabled")
+        # Deshabilita los OptionMenu si los tienes (ejemplo)
+        self.tipo_pnf_menu.configure(state="disabled")
+        self.duracion_trayectos_entry.configure(state="disabled")
+        self.duracion_semanas_entry.configure(state="disabled")
+        self.estado_menu.configure(state="disabled")
+        # Deshabilita el botón de fecha
+        self.btn_fecha.configure(state="disabled")

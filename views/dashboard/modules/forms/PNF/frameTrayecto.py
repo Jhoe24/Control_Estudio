@@ -27,6 +27,7 @@ class FrameTrayecto(SectionFrameBase):
         self.lista_tramos = []
         self.lista_datos_tramos = []
         self.tipo_trayecto = int(re.search(r'\d+', titulo).group(0))
+        
         # --- Fila para los datos de Trayecto ---
         self._crear_fila_widgets([
             ("Número:", crear_entry, {"width":300,"placeholder_text":"Ingrese número"}, 1, self, 'numero_entry'),
@@ -59,15 +60,34 @@ class FrameTrayecto(SectionFrameBase):
             fg_color=COLOR_BOTON_PRIMARIO_FG,
             hover_color=COLOR_BOTON_PRIMARIO_HOVER,
             text_color=COLOR_BOTON_PRIMARIO_TEXT,
-            command=self.agregar_tramos
+            command=self.agregar_tramos,
+            state="disabled"  # Deshabilitar al inicio
         )
         self.btn_tramos.pack(pady=(20, 0), ancho="w")
 
+        self.entries_a_validar = [
+            self.numero_entry,
+            self.nombre_entry,
+            self.duracion_semanas_entry,
+            self.duracion_horas_entry,
+            self.creditos_minimos_entry,
+            self.creditos_maximos_entry,
+            self.numero_tramos_menu,
+            self.objetivos_entry,
+            self.perfil_egreso_menu,
+            self.obligatorio_menu,
+            self.secuencial_menu,
+            self.estado_option_menu,
+        ]
+
+        for entry in self.entries_a_validar:
+            entry.bind("<KeyRelease>", lambda event: self.validar_campos())
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
     def agregar_tramos(self):
-        
+        for entry in self.entries_a_validar:
+            entry.bind("<KeyRelease>", lambda event: self.validar_campos_tramos_global()) 
         self.desactivar_scroll()  # Desactiva el scroll al abrir la ventana de tramos
         
         def cerrar_top():
@@ -76,7 +96,7 @@ class FrameTrayecto(SectionFrameBase):
 
         top = ctk.CTkToplevel(self, fg_color="White")
         top.title("Agregar Tramos")
-       
+              
 
         ancho = 600
         alto = 500
@@ -120,17 +140,18 @@ class FrameTrayecto(SectionFrameBase):
         self.button_frame.pack(pady=(25, 20))
 
         self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.procesar_tramos,
-                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT)
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT,
+                                        state="normal")
         self.btn_guardar.pack(side="left", padx=10)
+
+        #self.validar_campos_tramos_global(self.btn_guardar)
 
         self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Cerrar", width=140, command=cerrar_top,
                                         font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT)
         self.btn_cancelar.pack(side="left", padx=10)
-        self.btn_guardar.configure(state="desabled")  # Deshabilitar el botón de guardar al inicio
+    #    self.btn_guardar.configure(state="desabled")  # Deshabilitar el botón de guardar al inicio
         top.protocol("WM_DELETE_WINDOW", cerrar_top) # Para manejar el cierre de la ventana
         top.mainloop()
-
-        
 
     def _on_mousewheel(self, event):
         # Ajusta el nombre del frame si tu scrollable_frame tiene otro nombre
@@ -159,4 +180,27 @@ class FrameTrayecto(SectionFrameBase):
     def obtener_datos_trayectos(self):
         return self.controlador.getTrayectos(self,self.lista_datos_tramos)
 
-            
+    def validar_campos(self):
+        todos_llenos = all(entry.get().strip() for entry in self.entries_a_validar)
+        if todos_llenos:
+            self.btn_tramos.configure(state="normal")
+        else:
+            self.btn_tramos.configure(state="disabled")
+
+    def validar_campos_tramos_global(self, btn_guardar):
+        # Verifica que todos los FrameTramos existan y todos sus campos estén llenos
+        todos_llenos = True
+        for frame_tramo in self.lista_tramos:
+            if not all(entry.get().strip() for entry in frame_tramo.entries_a_validar):
+                todos_llenos = False
+                break
+        if hasattr(self, "btn_guardar"):
+            if todos_llenos and self.lista_tramos:
+                self.btn_guardar.configure(state="normal")
+            else:
+                self.btn_guardar.configure(state="disabled")
+
+    def deshabilitar_campos(self):
+        for entry in self.entries_a_validar:
+            entry.configure(state="disabled")
+        

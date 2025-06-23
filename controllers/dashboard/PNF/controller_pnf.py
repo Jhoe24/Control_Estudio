@@ -1,6 +1,13 @@
 import tkinter.messagebox as messagebox
-
+from models.PNF.modelo_pnf import ModeloPNF
 class ControllerPNF:
+    
+    def __init__(self):
+        self.modelo = ModeloPNF()
+
+    def registrar_pnf(self, dic_pnf):
+        pass
+
 
     def getTramos(self,vista_tramos):
         #diccionario para guardar los datos de los tramos
@@ -46,6 +53,10 @@ class ControllerPNF:
             "tipo_pnf": vista_pnf.tipo_pnf_menu.get(),
             "area_conocimiento": vista_pnf.area_conocimiento_entry.get(),
             "cantidad_trayectos": vista_pnf.get_trayecto(),
+            "duracion_semana": vista_pnf.duracion_semanas_entry.get(),
+            "duracion_creditos": vista_pnf.duracion_creditos_entry.get(),
+            "duracion_horas": vista_pnf.duracion_horas_entry.get(),
+
             "fecha_resolucion": vista_pnf.fecha_resolucion,
             "titulo_otorga": vista_pnf.titulo_otorga_entry.get(),
             "perfil_egreso": vista_pnf.perfil_egreso_entry.get(),

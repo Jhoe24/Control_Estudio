@@ -35,9 +35,12 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
 
         # Instanciar los frames de sección, pasando las validaciones
         self.datos_pnf = DatosPNFPensumFrame(self, self.vcmd_num_val, self.vcmd_fecha_val)
+
+        for entry in self.datos_pnf.entries_a_validar:
+            entry.bind("<KeyRelease>", lambda event: self.validar_campos_trayecto())
         
         print(self.datos_pnf.get_trayecto())
-        button_siguiente = ctk.CTkButton(
+        self.button_siguiente = ctk.CTkButton(
             self,
             text="Grabar trayecto",
             width=140,
@@ -45,20 +48,23 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
             fg_color=COLOR_BOTON_PRIMARIO_FG,
             hover_color=COLOR_BOTON_PRIMARIO_HOVER,
             text_color=COLOR_BOTON_PRIMARIO_TEXT,
-            command=self.actualizar_cantidad_trayecto
+            command=self.comando_trayecto,
+            state="disabled"  # Deshabilitar al inicio
         )
-        button_siguiente.pack(pady=(20, 0))
+        self.button_siguiente.pack(pady=(20, 0))
 
         # Empacar los frames
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.pack(pady=(25, 20))
 
         self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.obtener_datos_trayecto,
-                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT)
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT,
+                                        state="disabled", )
         self.btn_guardar.pack(side="left", padx=10)
 
         self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Limpiar Campos", width=140, #command=self.limpiar_formulario_completo,
-                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT)
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT,
+                                        state="disabled")
         self.btn_cancelar.pack(side="left", padx=10)
         self.btn_guardar.configure(state="desabled")  # Deshabilitar el botón de guardar al inicio
         
@@ -81,6 +87,47 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
             canvas.yview_scroll(1, "units")
         else:  # Windows/Mac
             canvas.yview_scroll(int(-1*(event.delta/2)), "units")
+
+    def comando_trayecto(self):
+        self.datos_pnf.deshabilitar_campos()
+        self.actualizar_cantidad_trayecto()
+    
+    def actualizar_cantidad_trayecto(self):
+        self.datos_cantidad_trayecto = self.datos_pnf.get_trayecto()
+        
+        if self.listado_trayectos:
+            for frame in self.listado_trayectos:
+                frame.destroy()
+        self.listado_trayectos = []
+
+        if self.datos_cantidad_trayecto > 0:
+            for i in range(self.datos_cantidad_trayecto):
+                self.listado_trayectos.append(FrameTrayecto(self, self.controlador, self.vcmd_num_val, self.vcmd_fecha_val, titulo=f"Trayecto #{i+1}"))
+                self.listado_trayectos[i].pack(fill="x", padx=10, pady=(10, 0))
+
+                
+        # SIEMPRE repack el frame de botones al final
+        self.btn_guardar.configure(state="normal")
+        self.button_frame.pack_forget()
+        self.button_frame.pack(pady=(25, 20))
+    
+    def obtener_datos_trayecto(self):
+        list_dic_trayectos = []
+        if self.listado_trayectos:
+            for frame_trayectos in self.listado_trayectos:
+                list_dic_trayectos.append(frame_trayectos.obtener_datos_trayectos())
+        
+        dato_completos = self.controlador.getPNF(self.datos_pnf,list_dic_trayectos)
+        pprint.pprint(dato_completos)
+    
+    def validar_campos_trayecto(self):
+    # Verifica que todos los entries tengan datos
+        todos_llenos = all(entry.get().strip() for entry in self.datos_pnf.entries_a_validar)
+        fecha_ok = self.datos_pnf.fecha_resolucion is not None and str(self.datos_pnf.fecha_resolucion).strip() != ""
+        if todos_llenos and fecha_ok:
+            self.button_siguiente.configure(state="normal", fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER)
+        else:
+            self.button_siguiente.configure(state="disabled")
     
     def actualizar_cantidad_trayecto(self):
         self.datos_cantidad_trayecto = self.datos_pnf.get_trayecto()
@@ -95,16 +142,10 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
                 self.listado_trayectos.append(FrameTrayecto(self, self.controlador, self.vcmd_num_val, self.vcmd_fecha_val, titulo=f"Trayecto #{i+1}"))
                 self.listado_trayectos[i].pack(fill="x", padx=10, pady=(10, 0))
                 
-        # SIEMPRE repack el frame de botones al final
+        # Habilita los botones después de grabar trayecto
         self.btn_guardar.configure(state="normal")
+        self.btn_cancelar.configure(state="normal")
         self.button_frame.pack_forget()
         self.button_frame.pack(pady=(25, 20))
+
     
-    def obtener_datos_trayecto(self):
-        list_dic_trayectos = []
-        if self.listado_trayectos:
-            for frame_trayectos in self.listado_trayectos:
-                list_dic_trayectos.append(frame_trayectos.obtener_datos_trayectos())
-        
-        dato_completos = self.controlador.getPNF(self.datos_pnf,list_dic_trayectos)
-        return
