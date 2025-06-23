@@ -178,7 +178,7 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
 
         # SIEMPRE coloca el frame de paginación en la fila siguiente a la última
         # La fila de inicio de los datos es 2, asÃ­ que si hay 'n' datos, la Ãºltima fila de datos es 2 + n - 1.
-        # La fila de paginaciÃ³n serÃ¡ 2 + n.
+        
         fila_paginacion = len(datos) + 2
         self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=6, pady=15, sticky="ew")
 

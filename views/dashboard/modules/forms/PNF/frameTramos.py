@@ -29,7 +29,7 @@ class FrameTramos(SectionFrameBase):
         self._crear_fila_widgets([
             ("Créditos:", crear_entry, {"width":300,"placeholder_text":"Ingrese créditos"}, 1, self, 'creditos_entry'),
             ("Objetivos:", crear_entry, {"width":300,"placeholder_text":"Ingrese objetivos"}, 1, self, 'objetivos_entry'),
-            ("Estado:", crear_option_menu, {"values": ["Activo", "Inactivo"], "width":300}, 1, self, 'estado_option_menu')
+            ("Estado:", crear_option_menu, {"values": ["activo", "inactivo"], "width":300}, 1, self, 'estado_option_menu')
         ])
 
         self.entries_a_validar = [

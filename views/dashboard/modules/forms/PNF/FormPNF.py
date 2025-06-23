@@ -126,7 +126,7 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self._crear_fila_widgets([
             ("Versión del Pensum:", crear_entry, {"width":300,"placeholder_text":"Ingrese versión"}, 1, self, 'version_pensum_entry'),
             ("Coordinador Nacional:", crear_entry, {"width":300,"placeholder_text":"Ingrese nombre del coordinador"}, 1, self, 'coordinador_nacional_entry'),
-            ("Estado:", crear_option_menu, {"values":["Activo", "Inactivo"], "command": lambda v: setattr(self.estado_menu, '_current_value',v)}, 1, self, 'estado_menu')
+            ("Estado:", crear_option_menu, {"values":["activo", "anactivo", "revision"], "command": lambda v: setattr(self.estado_menu, '_current_value',v)}, 1, self, 'estado_menu')
         ])
         
         self.entries_a_validar = [

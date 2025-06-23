@@ -49,7 +49,7 @@ class FrameTrayecto(SectionFrameBase):
             ("Perfil de Egreso:", crear_option_menu, {"values":["Técnico Superior Universitario", "Ingeniería", "Licenciatura", "Doctorado", "Especialista"], "command": lambda v: setattr(self.perfil_egreso_menu, '_current_value',v)}, 1, self, 'perfil_egreso_menu'),
             ("Obligatorio:", crear_option_menu, {"values":["Si", "No"], "command": lambda v: setattr(self.obligatorio_menu, '_current_value',v)}, 1, self, 'obligatorio_menu'),
             ("Secuencial:", crear_option_menu, {"values":["Si", "No"], "command": lambda v: setattr(self.secuencial_menu, '_current_value',v)}, 1, self, 'secuencial_menu'),
-            ("Estado:", crear_option_menu, {"values":["Activo", "Inactivo"], "command": lambda v: setattr(self.estado_option_menu, '_current_value',v)}, 1, self, 'estado_option_menu')
+            ("Estado:", crear_option_menu, {"values":["activo", "inactivo"], "command": lambda v: setattr(self.estado_option_menu, '_current_value',v)}, 1, self, 'estado_option_menu')
         ])
         
         self.btn_tramos = ctk.CTkButton(

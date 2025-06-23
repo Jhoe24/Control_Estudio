@@ -6,7 +6,7 @@ class ModeloPNF:
     def __init__(self):
        self.db_ruta = os.path.join('db', 'sistema_academico.db')
 
-    def registrar_pnf(self, datos_tramo,fecha_cracion):
+    def registrar_pnf(self, datos_pnf,fecha_cracion):
         con = None
         try:
             con = sql.connect(self.db_ruta)
@@ -21,29 +21,28 @@ class ModeloPNF:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
-                    datos_tramo["codigo"],
-                    datos_tramo["codigo_nacional"],
-                    datos_tramo["nombre_pnf"],
-                    datos_tramo["siglas"],
-                    datos_tramo["tipo_pnf"],
-                    datos_tramo["area_conocimiento"],
-                    datos_tramo["cantidad_trayectos"],
-                    datos_tramo["duracion_semanas"],
-                    datos_tramo["duracion_horas"],
-                    datos_tramo["titulo_otorga"],
-                    datos_tramo["titulo_egreso"],
-                    datos_tramo["resolucion"],
-                    datos_tramo["fecha_resolucion"],
-                    datos_tramo["version_pensum"],
-                    datos_tramo["coordinador_nacional"],
+                    datos_pnf["codigo"],
+                    datos_pnf["codigo_nacional"],
+                    datos_pnf["nombre_pnf"],
+                    datos_pnf["siglas"],
+                    datos_pnf["tipo_pnf"],
+                    datos_pnf["area_conocimiento"],
+                    datos_pnf["cantidad_trayectos"],
+                    datos_pnf["duracion_semana"],
+                    datos_pnf["duracion_horas"],
+                    datos_pnf["titulo_otorga"],
+                    datos_pnf["perfil_egreso"],
+                    datos_pnf["resolucion"],
+                    datos_pnf["fecha_resolucion"],
+                    datos_pnf["version_pensum"],
+                    datos_pnf["coordinador_nacional"],
                     fecha_cracion,
-                    datos_tramo["estado"]
+                    datos_pnf["estado"]
                 )
             )
 
             id_pnf = cursor.lastrowid
             con.commit()
-            con.close()
             return id_pnf   
 
         except Exception as e:
@@ -53,7 +52,7 @@ class ModeloPNF:
             if con is not None:
                 con.close()
     
-    def registrar_trayecto(self,datos_tramo,id_pnf):
+    def registrar_trayecto(self,datos_trayecto,id_pnf):
         con = None
         try:
             con = sql.connect(self.db_ruta)
@@ -63,34 +62,33 @@ class ModeloPNF:
                 """
                 INSERT INTO trayectos 
                 (pnf_id, numero, nombre, tipo, duracion_semanas, duracion_horas, creditos_minimos,
-                creditos_maximos, numeros_tramos, objectivos, perfil_egreso, obligatorio, secuencial, estado) 
+                creditos_maximos, numero_tramos, objetivos, perfil_egreso, obligatorio, secuencial, estado) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     id_pnf,
-                    datos_tramo["numero"],
-                    datos_tramo["nombre"],
-                    datos_tramo["tipo"],
-                    datos_tramo["duracion_semanas"],
-                    datos_tramo["duracion_horas"],
-                    datos_tramo["creditos_minimos"],
-                    datos_tramo["creditos_maximos"],
-                    datos_tramo["numero_tramos"],
-                    datos_tramo["objetivos"],
-                    datos_tramo["perfil_egreso"],
-                    datos_tramo["obligatorio"],
-                    datos_tramo["secuencial"],
-                    datos_tramo["estado"]
+                    datos_trayecto["numero"],
+                    datos_trayecto["nombre"],
+                    "Inicial",
+                    datos_trayecto["duracion_semanas"],
+                    datos_trayecto["duracion_horas"],
+                    datos_trayecto["creditos_minimos"],
+                    datos_trayecto["creditos_maximos"],
+                    datos_trayecto["numero_tramos"],
+                    datos_trayecto["objetivos"],
+                    datos_trayecto["perfil_egreso"],
+                    datos_trayecto["obligatorio"],
+                    datos_trayecto["secuencial"],
+                    datos_trayecto["estado"]
                 )
             )
 
             id_trayecto = cursor.lastrowid
             con.commit()
-            con.close()
             return id_trayecto   
 
         except Exception as e:
-            print(f"Error al registrar los datos del trayecto {datos_tramo["tipo"]}: {e}") 
+            print(f"Error al registrar los datos del trayecto {datos_trayecto["tipo"]}: {e}") 
             return False
         finally:
             if con is not None:
@@ -104,9 +102,9 @@ class ModeloPNF:
             
             cursor.execute(
                 """
-                INSERT INTO trayectos 
+                INSERT INTO tramos 
                 (trayecto_id, numero, nombre, duracion_semanas, duracion_horas, creditos,
-                objectivos, estado) 
+                objetivos, estado) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -123,7 +121,6 @@ class ModeloPNF:
 
            #id_trayecto = cursor.lastrowid
             con.commit()
-            con.close()
             return True   
 
         except Exception as e:
@@ -132,3 +129,25 @@ class ModeloPNF:
         finally:
             if con is not None:
                 con.close()
+
+    def obtner_lista_pnf(self):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            
+            cursor.execute(
+                """
+                SELECT id, codigo, nombre FROM pnf
+                """
+            )
+
+            return cursor.fetchall()   
+
+        except Exception as e:
+            print(f"Error al obtener la lista: {e}") 
+            return False
+        finally:
+            if con is not None:
+                con.close()
+

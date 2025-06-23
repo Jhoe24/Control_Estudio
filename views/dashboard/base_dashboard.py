@@ -170,7 +170,7 @@ class BaseDashboardView(BaseView):
                     if self.user_role.lower() in ["admin", "administrador"]:
                         submenu_items= [
                             ("Registrar P.N.F", "uc_icon", self.pnf),
-                            ("Listas de P.N.F", "uc_icon", self.unid_Curr),
+                            ("Listas de P.N.F", "uc_icon", self.list_pnf),
                             ("Unidades Curriculares", "uc_icon", self.unid_Curr),
                         ]
                 
@@ -310,6 +310,7 @@ class BaseDashboardView(BaseView):
     def asignar_notas(self): pass
     def carga_notas(self): pass
     def pnf(self): pass
+    def list_pnf(self):pass
     def unid_Curr(self): pass
     def sedes(self): pass
     def perfil(self): pass

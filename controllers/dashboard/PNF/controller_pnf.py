@@ -1,12 +1,43 @@
 import tkinter.messagebox as messagebox
 from models.PNF.modelo_pnf import ModeloPNF
+from datetime import datetime
 class ControllerPNF:
     
     def __init__(self):
         self.modelo = ModeloPNF()
+        self.listado_pnf = self.modelo.obtner_lista_pnf()
 
-    def registrar_pnf(self, dic_pnf):
-        pass
+    def registrar_pnf(self, dic_pnf, vista_formulario=None):
+        try:
+            fecha_actual = self.obtener_fecha_actual()
+            lista_trayectos = dic_pnf["lista_trayectos"]
+            id_pnf = self.modelo.registrar_pnf(dic_pnf, fecha_actual)
+
+            if not id_pnf:
+                messagebox.showerror("Error", "No se pudo registrar el PNF.", parent=vista_formulario)
+                return False
+
+            for trayecto in lista_trayectos:
+                lista_tramos = trayecto["lista_tramos"]
+                id_trayecto = self.modelo.registrar_trayecto(trayecto, id_pnf)
+
+                if not id_trayecto:
+                    messagebox.showerror("Error", f"No se pudo registrar el trayecto {trayecto.get('numero', '')}.", parent=vista_formulario)
+                    continue
+
+                for tramo in lista_tramos:
+                    exito_tramo = self.modelo.registrar_tramos(tramo, id_trayecto)
+                    if exito_tramo is not True:
+                        messagebox.showerror("Error", f"Error al registrar el tramo {tramo.get('numero', '')} del trayecto {trayecto.get('numero', '')}.", parent=vista_formulario)
+
+            messagebox.showinfo("Éxito", "PNF registrado correctamente.", parent=vista_formulario)
+            return True
+
+        except Exception as e:
+            print(f"Error inesperado al registrar el PNF: {e}")
+            messagebox.showerror("Error inesperado", f"Ocurrió un error: {e}", parent=vista_formulario)
+            return False
+
 
 
     def getTramos(self,vista_tramos):
@@ -166,3 +197,6 @@ class ControllerPNF:
             return True
         except Exception as e:
             print(e)
+
+    def obtener_fecha_actual(self):
+        return datetime.now().strftime("%Y-%m-%d")
