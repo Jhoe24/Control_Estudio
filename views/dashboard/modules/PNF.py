@@ -149,4 +149,21 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         self.button_frame.pack_forget()
         self.button_frame.pack(pady=(25, 20))
 
+    def validar_todo_completo(self):
+        # Verifica campos principales
+        todos_llenos = all(entry.get().strip() for entry in self.datos_pnf.entries_a_validar)
+        fecha_ok = self.datos_pnf.fecha_resolucion is not None and str(self.datos_pnf.fecha_resolucion).strip() != ""
+        # Verifica trayectos
+        trayectos_ok = True
+        if self.listado_trayectos:
+            for frame in self.listado_trayectos:
+                if not frame.todos_campos_llenos():  # Debes implementar este método en FrameTrayecto
+                    trayectos_ok = False
+                    break
+        # Habilita o deshabilita el botón
+        if todos_llenos and fecha_ok and trayectos_ok and self.listado_trayectos:
+            self.btn_guardar.configure(state="normal")
+        else:
+            self.btn_guardar.configure(state="disabled")
+
     
