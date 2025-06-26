@@ -65,6 +65,12 @@ class FrameTrayecto(SectionFrameBase):
         )
         self.btn_tramos.pack(pady=(20, 0), ancho="w")
 
+        # Label para mostrar el estado de los tramos cargados
+        self.tramos_status_label = ctk.CTkLabel(self, text="No hay tramos cargados previamente.", font=FUENTE_LABEL_CAMPO, 
+                                                 text_color=COLOR_TEXTO_PRINCIPAL, anchor="w", width=300)
+        self.tramos_status_label.pack(pady=(0, 10), anchor="w")
+
+
         self.entries_a_validar = [
             self.numero_entry,
             self.nombre_entry,
@@ -129,6 +135,30 @@ class FrameTrayecto(SectionFrameBase):
                 frame.destroy() 
         self.lista_tramos = []
 
+        # Si hay datos guardados, los muestra y deshabilita los campos
+        if self.lista_datos_tramos:
+            for i, datos in enumerate(self.lista_datos_tramos):
+                tramo = FrameTramos(scrollable_frame, self.controlador, self.vcmd_num, self.vcmd_fecha, titulo=f"Tramo #{i+1}")
+                tramo.pack(fill="x", padx=10, pady=10)
+                # Asigna los valores guardados a los campos
+                for entry, valor in zip(tramo.entries_a_validar, datos.values()):
+                    if isinstance(entry, ctk.CTkOptionMenu):
+                        entry.set(valor)
+                    else:
+                        entry.insert(0, valor)
+                    entry.configure(state="disabled")  # Deshabilita el campo
+                self.lista_tramos.append(tramo)
+            # No permite grabar de nuevo
+            self.button_frame = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
+            self.button_frame.pack(pady=(25, 20))
+            self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Cerrar", width=140, command=cerrar_top,
+                                            font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT)
+            self.btn_cancelar.pack(side="left", padx=10)
+            top.protocol("WM_DELETE_WINDOW", cerrar_top)
+            top.mainloop()
+            return
+
+        # Si no hay datos guardados, crea los tramos según el número seleccionado
         for i in range(numero_tramos):
             tramo = FrameTramos(scrollable_frame, self.controlador, self.vcmd_num, self.vcmd_fecha, titulo=f"Tramo #{i+1}")
             tramo.pack(fill="x", padx=10, pady=10)
@@ -188,6 +218,7 @@ class FrameTrayecto(SectionFrameBase):
                 break
         self.activar_scroll()
         self.deshabilitar_campos_tramos()
+        self.actualizar_status_tramos()
         return self.lista_datos_tramos
         
     def obtener_datos_trayectos(self):
@@ -204,8 +235,12 @@ class FrameTrayecto(SectionFrameBase):
          # Verifica que todos los FrameTramos existan y todos sus campos estén llenos
         todos_llenos = True
         for frame_tramo in self.lista_tramos:
-            if not all(entry.get().strip() for entry in frame_tramo.entries_a_validar):
-                todos_llenos = False
+            for entry in getattr(frame_tramo, "entries_a_validar", []):
+                # Verifica que el entry tenga el método get (no ha sido destruido)
+                if not hasattr(entry, "get") or entry.get() is None or entry.get().strip() == "":
+                    todos_llenos = False
+                    break
+            if not todos_llenos:
                 break
         if hasattr(self, "btn_guardar"):
             if todos_llenos and self.lista_tramos:
@@ -220,4 +255,11 @@ class FrameTrayecto(SectionFrameBase):
                 entry.configure(state="disabled")
         if hasattr(self, "btn_guardar"):
             self.btn_guardar.configure(state="disabled")
+
+    def actualizar_status_tramos(self):
+        cantidad = len(self.lista_datos_tramos)
+        if cantidad == 0:
+            self.tramos_status_label.configure(text="No hay tramos cargados previamente.")
+        else:
+            self.tramos_status_label.configure(text=f"{cantidad} tramo(s) cargado(s) correctamente.")
         

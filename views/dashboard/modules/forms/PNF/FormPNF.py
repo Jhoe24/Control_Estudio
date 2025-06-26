@@ -245,6 +245,9 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.estado_menu.configure(state="disabled")
         # Deshabilita el botón de fecha
         self.btn_fecha.configure(state="disabled")
+        # Deshabilita el botón de grabar Trayecto
+        if hasattr(self.master, 'button_siguiente'):
+            self.master.button_siguiente.configure(state="disabled")
     
     def set_datos(self, datos):
         print(datos)

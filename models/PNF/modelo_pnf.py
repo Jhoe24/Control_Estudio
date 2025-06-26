@@ -18,7 +18,7 @@ class ModeloPNF:
                 (codigo, codigo_nacional, nombre, nombre_corto, nivel,area_conocimiento, duracion_trayectos,
                 duracion_semanas, total_creditos,total_horas, titulo_otorga, perfil_egreso, resolucion_creacion,
                 fecha_resolucion, version_pensum, coordinador_nacional, fecha_creacion,fecha_actualizacion, estado) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     datos_pnf["codigo"],

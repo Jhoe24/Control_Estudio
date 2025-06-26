@@ -120,6 +120,7 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         dato_completos = self.controlador.getPNF(self.datos_pnf,list_dic_trayectos)
         if dato_completos:
             self.controlador.registrar_pnf(dato_completos,self)
+        print("Datos del PNF:", dato_completos)
     
     def validar_campos_trayecto(self):
     # Verifica que todos los entries tengan datos
