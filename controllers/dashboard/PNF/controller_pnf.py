@@ -38,7 +38,25 @@ class ControllerPNF:
             messagebox.showerror("Error inesperado", f"Ocurrió un error: {e}", parent=vista_formulario)
             return False
 
+    def obtener_datos_completos(self,id):
+        dic_pnf = self.modelo.obtener_pnf(id)
+        list_dic_trayectos =self.modelo.obtener_trayecto(id)
+        #dic_pnf["lista_trayectos"] = list_dic_trayectos
+        new_trayetos = []
 
+        if list_dic_trayectos:
+            for trayecto in list_dic_trayectos:
+                if trayecto:
+                    dic_tramo = self.modelo.obtener_tramo(trayecto["id"])
+                    if dic_tramo:
+                        trayecto["lista_tramos"] = dic_tramo
+                    else:
+                        trayecto["lista_tramos"] = []
+                    new_trayetos.append(trayecto)
+            dic_pnf["lista_trayectos"] = new_trayetos
+        else:
+            dic_pnf["lista_trayectos"] = []
+        return dic_pnf
 
     def getTramos(self,vista_tramos):
         #diccionario para guardar los datos de los tramos

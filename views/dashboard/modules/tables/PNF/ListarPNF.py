@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 import threading
 from views.dashboard.components.widget_utils import *
+from views.dashboard.modules.forms.PNF.FormPNF import DatosPNFPensumFrame
 
 class ListarPNF(ctk.CTkScrollableFrame):
     def __init__(self, master, controller):
@@ -9,6 +10,17 @@ class ListarPNF(ctk.CTkScrollableFrame):
         self.controller = controller
         self.lista_pnf = self.controller.listado_pnf  # Debe ser una lista de tuplas (id, codigo, nombre)
         self.filas_datos = []
+
+        try:
+            toplevel = self.winfo_toplevel()
+            self.vcmd_num_val = toplevel.register(self.controller._solo_numeros)
+            self.vcmd_fecha_val = toplevel.register(self.controller._numeros_y_barras)
+            self.vcmd_decimal_val = toplevel.register(self.controller._solo_decimal)
+        except Exception: # Fallback si no es un toplevel (ej. si el master es el root)
+            self.vcmd_num_val = master.register(self.controller._solo_numeros)
+            self.vcmd_fecha_val = master.register(self.controller._numeros_y_barras)
+            self.vcmd_decimal_val = master.register(self.controller._solo_decimal)
+
 
         # --- ENCABEZADOS (FILA 1) ---
         headers = ["ID", "Código", "Nombre", "Acción"]
@@ -50,4 +62,11 @@ class ListarPNF(ctk.CTkScrollableFrame):
 
     def ver_datos_completos(self, pnf):
         # Por ahora no hace nada, puedes implementar la lógica aquí más adelante
-        pass
+        dic_datos = self.controller.obtener_datos_completos(pnf[0])
+        ventana = ctk.CTkToplevel(self,fg_color="White")
+        
+        frame_pnf = DatosPNFPensumFrame(ventana,self.vcmd_num_val,self.vcmd_fecha_val)
+        frame_pnf.set_datos(dic_datos)
+        frame_pnf.pack(fill="x", padx=20, pady=10)
+
+

@@ -142,7 +142,7 @@ class FrameTrayecto(SectionFrameBase):
         self.button_frame = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
         self.button_frame.pack(pady=(25, 20))
 
-        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.procesar_tramos,
+        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command= lambda:self.procesar_tramos(top),
                                         font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT,
                                         state="disabled")
         self.btn_guardar.pack(side="left", padx=10)
@@ -172,9 +172,9 @@ class FrameTrayecto(SectionFrameBase):
     def activar_scroll(self):
         self.master.bind_all("<MouseWheel>", self._on_mousewheel)
 
-    def procesar_tramos(self):
+    def procesar_tramos(self,top = None):
+       
         self.lista_datos_tramos = []
-
         if self.lista_tramos:
             for frame in self.lista_tramos:
                 datos = frame.procesar_tramo()

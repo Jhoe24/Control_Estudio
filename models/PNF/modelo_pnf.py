@@ -6,7 +6,7 @@ class ModeloPNF:
     def __init__(self):
        self.db_ruta = os.path.join('db', 'sistema_academico.db')
 
-    def registrar_pnf(self, datos_pnf,fecha_cracion):
+    def registrar_pnf(self, datos_pnf,fecha_creacion):
         con = None
         try:
             con = sql.connect(self.db_ruta)
@@ -16,8 +16,8 @@ class ModeloPNF:
                 """
                 INSERT INTO pnf 
                 (codigo, codigo_nacional, nombre, nombre_corto, nivel,area_conocimiento, duracion_trayectos,
-                duracion_semanas, total_horas, titulo_otorga, perfil_egreso, resolucion_creacion,
-                fecha_resolucion, version_pensum, coordinador_nacional, fecha_actualizacion, estado) 
+                duracion_semanas, total_creditos,total_horas, titulo_otorga, perfil_egreso, resolucion_creacion,
+                fecha_resolucion, version_pensum, coordinador_nacional, fecha_creacion,fecha_actualizacion, estado) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -29,6 +29,7 @@ class ModeloPNF:
                     datos_pnf["area_conocimiento"],
                     datos_pnf["cantidad_trayectos"],
                     datos_pnf["duracion_semana"],
+                    datos_pnf["duracion_creditos"],
                     datos_pnf["duracion_horas"],
                     datos_pnf["titulo_otorga"],
                     datos_pnf["perfil_egreso"],
@@ -36,7 +37,8 @@ class ModeloPNF:
                     datos_pnf["fecha_resolucion"],
                     datos_pnf["version_pensum"],
                     datos_pnf["coordinador_nacional"],
-                    fecha_cracion,
+                    fecha_creacion,
+                    fecha_creacion,
                     datos_pnf["estado"]
                 )
             )
@@ -151,3 +153,64 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
+    def obtener_pnf(self,id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM pnf WHERE id = ?
+                """, (id,)
+            )
+            return cursor.fetchone()   # Un solo diccionario o None
+        except Exception as e:
+            print(f"Error al obtener la lista: {e}") 
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+    def obtener_trayecto(self, id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM trayectos WHERE pnf_id = ?
+                """, (id,)
+            )
+            return cursor.fetchall()   # Lista de diccionarios
+        except Exception as e:
+            print(f"Error al obtener el trayecto: {e}") 
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+    def obtener_tramo(self, id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM tramos WHERE trayecto_id = ?
+                """, (id,)
+            )
+            return cursor.fetchall()  # Ahora retorna una lista de diccionarios
+        except Exception as e:
+            print(f"Error al obtener tramo: {e}") 
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+
+
+# db = ModeloPNF()
+# pprint(db.obtener_pnf(3))
