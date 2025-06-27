@@ -9,8 +9,15 @@ class ListarPNF(ctk.CTkScrollableFrame):
         super().__init__(master, fg_color="white")
         self.controller = controller
         self.lista_pnf = self.controller.listado_pnf  # Debe ser una lista de tuplas (id, codigo, nombre)
-        self.filas_datos = []
+        
+        self.cantidad_mostrar = 10
 
+        self.cantidad_paginas = (len(self.lista_pnf) // self.cantidad_mostrar) + (1 if len(self.lista_pnf) % self.cantidad_mostrar > 0 else 0)
+
+        self.filas_datos = []
+        """
+        Implementar logica para la paginacion 
+        """
         try:
             toplevel = self.winfo_toplevel()
             self.vcmd_num_val = toplevel.register(self.controller._solo_numeros)
@@ -32,6 +39,30 @@ class ListarPNF(ctk.CTkScrollableFrame):
         for i in range(len(headers)):
             self.grid_columnconfigure(i, weight=1)
 
+
+      
+# --- PAGINACIÓN (se ubicará dinámicamente al final de los datos) ---
+        self.frame_paginacion = ctk.CTkFrame(self, fg_color="transparent")
+
+        # Configuración de columnas para centrar los elementos de paginación
+        self.frame_paginacion.grid_columnconfigure(0, weight=1)
+        self.frame_paginacion.grid_columnconfigure(1, weight=0)
+        self.frame_paginacion.grid_columnconfigure(2, weight=0)
+        self.frame_paginacion.grid_columnconfigure(3, weight=0)
+        self.frame_paginacion.grid_columnconfigure(4, weight=1)
+
+        self.boton_anterior = ctk.CTkButton(self.frame_paginacion, text="Anterior", state="disabled")
+        self.label_pagina = ctk.CTkLabel(self.frame_paginacion, text="1 de 1", text_color="#222")
+        self.boton_siguiente = ctk.CTkButton(self.frame_paginacion, text="Siguiente", state="disabled")
+
+        self.boton_anterior.grid(row=0, column=1, padx=(0, 5))
+        self.label_pagina.grid(row=0, column=2, padx=5)
+        self.boton_siguiente.grid(row=0, column=3, padx=(5, 0))
+
+        # Coloca el frame de paginación al final de la tabla (ajusta la fila según tus datos)
+        fila_paginacion = len(self.lista_pnf) + 2
+        self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=4, pady=15, sticky="ew")
+                
         self.mostrar_listado()
 
     def mostrar_listado(self):
@@ -63,9 +94,29 @@ class ListarPNF(ctk.CTkScrollableFrame):
     def ver_datos_completos(self, pnf):
         # Por ahora no hace nada, puedes implementar la lógica aquí más adelante
         dic_datos = self.controller.obtener_datos_completos(pnf[0])
-        ventana = ctk.CTkToplevel(self,fg_color="White")
+        top = ctk.CTkToplevel(self,fg_color="White")
+        ancho = 900
+        alto = 700
+
+        # Obtén el tamaño de la pantalla
+        top.update_idletasks()  # Asegura que winfo_screenwidth/height sean correctos
+        screen_width = top.winfo_screenwidth()
+        screen_height = top.winfo_screenheight()
+
+        # Calcula la posición centrada
+        x = (screen_width // 2) - (ancho // 2)
+        y = (screen_height // 2) - (alto // 2)
+
+        top.geometry(f"{ancho}x{alto}+{x}+{y}")
+        top.lift()
+        top.focus_force()
+        top.grab_set()
+
+        #agregar scroll
+        scroll_frame = ctk.CTkScrollableFrame(top,fg_color="White")
+        scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
-        frame_pnf = DatosPNFPensumFrame(ventana,self.vcmd_num_val,self.vcmd_fecha_val)
+        frame_pnf = DatosPNFPensumFrame(scroll_frame,self.vcmd_num_val,self.vcmd_fecha_val)
         frame_pnf.set_datos(dic_datos)
         frame_pnf.pack(fill="x", padx=20, pady=10)
 

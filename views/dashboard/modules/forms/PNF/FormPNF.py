@@ -253,25 +253,56 @@ class DatosPNFPensumFrame(SectionFrameBase):
         print(datos)
         self.codigo_entry.insert(0, datos.get("codigo", ""))
         self.codigo_entry.configure(state="disabled")
+
         self.codigo_nacional_entry.insert(0, datos.get("codigo_nacional", ""))
+        self.codigo_nacional_entry.configure(state="disabled")
+
         self.nombre_entry.insert(0, datos.get("nombre", ""))
+        self.nombre_entry.configure(state="disabled")
+
         self.siglas_entry.insert(0, datos.get("nombre_corto", ""))
+        self.siglas_entry.configure(state="disabled")
+        
         self.var_tipo_pnf.set(datos.get("nivel", "TSU"))
+        self.tipo_pnf_menu.configure(state="disabled")
+
         self.area_conocimiento_entry.insert(0, datos.get("area_conocimiento", ""))
+        self.area_conocimiento_entry.configure(state="disabled")
+
         self.duracion_trayectos_entry.set(str(datos.get("duracion_trayectos", "")))
+        self.duracion_trayectos_entry.configure(state="disabled")
+
         self.duracion_semanas_entry.set(str(datos.get("duracion_semanas", "")))
+        self.duracion_semanas_entry.configure(state="disabled")
 
         horas_credito_str = str(datos.get("total_creditos", "")) if datos.get("total_creditos") is not None else "0"
         self.duracion_creditos_entry.insert(0, horas_credito_str)
+        self.duracion_creditos_entry.configure(state="disabled")
+
         self.duracion_horas_entry.insert(0, str(datos.get("total_horas", "")))
+        self.duracion_horas_entry.configure(state="disabled")
+
         # Si tienes modalidad, puedes agregarlo aquí si tienes un campo correspondiente
         self.titulo_otorga_entry.insert(0, datos.get("titulo_otorga", ""))
+        self.titulo_otorga_entry.configure(state="disabled")
+
         self.perfil_egreso_entry.insert(0, datos.get("perfil_egreso", ""))
+        self.perfil_egreso_entry.configure(state="disabled")
+
         # Si tienes campo ocupacional, agrégalo si tienes el entry
         self.resolucion_entry.insert(0, datos.get("resolucion_creacion", ""))
+        self.resolucion_entry.configure(state="disabled")
+
         self.version_pensum_entry.insert(0, datos.get("version_pensum", ""))
+        self.version_pensum_entry.configure(state="disabled")
+
         self.coordinador_nacional_entry.insert(0, datos.get("coordinador_nacional", ""))
+        self.coordinador_nacional_entry.configure(state="disabled")
+
         self.estado_menu.set(datos.get("estado", "activo"))
+        self.estado_menu.configure(state="disabled")
+
         # Fecha de resolución
         if "fecha_resolucion" in datos and datos["fecha_resolucion"]:
             self.set_fecha_resolucion(datos["fecha_resolucion"])
+        self.btn_fecha.configure(state="disabled")
