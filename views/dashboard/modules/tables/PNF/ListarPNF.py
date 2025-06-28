@@ -3,6 +3,7 @@ import tkinter as tk
 import threading
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.PNF.FormPNF import DatosPNFPensumFrame
+from views.dashboard.modules.forms.PNF.frameTrayecto import FrameTrayecto
 
 class ListarPNF(ctk.CTkScrollableFrame):
     def __init__(self, master, controller):
@@ -10,10 +11,11 @@ class ListarPNF(ctk.CTkScrollableFrame):
         self.controller = controller
         self.lista_pnf = self.controller.listado_pnf  # Debe ser una lista de tuplas (id, codigo, nombre)
         
-        self.cantidad_mostrar = 10
+        self.pagina_actual = 1
+        self.cantidad_mostrar = 5
 
         self.cantidad_paginas = (len(self.lista_pnf) // self.cantidad_mostrar) + (1 if len(self.lista_pnf) % self.cantidad_mostrar > 0 else 0)
-
+       
         self.filas_datos = []
         """
         Implementar logica para la paginacion 
@@ -28,7 +30,9 @@ class ListarPNF(ctk.CTkScrollableFrame):
             self.vcmd_fecha_val = master.register(self.controller._numeros_y_barras)
             self.vcmd_decimal_val = master.register(self.controller._solo_decimal)
 
-
+        #Primeras paginas a mostrar
+        self.paginas_mostrar = self.lista_pnf[:self.cantidad_mostrar]
+        self.posicion_actual = len(self.paginas_mostrar)
         # --- ENCABEZADOS (FILA 1) ---
         headers = ["ID", "Código", "Nombre", "Acción"]
         for col, header in enumerate(headers):
@@ -51,23 +55,28 @@ class ListarPNF(ctk.CTkScrollableFrame):
         self.frame_paginacion.grid_columnconfigure(3, weight=0)
         self.frame_paginacion.grid_columnconfigure(4, weight=1)
 
-        self.boton_anterior = ctk.CTkButton(self.frame_paginacion, text="Anterior", state="disabled")
-        self.label_pagina = ctk.CTkLabel(self.frame_paginacion, text="1 de 1", text_color="#222")
-        self.boton_siguiente = ctk.CTkButton(self.frame_paginacion, text="Siguiente", state="disabled")
+        self.boton_anterior = ctk.CTkButton(self.frame_paginacion, text="Anterior", command=self.anterior_pagina)
+        self.label_pagina = ctk.CTkLabel(self.frame_paginacion, text=f"{self.pagina_actual} de {self.cantidad_paginas}", text_color="#222")
+        self.boton_siguiente = ctk.CTkButton(self.frame_paginacion, text="Siguiente",command=self.siguiente_pagina)
 
         self.boton_anterior.grid(row=0, column=1, padx=(0, 5))
         self.label_pagina.grid(row=0, column=2, padx=5)
         self.boton_siguiente.grid(row=0, column=3, padx=(5, 0))
 
         # Coloca el frame de paginación al final de la tabla (ajusta la fila según tus datos)
-        fila_paginacion = len(self.lista_pnf) + 2
+        fila_paginacion = len(self.paginas_mostrar) + 2
         self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=4, pady=15, sticky="ew")
                 
-        self.mostrar_listado()
+        self.calcular_pagina()
 
     def mostrar_listado(self):
+        # Limpia las filas anteriores
+        for fila in self.filas_datos:
+            for widget in fila:
+                widget.destroy()
+        self.filas_datos.clear()
         # Empieza en la fila 2 porque la fila 1 es el encabezado
-        for fila, tupla_pnf in enumerate(self.lista_pnf, start=2):
+        for fila, tupla_pnf in enumerate(self.paginas_mostrar, start=2):
             fila_widgets = [
                 self._crear_celda(fila, 0, tupla_pnf[0]),  # ID
                 self._crear_celda(fila, 1, tupla_pnf[1]),  # Código
@@ -121,3 +130,53 @@ class ListarPNF(ctk.CTkScrollableFrame):
         frame_pnf.pack(fill="x", padx=20, pady=10)
 
 
+        if dic_datos["lista_trayectos"]:
+            list_trayecto=[]
+            i = 1
+            for datos_trayecto in dic_datos["lista_trayectos"]:
+                frame = FrameTrayecto(scroll_frame,self.controller,self.vcmd_num_val,self.vcmd_fecha_val,f"Trayecto #{i}")
+                frame.set_datos(datos_trayecto)
+                list_trayecto.append(frame)
+            for frame in list_trayecto:
+                frame.pack(fill="x", padx=20, pady=10)
+
+            
+
+    #Logica para la paginacion
+    def siguiente_pagina(self):
+         # Calcula el nuevo inicio
+        nuevo_inicio = self.pagina_actual * self.cantidad_mostrar
+        nuevo_fin = nuevo_inicio + self.cantidad_mostrar
+
+        # Solo avanza si no es la última página
+        if self.pagina_actual < self.cantidad_paginas:
+            self.pagina_actual += 1
+            self.paginas_mostrar = self.lista_pnf[nuevo_inicio:nuevo_fin]
+            self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_paginas}")
+
+            # Muestra la nueva página
+            self.calcular_pagina()
+
+    def anterior_pagina(self):
+        # Solo retrocede si no es la primera página
+        if self.pagina_actual > 1:
+            self.pagina_actual -= 1
+            nuevo_inicio = (self.pagina_actual - 1) * self.cantidad_mostrar
+            nuevo_fin = nuevo_inicio + self.cantidad_mostrar
+            self.paginas_mostrar = self.lista_pnf[nuevo_inicio:nuevo_fin]
+            self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_paginas}")
+            self.calcular_pagina()
+
+
+    def calcular_pagina(self):
+
+        estado_btn_siguiente = "normal"
+        estado_btn_anterio = "normal"
+
+        if self.pagina_actual == 1: estado_btn_anterio = "disabled"
+        self.boton_anterior.configure(state=estado_btn_anterio)
+
+        if self.pagina_actual == self.cantidad_paginas: estado_btn_siguiente = "disabled"
+        self.boton_siguiente.configure(state=estado_btn_siguiente)
+
+        self.mostrar_listado()

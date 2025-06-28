@@ -263,3 +263,33 @@ class FrameTrayecto(SectionFrameBase):
         else:
             self.tramos_status_label.configure(text=f"{cantidad} tramo(s) cargado(s) correctamente.")
         
+
+    def set_datos(self, datos):
+        if datos:
+            self.numero_entry.insert(0, datos.get("numero", ""))
+            self.numero_entry.configure(state="disabled")
+            self.nombre_entry.insert(0, datos.get("nombre", ""))
+            self.nombre_entry.configure(state="disabled")
+            self.duracion_semanas_entry.insert(0, datos.get("duracion_semanas", ""))
+            self.duracion_semanas_entry.configure(state="disabled")
+            self.duracion_horas_entry.insert(0, datos.get("duracion_horas", ""))
+            self.duracion_horas_entry.configure(state="disabled")
+            self.creditos_minimos_entry.insert(0, datos.get("creditos_minimos", ""))
+            self.creditos_minimos_entry.configure(state="disabled")
+            self.creditos_maximos_entry.insert(0, datos.get("creditos_maximos", ""))
+            self.creditos_maximos_entry.configure(state="disabled")
+            self.numero_tramos_menu.set(str(datos.get("numero_tramos", "")))
+            self.numero_tramos_menu.configure(state="disabled")
+            self.objetivos_entry.insert(0, datos.get("objetivos", ""))
+            self.objetivos_entry.configure(state="disabled")
+            self.perfil_egreso_menu.set(datos.get("perfil_egreso", ""))
+            self.perfil_egreso_menu.configure(state="disabled")
+            self.obligatorio_menu.set("Si" if datos.get("obligatorio", True) else "No")
+            self.obligatorio_menu.configure(state="disabled")
+            self.secuencial_menu.set("Si" if datos.get("secuencial", True) else "No")
+            self.secuencial_menu.configure(state="disabled")
+            self.estado_option_menu.set(datos.get("estado", "activo"))
+            self.estado_option_menu.configure(state="disabled")
+        else:
+            for campo in self.entries_a_validar:
+                campo.configure(state="disabled")
