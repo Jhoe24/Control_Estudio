@@ -11,6 +11,7 @@ class FrameTrayecto(SectionFrameBase):
         self.master = master
         self.controlador = controlador
         self.vcmd_num = vcmd_num 
+        self.para_edicion = False
         # self.var = ctk.StringVar()
         # self.var.set("Activo")  # Valor por defecto para el estado
         # self.var2 = ctk.StringVar()
@@ -136,6 +137,7 @@ class FrameTrayecto(SectionFrameBase):
         self.lista_tramos = []
 
         # Si hay datos guardados, los muestra y deshabilita los campos
+       
         if self.lista_datos_tramos:
             for i, datos in enumerate(self.lista_datos_tramos):
                 tramo = FrameTramos(scrollable_frame, self.controlador, self.vcmd_num, self.vcmd_fecha, titulo=f"Tramo #{i+1}")
@@ -146,11 +148,19 @@ class FrameTrayecto(SectionFrameBase):
                         entry.set(valor)
                     else:
                         entry.insert(0, valor)
-                    entry.configure(state="disabled")  # Deshabilita el campo
+
+                    if self.para_edicion == False: entry.configure(state="disabled")  # Deshabilita el campo
+
                 self.lista_tramos.append(tramo)
             # No permite grabar de nuevo
             self.button_frame = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
             self.button_frame.pack(pady=(25, 20))
+            if self.para_edicion:
+                self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos Nuevos", width=140, command= lambda:self.procesar_tramos(top),
+                                            font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT,
+                                            state="normal")
+                self.btn_guardar.pack(side="left", padx=10)
+
             self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Cerrar", width=140, command=cerrar_top,
                                             font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT)
             self.btn_cancelar.pack(side="left", padx=10)
@@ -209,7 +219,7 @@ class FrameTrayecto(SectionFrameBase):
             for frame in self.lista_tramos:
                 datos = frame.procesar_tramo()
                 self.lista_datos_tramos.append(datos)
-        messagebox.showinfo("Información", "Tramos procesados correctamente.")
+        messagebox.showinfo("Información", "Tramos procesados correctamente.",parent=top)
 
         # Cierra la ventana de tramos si está abierta
         for widget in self.master.winfo_children():
@@ -221,28 +231,34 @@ class FrameTrayecto(SectionFrameBase):
         self.actualizar_status_tramos()
         return self.lista_datos_tramos
         
-    def obtener_datos_trayectos(self):
+    def obtener_datos_trayectos(self, lis_datos = None):
+        if lis_datos and not self.lista_datos_tramos:
+            self.lista_datos_tramos = lis_datos
         return self.controlador.getTrayectos(self,self.lista_datos_tramos)
 
     def validar_campos(self):
-        todos_llenos = all(entry.get().strip() for entry in self.entries_a_validar)
+        todos_llenos = all(str(entry.get()).strip() for entry in self.entries_a_validar)
         if todos_llenos:
             self.btn_tramos.configure(state="normal")
         else:
             self.btn_tramos.configure(state="disabled")
 
     def validar_campos_tramos_global(self):
-         # Verifica que todos los FrameTramos existan y todos sus campos estén llenos
         todos_llenos = True
         for frame_tramo in self.lista_tramos:
             for entry in getattr(frame_tramo, "entries_a_validar", []):
-                # Verifica que el entry tenga el método get (no ha sido destruido)
-                if not hasattr(entry, "get") or entry.get() is None or entry.get().strip() == "":
+                try:
+                    valor = str(entry.get()).strip()
+                except Exception:
+                    todos_llenos = False
+                    break
+                if valor == "":
                     todos_llenos = False
                     break
             if not todos_llenos:
                 break
-        if hasattr(self, "btn_guardar"):
+        # Verifica que el botón existe antes de configurarlo
+        if hasattr(self, "btn_guardar") and self.btn_guardar.winfo_exists():
             if todos_llenos and self.lista_tramos:
                 self.btn_guardar.configure(state="normal")
             else:
@@ -290,6 +306,22 @@ class FrameTrayecto(SectionFrameBase):
             self.secuencial_menu.configure(state="disabled")
             self.estado_option_menu.set(datos.get("estado", "activo"))
             self.estado_option_menu.configure(state="disabled")
+            if datos["lista_tramos"]:
+                
+                self.btn_tramos.configure(text="Ver Tramos",state="normal",command=lambda:self.decirhola(datos["lista_tramos"]))
+                self.tramos_status_label.configure(text = "Hay tramos cargados")
+
         else:
             for campo in self.entries_a_validar:
                 campo.configure(state="disabled")
+        
+    def decirhola(self,lista_datos):
+       if not self.lista_datos_tramos:
+            self.lista_datos_tramos = lista_datos
+       self.agregar_tramos()
+
+    def habilitar_campos(self):
+        for campo in self.entries_a_validar:
+            campo.configure(state="norma")
+        self.para_edicion = True
+        

@@ -103,6 +103,7 @@ class ListarPNF(ctk.CTkScrollableFrame):
     def ver_datos_completos(self, pnf):
         # Por ahora no hace nada, puedes implementar la lógica aquí más adelante
         dic_datos = self.controller.obtener_datos_completos(pnf[0])
+        dic_id = self.controller.obtener_id(dic_datos)
         top = ctk.CTkToplevel(self,fg_color="White")
         ancho = 900
         alto = 700
@@ -129,9 +130,11 @@ class ListarPNF(ctk.CTkScrollableFrame):
         frame_pnf.set_datos(dic_datos)
         frame_pnf.pack(fill="x", padx=20, pady=10)
 
+        list_trayecto = []  # <-- inicializa aquí
+
 
         if dic_datos["lista_trayectos"]:
-            list_trayecto=[]
+            
             i = 1
             for datos_trayecto in dic_datos["lista_trayectos"]:
                 frame = FrameTrayecto(scroll_frame,self.controller,self.vcmd_num_val,self.vcmd_fecha_val,f"Trayecto #{i}")
@@ -140,8 +143,18 @@ class ListarPNF(ctk.CTkScrollableFrame):
             for frame in list_trayecto:
                 frame.pack(fill="x", padx=20, pady=10)
 
-            
+        botones_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        botones_frame.pack(pady=10)
 
+        self.btn_actualizar = ctk.CTkButton(
+            botones_frame, text="Actualizar Datos", state="disabled", command=lambda:self.actualizar_pnf(frame_pnf,list_trayecto,dic_datos["lista_trayectos"],dic_id,top)
+        )
+        self.btn_actualizar.pack(side="left", padx=10)
+
+        # Botón para editar campos
+        ctk.CTkButton(botones_frame, text="Editar Campos",command=lambda:self.habilitar_todos(frame_pnf,list_trayecto)).pack(side="left", padx=10)
+        ctk.CTkButton(botones_frame, text="Cerrar").pack(side="left", padx=10)
+    
     #Logica para la paginacion
     def siguiente_pagina(self):
          # Calcula el nuevo inicio
@@ -180,3 +193,20 @@ class ListarPNF(ctk.CTkScrollableFrame):
         self.boton_siguiente.configure(state=estado_btn_siguiente)
 
         self.mostrar_listado()
+
+    def habilitar_todos(self,frame_pnf, lista_trayecto):
+        frame_pnf.habilitar_campos()
+
+        for frame_trayecto in lista_trayecto:
+            frame_trayecto.habilitar_campos()
+        self.btn_actualizar.configure(state="normal")
+
+    def actualizar_pnf(self,frame_pnf, lista_trayecto,listaDatosTrayecto,dic_id,top):
+        lista_datos_trayecto=[]
+        for trayecto,datos_trayecto in zip(lista_trayecto,listaDatosTrayecto):
+            lista_datos_trayecto.append(trayecto.obtener_datos_trayectos(datos_trayecto["lista_tramos"]))
+        dic_pnf = self.controller.getPNF(frame_pnf,lista_datos_trayecto)
+        exito = self.controller.update_pnf(dic_pnf,dic_id,top)
+        if exito:
+            top.destroy()
+            self.lista_pnf = self.controller.listado_pnf

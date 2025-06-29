@@ -54,7 +54,32 @@ class FrameTramos(SectionFrameBase):
     
     
     def validar_campos_tramo(self):
-        todos_llenos = all(entry.get().strip() for entry in self.entries_a_validar)
+        todos_llenos = all(str(entry.get()).strip() for entry in self.entries_a_validar)
         # Notifica al padre (FrameTrayecto) para que valide el botón global
         if hasattr(self.master.master, "validar_campos_tramos_global"):
-            self.master.master.validar_campos_tramos_global()
+            self.master.master.validar_campos_tramos_global()   
+
+
+    def set_datos(self, datos):
+        self.numero_entry.insert(0, datos.get("numero", ""))
+        self.numero_entry.configure(state="disabled")
+        self.nombre_entry.insert(0, datos.get("nombre", ""))
+        self.nombre_entry.configure(state="disabled")
+        self.duracion_semanas_entry.insert(0, datos.get("duracion_semanas", ""))
+        self.duracion_semanas_entry.configure(state="disabled")
+        self.duracion_horas_entry.insert(0, datos.get("duracion_horas", ""))
+        self.duracion_horas_entry.configure(state="disabled")
+        self.creditos_entry.insert(0, datos.get("creditos", ""))
+        self.creditos_entry.configure(state="disabled")
+        self.objetivos_entry.insert(0, datos.get("objetivos", ""))
+        self.objetivos_entry.configure(state="disabled")
+        # Si tienes un campo para competencias, agrégalo aquí
+        if hasattr(self, "competencias_entry"):
+            self.competencias_entry.insert(0, datos.get("competencias", ""))
+            self.competencias_entry.configure(state="disabled")
+        self.estado_option_menu.set(datos.get("estado", "activo"))
+        self.estado_option_menu.configure(state="disabled")
+    
+    def habilitar_campos(self):
+        for campo in self.entries_a_validar:
+            campo.configure(state="norma")

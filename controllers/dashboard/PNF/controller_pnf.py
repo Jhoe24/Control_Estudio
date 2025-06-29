@@ -1,6 +1,7 @@
 import tkinter.messagebox as messagebox
 from models.PNF.modelo_pnf import ModeloPNF
 from datetime import datetime
+from pprint import pprint
 class ControllerPNF:
     
     def __init__(self):
@@ -57,6 +58,52 @@ class ControllerPNF:
         else:
             dic_pnf["lista_trayectos"] = []
         return dic_pnf
+    
+    def update_pnf(self,dic_pnf,dic_id,top):
+        pprint(dic_pnf)
+        exito = self.modelo.update_pnf(dic_pnf,dic_id["id_pnf"])
+        if exito:
+            if dic_pnf["lista_trayectos"]:
+                for trayectos,id_trayecto in zip(dic_pnf["lista_trayectos"],dic_id["ids_trayectos"]):
+                    exito = self.modelo.update_trayecto(trayectos,id_trayecto[0])
+                    if exito:
+                        for tramos,id in zip(trayectos["lista_tramos"],id_trayecto[1]):
+                            exito = self.modelo.update_tramo(tramos,id)
+                            if exito == False:
+                                messagebox.showinfo("Error", f"tramo {tramos["numero"]} no se puedo actualizar.", parent=top)
+                    else:
+                        messagebox.showinfo("Error", f"trayecto {trayectos["numero"]} no se puedo actualizar.", parent=top)
+
+            messagebox.showinfo("Éxito","PNF actualizado correctamente.", parent=top)
+            self.listado_pnf = self.modelo.obtner_lista_pnf()
+            return True
+        else: 
+            messagebox.showinfo("Error", f"El PNF no se puedo actualizar.", parent=top)
+            return False
+
+    def obtener_id(self,dic_pnf):
+        dic_id = {}
+        dic_id["id_pnf"] = dic_pnf["id"]
+
+        if dic_pnf["lista_trayectos"]:
+
+            list_id_trayectos = []
+            list_id_tramos = []
+
+            conjunto =[]
+            for trayecto in dic_pnf["lista_trayectos"]:
+                conjunto.append(trayecto["id"])
+
+                if trayecto["lista_tramos"]:
+                    for tramo in trayecto["lista_tramos"]:
+                        list_id_tramos.append(tramo["id"])
+
+                conjunto.append(list_id_tramos)
+                list_id_trayectos.append(conjunto)
+            dic_id['ids_trayectos']=list_id_trayectos
+        return dic_id
+
+
 
     def getTramos(self,vista_tramos):
         #diccionario para guardar los datos de los tramos
@@ -70,7 +117,7 @@ class ControllerPNF:
             "estado": vista_tramos.estado_option_menu.get(), 
         }
         return dic_tramos
-    
+
     def getTrayectos(self,vista_trayectos, lista_tramos):
         #diccinario para guardar los datos de los trayectos
         dic_trayectos = {

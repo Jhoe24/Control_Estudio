@@ -210,7 +210,145 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
+    def update_pnf(self, datos_pnf, id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                UPDATE pnf SET
+                    codigo = ?,
+                    codigo_nacional = ?,
+                    nombre = ?,
+                    nombre_corto = ?,
+                    nivel = ?,
+                    area_conocimiento = ?,
+                    duracion_trayectos = ?,
+                    duracion_semanas = ?,
+                    total_creditos = ?,
+                    total_horas = ?,
+                    titulo_otorga = ?,
+                    perfil_egreso = ?,
+                    resolucion_creacion = ?,
+                    fecha_resolucion = ?,
+                    version_pensum = ?,
+                    coordinador_nacional = ?,
+                    estado = ?
+                WHERE id = ?
+                """,
+                (
+                    datos_pnf["codigo"],
+                    datos_pnf["codigo_nacional"],
+                    datos_pnf["nombre_pnf"],
+                    datos_pnf["siglas"],
+                    datos_pnf["tipo_pnf"],
+                    datos_pnf["area_conocimiento"],
+                    datos_pnf["cantidad_trayectos"],
+                    datos_pnf["duracion_semana"],
+                    datos_pnf["duracion_creditos"],
+                    datos_pnf["duracion_horas"],
+                    datos_pnf["titulo_otorga"],
+                    datos_pnf["perfil_egreso"],
+                    datos_pnf["resolucion"],
+                    datos_pnf["fecha_resolucion"],
+                    datos_pnf["version_pensum"],
+                    datos_pnf["coordinador_nacional"],
+                    datos_pnf["estado"],
+                    id
+                )
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al actualizar el PNF: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
 
+    def update_trayecto(self, datos_trayecto, id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                UPDATE trayectos SET
+                    numero = ?,
+                    nombre = ?,
+                    tipo = ?,
+                    duracion_semanas = ?,
+                    duracion_horas = ?,
+                    creditos_minimos = ?,
+                    creditos_maximos = ?,
+                    numero_tramos = ?,
+                    objetivos = ?,
+                    perfil_egreso = ?,
+                    obligatorio = ?,
+                    secuencial = ?,
+                    estado = ?
+                WHERE id = ?
+                """,
+                (
+                    datos_trayecto["numero"],
+                    datos_trayecto["nombre"],
+                    "Inicial",  # Si siempre es "Inicial" como en el registro
+                    datos_trayecto["duracion_semanas"],
+                    datos_trayecto["duracion_horas"],
+                    datos_trayecto["creditos_minimos"],
+                    datos_trayecto["creditos_maximos"],
+                    datos_trayecto["numero_tramos"],
+                    datos_trayecto["objetivos"],
+                    datos_trayecto["perfil_egreso"],
+                    datos_trayecto["obligatorio"],
+                    datos_trayecto["secuencial"],
+                    datos_trayecto["estado"],
+                    id
+                )
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al actualizar el trayecto: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
 
-# db = ModeloPNF()
-# pprint(db.obtener_pnf(3))
+    def update_tramo(self, datos_tramo, id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                UPDATE tramos SET
+                    numero = ?,
+                    nombre = ?,
+                    duracion_semanas = ?,
+                    duracion_horas = ?,
+                    creditos = ?,
+                    objetivos = ?,
+                    estado = ?
+                WHERE id = ?
+                """,
+                (
+                    datos_tramo["numero"],
+                    datos_tramo["nombre"],
+                    datos_tramo["duracion_semanas"],
+                    datos_tramo["duracion_horas"],
+                    datos_tramo["creditos"],
+                    datos_tramo["objetivos"],
+                    datos_tramo["estado"],
+                    id
+                )
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al actualizar el tramo: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()

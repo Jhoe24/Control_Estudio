@@ -250,7 +250,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.master.button_siguiente.configure(state="disabled")
     
     def set_datos(self, datos):
-        print(datos)
         self.codigo_entry.insert(0, datos.get("codigo", ""))
         self.codigo_entry.configure(state="disabled")
 
@@ -306,3 +305,7 @@ class DatosPNFPensumFrame(SectionFrameBase):
         if "fecha_resolucion" in datos and datos["fecha_resolucion"]:
             self.set_fecha_resolucion(datos["fecha_resolucion"])
         self.btn_fecha.configure(state="disabled")
+
+    def habilitar_campos(self):
+        for campo in self.entries_a_validar:
+            campo.configure(state="norma")
