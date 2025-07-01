@@ -41,7 +41,7 @@ class MainWindow(ctk.CTk):
         # Configuración del tema y colores
         ctk.set_appearance_mode(self.tema)
         
-        # AppConfig().centrar_ventana(self, *self.tamano_ventana.split("x"))  # Centramos la ventana en la pantalla
+        AppConfig().centrar_ventana(self, *self.tamano_ventana.split("x"))  # Centramos la ventana en la pantalla
         
         self.vista_actual = None # Declaramos una variable para la vista actual
         
@@ -55,10 +55,10 @@ class MainWindow(ctk.CTk):
             "PNF": ControllerPNF()
             }  # Aquí se inicializa el controlador del dashboard, que es el panel de control de la aplicación. 
         # El servicio de usuario se inyecta en el controlador de autenticación, cuya funcion es manejar la lógica de autenticación y autorización de usuarios. 
-        
+
         # Mostramos la vista de login al iniciar la aplicación
-        #self.mostrar_vista_login()
-        self.mostrar_vista_dashboardd("Master", "admin")  # Por defecto mostramos el dashboard de admin, pero esto se puede cambiar dependiendo del rol del usuario que inicie sesión.
+        self.mostrar_vista_login()
+        #self.mostrar_vista_dashboardd("Master", "admin")  # Por defecto mostramos el dashboard de admin, pero esto se puede cambiar dependiendo del rol del usuario que inicie sesión.
     
     def limpiar_vista_actual(self):
         if self.vista_actual:

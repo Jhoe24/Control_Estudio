@@ -58,9 +58,12 @@ class FrameTrayecto(SectionFrameBase):
             ("Secuencial:", crear_option_menu, {"values":["Si", "No"], "command": lambda v: setattr(self.secuencial_menu, '_current_value',v)}, 1, self, 'secuencial_menu'),
             ("Estado:", crear_option_menu, {"values":["activo", "inactivo"], "command": lambda v: setattr(self.estado_option_menu, '_current_value',v)}, 1, self, 'estado_option_menu')
         ])
-        
+        # --- Fila para el botón de agregar tramos ---
+        self.botones_tramos_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.botones_tramos_frame.pack(pady=(20, 0), anchor="w")  # Puedes ajustar anchor según tu diseño
+
         self.btn_tramos = ctk.CTkButton(
-            self,
+            self.botones_tramos_frame,
             text    ="Agregar Tramos",
             width=140,
             font=FUENTE_BOTON,
@@ -70,7 +73,20 @@ class FrameTrayecto(SectionFrameBase):
             command=self.agregar_tramos,
             state="disabled"  # Deshabilitar al inicio
         )
-        self.btn_tramos.pack(pady=(20, 0), ancho="w")
+        self.btn_tramos.pack(side="left", padx=(0, 10))
+
+        # Botón para agregar nuevos tramos
+        # Solo se muestra si el trayecto es editable
+        self.btn_agregar_nuevos_tramos = ctk.CTkButton(
+            self.botones_tramos_frame,
+            text="Agregar Nuevos Tramos",
+            width=140,
+            font=FUENTE_BOTON,
+            fg_color=COLOR_BOTON_PRIMARIO_FG,
+            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
+            text_color=COLOR_BOTON_PRIMARIO_TEXT,
+            command=self.agregar_nuevos_tramos,
+            )
 
         # Label para mostrar el estado de los tramos cargados
         self.tramos_status_label = ctk.CTkLabel(self, text="No hay tramos cargados previamente.", font=FUENTE_LABEL_CAMPO, 
@@ -482,15 +498,5 @@ class FrameTrayecto(SectionFrameBase):
             campo.configure(state="normal")
         self.numero_entry.configure(state="disabled")  # Deshabilitar el campo de número
         self.para_edicion = True
-        self.btn_agregar_nuevos_tramos = ctk.CTkButton(
-            self,
-            text="Agregar Nuevos Tramos",
-            width=140,
-            font=FUENTE_BOTON,
-            fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-            text_color=COLOR_BOTON_PRIMARIO_TEXT,
-            command=self.agregar_nuevos_tramos,
-            
-        )
-        self.btn_agregar_nuevos_tramos.pack(pady=(10, 0))
+
+        self.btn_agregar_nuevos_tramos.pack(side="left")
