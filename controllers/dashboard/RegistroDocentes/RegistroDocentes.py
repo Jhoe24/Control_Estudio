@@ -37,9 +37,9 @@ class DocenteController:
             return False
         #print(f"id: {id} '/n Datos: {datos}")
 
-    def buscar_docente(self, tipo_doc, nro_doc):
+    def buscar_estudiante(self, tipo_doc, nro_doc):
         
-        registro = self.modelo_docente.buscar_docente(tipo_doc, nro_doc)
+        registro = self.modelo_docente.buscar_estudiante(tipo_doc, nro_doc)
 
         if registro:
             return registro

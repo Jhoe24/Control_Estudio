@@ -53,7 +53,6 @@ class EstudianteController:
     def buscar_estudiante(self, tipo_doc, nro_doc):
         
         registro = self.modelo.buscar_estudiante(tipo_doc, nro_doc)
-        print("id = ", registro.get("id", "No ID found"))
         print(f"buscar estudiante {tipo_doc} : {nro_doc} : {registro}")
         if registro:
             return registro

@@ -254,7 +254,7 @@ class ModeloDocente:
             return False
        
     
-    def buscar_docente(self, tipo_documento, nro_documento):
+    def buscar_estudiante(self, tipo_documento, nro_documento):
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
@@ -264,7 +264,7 @@ class ModeloDocente:
                 SELECT ip.*, e.*
                 FROM informacion_personal ip
                 JOIN docentes e ON ip.id= e.persona_id
-                WHERE ip.tipo='docentes' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
+                WHERE ip.tipo='docente' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
                 LIMIT 1
             ''', (tipo_documento, nro_documento))
             resultado = cursor.fetchone()
@@ -274,9 +274,10 @@ class ModeloDocente:
 
             nombres_columnas = [desc[0] for desc in cursor.description]
             docentes = dict(zip(nombres_columnas, resultado))
-            persona_id = docentes['id']
+            persona_id = docentes['persona_id']
 
             # Telefonos del estudiante
+            
             cursor.execute('''
                 SELECT tipo_telefono, numero, principal FROM telefonos
                 WHERE persona_id = ?
@@ -292,6 +293,7 @@ class ModeloDocente:
                 LIMIT 1
             ''', (persona_id,))
             dir_row = cursor.fetchone()
+
             if dir_row:
                 docentes['estado'] = dir_row[0]
                 docentes['municipio'] = dir_row[1]
@@ -308,7 +310,8 @@ class ModeloDocente:
                 docentes['calle'] = ''
                 docentes['casa_apart'] = ''
                 docentes['tipo_direccion'] = ''
-
+                
+            
             con.close()
             return docentes
 
