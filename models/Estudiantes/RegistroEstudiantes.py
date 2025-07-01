@@ -216,7 +216,7 @@ class ModelRegistroEstudiantes:
                 
                 estudiante = dict(zip(nombres_columnas, resultado))
                 
-                persona_id = estudiante['id']
+                persona_id = estudiante['persona_id']
 
                 tel_info = telefonos_dict.get(persona_id, {})
                 # estudiante['telefono_principal'] = tel_info.get('telefono_principal', '')
@@ -259,9 +259,9 @@ class ModelRegistroEstudiantes:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
 
-            # Buscar estudiante
+            # Buscar estudiante, usando alias para los IDs
             cursor.execute('''
-                SELECT ip.*, e.*
+                SELECT ip.id AS persona_id, ip.*, e.id AS estudiante_id, e.*
                 FROM informacion_personal ip
                 JOIN estudiantes e ON ip.id= e.persona_id
                 WHERE ip.tipo='estudiante' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
@@ -274,7 +274,7 @@ class ModelRegistroEstudiantes:
 
             nombres_columnas = [desc[0] for desc in cursor.description]
             estudiante = dict(zip(nombres_columnas, resultado))
-            persona_id = estudiante['id']
+            persona_id = estudiante['persona_id']  # Usar el alias correcto
 
             # Telefonos del estudiante
             cursor.execute('''
@@ -285,6 +285,7 @@ class ModelRegistroEstudiantes:
             estudiante['telefonos'] = [(tipo_telefono, numero, principal) for tipo_telefono, numero, principal in telefonos]
 
             # Direccion del estudiante
+            print("persona_id:", persona_id)
             cursor.execute('''
                 SELECT estado, municipio, parroquia, sector, calle, casa_edificio, tipo_direccion
                 FROM direcciones
@@ -408,7 +409,7 @@ class ModelRegistroEstudiantes:
                                datos_estudiantes['correo_electronico'],
                                id
                            ))
-
+            print(datos_estudiantes["codigo_sni"])
             # Actualizar datos en la tabla estudiantes
             cursor.execute('''
                            UPDATE estudiantes
@@ -459,7 +460,7 @@ class ModelRegistroEstudiantes:
                     1 if idx == 0 else 0  # El primero es principal, los demás secundarios
                 ))
 
-            
+            print("id:", id)
             # Actualizar direcciones
             cursor.execute('''
                            UPDATE direcciones
@@ -504,5 +505,4 @@ class ModelRegistroEstudiantes:
     #     except Exception as e:
     #         print(f"Error en la consulta {table}: {e}") 
     #         return False
-        
-            
+

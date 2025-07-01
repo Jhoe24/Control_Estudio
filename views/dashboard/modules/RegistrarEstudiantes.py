@@ -92,7 +92,7 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
             canvas.yview_scroll(int(-1*(event.delta/2)), "units")
 
     # Formulario de actualizacion
-    def ver_datos_completos(self, estudiante):
+    def ver_datos_completos(self, estudiante, listado_estudiantes=None):
         """
         Muestra una ventana emergente con los datos completos de un estudiante, en formato similar al formulario.
         """
@@ -133,9 +133,9 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
         botones_frame.pack(pady=10)
 
         # Botón para actualizar datos
-        estudiante_id = estudiante['id']
+        estudiante_id = estudiante['persona_id']
         self.btn_actualizar = ctk.CTkButton(
-            botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_estudiante(estudiante_id,ventana)  # Cambia el comando aquí
+            botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_estudiante(estudiante_id,ventana,listado_estudiantes)  # Cambia el comando aquí
         )
         self.btn_actualizar.pack(side="left", padx=10)
 
@@ -155,15 +155,19 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
             self.sistema_ingreso_frame.habilitar_edicion()
         if self.datos_ubicacion_frame is not None:
             self.datos_ubicacion_frame.habilitar_edicion()
-    
-    def actualizar_estudiante(self, id, ventana):
+
+    def actualizar_estudiante(self, id, ventana, listado_estudiantes):
         # Obtener los datos de los frames para actualizarlos
         datos = self.controlador.obtener_todos_los_datos(self)
         if self.controlador.validar_campos_obligatorios(datos, self):
             exito = self.controlador.cargar_estudiante_para_edicion(id, datos, self)
             if exito:
                 #self.controlador.master_controlador.estudiantes.limpiar_formulario_completo(self)
+                if listado_estudiantes:
+                    listado_estudiantes.mostrar_pagina(True)
                 ventana.destroy()
             else:
                 pass
+                
+       
     

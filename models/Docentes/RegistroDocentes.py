@@ -254,69 +254,69 @@ class ModeloDocente:
             return False
        
     
-    # def buscar_estudiante(self, tipo_documento, nro_documento):
-    #     try:
-    #         con = sql.connect(self.db_ruta)
-    #         cursor = con.cursor()
+    def buscar_docente(self, tipo_documento, nro_documento):
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
 
-    #         # Buscar estudiante
-    #         cursor.execute('''
-    #             SELECT ip.*, e.*
-    #             FROM informacion_personal ip
-    #             JOIN estudiantes e ON ip.id= e.persona_id
-    #             WHERE ip.tipo='estudiante' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
-    #             LIMIT 1
-    #         ''', (tipo_documento, nro_documento))
-    #         resultado = cursor.fetchone()
-    #         if not resultado:
-    #             con.close()
-    #             return None  # No encontrado
+            # Buscar estudiante
+            cursor.execute('''
+                SELECT ip.*, e.*
+                FROM informacion_personal ip
+                JOIN docentes e ON ip.id= e.persona_id
+                WHERE ip.tipo='docentes' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
+                LIMIT 1
+            ''', (tipo_documento, nro_documento))
+            resultado = cursor.fetchone()
+            if not resultado:
+                con.close()
+                return None  # No encontrado
 
-    #         nombres_columnas = [desc[0] for desc in cursor.description]
-    #         estudiante = dict(zip(nombres_columnas, resultado))
-    #         persona_id = estudiante['id']
+            nombres_columnas = [desc[0] for desc in cursor.description]
+            docentes = dict(zip(nombres_columnas, resultado))
+            persona_id = docentes['id']
 
-    #         # Telefonos del estudiante
-    #         cursor.execute('''
-    #             SELECT tipo_telefono, numero, principal FROM telefonos
-    #             WHERE persona_id = ?
-    #         ''', (persona_id,))
-    #         telefonos = cursor.fetchall()
-    #         estudiante['telefonos'] = [(tipo_telefono, numero, principal) for tipo_telefono, numero, principal in telefonos]
+            # Telefonos del estudiante
+            cursor.execute('''
+                SELECT tipo_telefono, numero, principal FROM telefonos
+                WHERE persona_id = ?
+            ''', (persona_id,))
+            telefonos = cursor.fetchall()
+            docentes['telefonos'] = [(tipo_telefono, numero, principal) for tipo_telefono, numero, principal in telefonos]
 
-    #         # Direccion del estudiante
-    #         cursor.execute('''
-    #             SELECT estado, municipio, parroquia, sector, calle, casa_edificio, tipo_direccion
-    #             FROM direcciones
-    #             WHERE persona_id = ? AND principal=1
-    #             LIMIT 1
-    #         ''', (persona_id,))
-    #         dir_row = cursor.fetchone()
-    #         if dir_row:
-    #             estudiante['estado'] = dir_row[0]
-    #             estudiante['municipio'] = dir_row[1]
-    #             estudiante['parroquia'] = dir_row[2]
-    #             estudiante['sector'] = dir_row[3]
-    #             estudiante['calle'] = dir_row[4]
-    #             estudiante['casa_apart'] = dir_row[5]
-    #             estudiante['tipo_direccion'] = dir_row[6]
-    #         else:
-    #             estudiante['estado'] = ''
-    #             estudiante['municipio'] = ''
-    #             estudiante['parroquia'] = ''
-    #             estudiante['sector'] = ''
-    #             estudiante['calle'] = ''
-    #             estudiante['casa_apart'] = ''
-    #             estudiante['tipo_direccion'] = ''
+            # Direccion del estudiante
+            cursor.execute('''
+                SELECT estado, municipio, parroquia, sector, calle, casa_edificio, tipo_direccion
+                FROM direcciones
+                WHERE persona_id = ? AND principal=1
+                LIMIT 1
+            ''', (persona_id,))
+            dir_row = cursor.fetchone()
+            if dir_row:
+                docentes['estado'] = dir_row[0]
+                docentes['municipio'] = dir_row[1]
+                docentes['parroquia'] = dir_row[2]
+                docentes['sector'] = dir_row[3]
+                docentes['calle'] = dir_row[4]
+                docentes['casa_apart'] = dir_row[5]
+                docentes['tipo_direccion'] = dir_row[6]
+            else:
+                docentes['estado'] = ''
+                docentes['municipio'] = ''
+                docentes['parroquia'] = ''
+                docentes['sector'] = ''
+                docentes['calle'] = ''
+                docentes['casa_apart'] = ''
+                docentes['tipo_direccion'] = ''
 
-    #         con.close()
-    #         return estudiante
+            con.close()
+            return docentes
 
-    #     except Exception as e:
-    #         print(f"Error al realizar la consulta: {e}")
-    #         return False
-    #     finally:
-    #         con.close()
+        except Exception as e:
+            print(f"Error al realizar la consulta: {e}")
+            return False
+        finally:
+            con.close()
 
     def obtener_id_ultimo(self):
         con = None

@@ -32,13 +32,13 @@ class EstudianteController:
 
     def cargar_estudiante_para_edicion(self, id_estudiante, dic_estudiante, vista_formulario):
         print(f"cargar estudiante para edicion {id_estudiante} : {dic_estudiante}")
-        # existo = self.modelo.update_estudiante(id_estudiante, dic_estudiante)
-        # if existo:
-        #     messagebox.showinfo("Info", "Exito al actualizar los datos del estudiante")
-        #     return True
-        # else:
-        #     messagebox.showerror("Error", "Hubo un error al actualizar los datos del estudiante.", parent=vista_formulario)
-        #     return False
+        existo = self.modelo.update_estudiante(id_estudiante, dic_estudiante)
+        if existo:
+            messagebox.showinfo("Info", "Exito al actualizar los datos del estudiante")
+            return True
+        else:
+            messagebox.showerror("Error", "Hubo un error al actualizar los datos del estudiante.", parent=vista_formulario)
+            return False
 
     def obtener_lista_estudiantes(self,desde):
         #Obtener 10 registro de estudiantes
@@ -47,12 +47,14 @@ class EstudianteController:
         if desde < nmin : desde = nmin
         if desde > (nmax) : desde = nmax-1
         resultado = self.modelo.lista_Estudiantes(desde)
+        #print(f"obtener lista estudiantes desde {resultado}")
         return resultado
 
     def buscar_estudiante(self, tipo_doc, nro_doc):
         
         registro = self.modelo.buscar_estudiante(tipo_doc, nro_doc)
-
+        print("id = ", registro.get("id", "No ID found"))
+        print(f"buscar estudiante {tipo_doc} : {nro_doc} : {registro}")
         if registro:
             return registro
         else:

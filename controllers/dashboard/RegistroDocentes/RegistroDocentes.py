@@ -39,12 +39,12 @@ class DocenteController:
 
     def buscar_docente(self, tipo_doc, nro_doc):
         
-        registro = self.modelo.buscar_estudiante(tipo_doc, nro_doc)
+        registro = self.modelo_docente.buscar_docente(tipo_doc, nro_doc)
 
         if registro:
             return registro
         else:
-            messagebox.showerror("Error", "No se encontró el estudiante con los datos proporcionados.")
+            messagebox.showerror("Error", "No se encontró el docente con los datos proporcionados.")
             return None
 
     def _solo_numeros(self, char_input):

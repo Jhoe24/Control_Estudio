@@ -81,10 +81,14 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
 
         self.mostrar_pagina()
 
-    def mostrar_pagina(self):
+    def mostrar_pagina(self, indicador = False):
         """
         Muestra los estudiantes de la página actual y actualiza el estado de los botones.
         """
+        if indicador:
+            # Si se indica, se recarga la página actual
+            self.estudiantes = self.controlador.obtener_lista_estudiantes((self.pagina_actual - 1) * self.registros_por_pagina)
+
         self.cargar_datos(self.estudiantes)
         self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
 
@@ -170,15 +174,16 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
             boton = ctk.CTkButton(
                 celda_btn, text="Ver datos", width=100,
                 text_color=COLOR_ENTRY_BG,
-                command=lambda est=estudiante: self.furmulario_estudiante.ver_datos_completos(est)
+                command=lambda est=estudiante: self.furmulario_estudiante.ver_datos_completos(est,self)
             )
             boton.pack(padx=10, pady=5)
             fila_widgets.append(celda_btn)
             self.filas_datos.append(fila_widgets)
+            
 
         # SIEMPRE coloca el frame de paginación en la fila siguiente a la última
-        # La fila de inicio de los datos es 2, asÃ­ que si hay 'n' datos, la Ãºltima fila de datos es 2 + n - 1.
-        
+        # La fila de inicio de los datos es 2, así que si hay 'n' datos, la última fila de datos es 2 + n - 1.
+
         fila_paginacion = len(datos) + 2
         self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=6, pady=15, sticky="ew")
 
