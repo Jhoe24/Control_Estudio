@@ -99,9 +99,12 @@ class AdminDashboardView(BaseDashboardView):
 
         unid_Curr = UnidadCurricular(self.cuerpo_principal, None, controlador= None)
         unid_Curr.pack(fill="both", expand=True, padx=10, pady=10)
+
     def list_pnf(self):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
-
+        
+        # Asegúrate de que el controlador tenga el listado de PNF actualizado
+        self.controller['PNF'].actualizar_listado()
         unid_Curr = ListarPNF(self.cuerpo_principal, self.controller["PNF"])
         unid_Curr.pack(fill="both", expand=True, padx=10, pady=10)

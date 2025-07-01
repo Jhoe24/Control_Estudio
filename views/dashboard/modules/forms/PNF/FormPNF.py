@@ -308,4 +308,11 @@ class DatosPNFPensumFrame(SectionFrameBase):
 
     def habilitar_campos(self):
         for campo in self.entries_a_validar:
-            campo.configure(state="norma")
+            campo.configure(state="normal")
+            self.duracion_trayectos_entry.configure(state="normal")
+            self.duracion_semanas_entry.configure(state="normal")
+            self.btn_fecha.configure(state="normal")
+            self.estado_menu.configure(state="normal")
+            self.tipo_pnf_menu.configure(state="normal")
+           
+        # Habilitar el botón de grabar Trayecto si existe

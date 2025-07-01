@@ -142,6 +142,8 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         if self.datos_cantidad_trayecto > 0:
             for i in range(self.datos_cantidad_trayecto):
                 self.listado_trayectos.append(FrameTrayecto(self, self.controlador, self.vcmd_num_val, self.vcmd_fecha_val, titulo=f"Trayecto #{i+1}"))
+                self.listado_trayectos[i].numero_entry.insert(0, i+1)
+                self.listado_trayectos[i].numero_entry.configure(state="disabled")  
                 self.listado_trayectos[i].pack(fill="x", padx=10, pady=(10, 0))
                 
         # Habilita los botones después de grabar trayecto

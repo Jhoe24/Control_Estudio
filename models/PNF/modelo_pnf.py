@@ -270,12 +270,12 @@ class ModeloPNF:
     def update_trayecto(self, datos_trayecto, id):
         con = None
         try:
+            print(datos_trayecto["numero"])
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
             cursor.execute(
                 """
                 UPDATE trayectos SET
-                    numero = ?,
                     nombre = ?,
                     tipo = ?,
                     duracion_semanas = ?,
@@ -291,7 +291,6 @@ class ModeloPNF:
                 WHERE id = ?
                 """,
                 (
-                    datos_trayecto["numero"],
                     datos_trayecto["nombre"],
                     "Inicial",  # Si siempre es "Inicial" como en el registro
                     datos_trayecto["duracion_semanas"],
@@ -348,6 +347,112 @@ class ModeloPNF:
             return True
         except Exception as e:
             print(f"Error al actualizar el tramo: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+#==================================================================================================================
+    def obtener_lista_trayecto(self, id_pnf):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            
+            cursor.execute(
+                """
+                SELECT id, nombre FROM trayectos WHERE pnf_id = ?
+                """, (id_pnf,)
+            )
+
+            return cursor.fetchall()   
+
+        except Exception as e:
+            print(f"Error al obtener la lista: {e}") 
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+    def obtener_lista_tramo(self, id_trayecto):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            
+            cursor.execute(
+                """
+                SELECT id, nombre FROM tramos WHERE trayecto_id = ?
+                """, (id_trayecto,)
+            )
+
+            return cursor.fetchall()   
+
+        except Exception as e:
+            print(f"Error al obtener la lista: {e}") 
+            return False
+        finally:
+            if con is not None:
+                con.close()
+    
+    def registrar_unidad_curricular(self, datos_uc,fecha_actual):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            
+            cursor.execute(
+
+                """
+                INSERT INTO unidades_curriculares
+                (codigo, nombre, nombre_corto, pnf_id, trayecto_id, tramo_id, area, subarea, eje_formativo, horas_teoricas, horas_practicas,
+                horas_laboratorio, horas_trabajo_independiente, horas_totales, unidades_credito, tipo, caracter, modalidad, complejidad,
+                prelaciones, competencias_genericas, competencias_especificas, saberes_cognitivos, saberes_procedimentales, saberes_actitudinales,
+                estrategias_ensenanza, recursos_didacticos, evaluacion, bibliografia, homologacion_clave, clave_especial,
+                estado, fecha_creacion, fecha_actualizacion)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                """,
+                (
+                    datos_uc["codigo"],
+                    datos_uc["nombre"],
+                    datos_uc["nombre_corto"],
+                    datos_uc["id_pnf"],
+                    datos_uc["id_trayecto"],
+                    datos_uc["id_tramo"],
+                    datos_uc["area"],
+                    datos_uc["subarea"],
+                    datos_uc["eje_formativo"],
+                    datos_uc["horas_teoricas"],
+                    datos_uc["horas_practicas"],
+                    datos_uc["horas_laboratorio"],
+                    datos_uc["horas_trabajo_independiente"],
+                    datos_uc["horas_totales"],
+                    datos_uc["unidades_credito"],
+                    datos_uc["tipo"],
+                    datos_uc["caracter"],
+                    datos_uc["modalidad"],
+                    datos_uc["complejidad"],
+                    datos_uc["prelaciones"],
+                    datos_uc["competencias_genericas"],
+                    datos_uc["competencias_especificas"],
+                    datos_uc["saberes_cognitivos"],
+                    datos_uc["saberes_procedimentales"],
+                    datos_uc["saberes_actitudinales"],
+                    datos_uc["estrategias_ensenanza"],
+                    datos_uc["recursos_didacticos"],
+                    datos_uc["evaluacion"],
+                    datos_uc["bibliografia"],
+                    datos_uc["homologacion_clave"],
+                    datos_uc["clave_especial"],
+                    datos_uc["estado"],
+                    fecha_actual,
+                    fecha_actual,
+                    
+                )
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al registrar la unidad curricular: {e}")
             return False
         finally:
             if con is not None:

@@ -82,4 +82,5 @@ class FrameTramos(SectionFrameBase):
     
     def habilitar_campos(self):
         for campo in self.entries_a_validar:
-            campo.configure(state="norma")
+            campo.configure(state="normal")
+        self.numero_entry.configure(state="disabled")  # Habilita el campo de número

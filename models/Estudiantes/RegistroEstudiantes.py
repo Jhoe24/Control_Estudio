@@ -395,11 +395,9 @@ class ModelRegistroEstudiantes:
             # Actualizar datos en la tabla de informacion_personal
             cursor.execute('''
                            UPDATE informacion_personal
-                           SET documento_identidad = ?, tipo_documento = ?, nombres = ?, apellidos = ?, fecha_nacimiento = ?, sexo = ?, estado_civil = ?, nacionalidad = ?, lugar_nacimiento = ?, correo_electronico = ?
+                           SET nombres = ?, apellidos = ?, fecha_nacimiento = ?, sexo = ?, estado_civil = ?, nacionalidad = ?, lugar_nacimiento = ?, correo_electronico = ?
                            WHERE id = ?
                            ''',(
-                               datos_estudiantes['nro_documento'],
-                               datos_estudiantes['tipo_documento'],
                                datos_estudiantes['nombre'],
                                datos_estudiantes['apellido'],
                                datos_estudiantes['f_nacimiento'],

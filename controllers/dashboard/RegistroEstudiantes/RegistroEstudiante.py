@@ -31,13 +31,14 @@ class EstudianteController:
         print(datos_estudiante)
 
     def cargar_estudiante_para_edicion(self, id_estudiante, dic_estudiante, vista_formulario):
-        existo = self.modelo.update_estudiante(id_estudiante, dic_estudiante)
-        if existo:
-            messagebox.showinfo("Info", "Exito al actualizar los datos del estudiante")
-            return True
-        else:
-            messagebox.showerror("Error", "Hubo un error al actualizar los datos del estudiante.", parent=vista_formulario)
-            return False
+        print(f"cargar estudiante para edicion {id_estudiante} : {dic_estudiante}")
+        # existo = self.modelo.update_estudiante(id_estudiante, dic_estudiante)
+        # if existo:
+        #     messagebox.showinfo("Info", "Exito al actualizar los datos del estudiante")
+        #     return True
+        # else:
+        #     messagebox.showerror("Error", "Hubo un error al actualizar los datos del estudiante.", parent=vista_formulario)
+        #     return False
 
     def obtener_lista_estudiantes(self,desde):
         #Obtener 10 registro de estudiantes

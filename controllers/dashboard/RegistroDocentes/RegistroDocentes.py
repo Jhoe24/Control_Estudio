@@ -37,6 +37,16 @@ class DocenteController:
             return False
         #print(f"id: {id} '/n Datos: {datos}")
 
+    def buscar_docente(self, tipo_doc, nro_doc):
+        
+        registro = self.modelo.buscar_estudiante(tipo_doc, nro_doc)
+
+        if registro:
+            return registro
+        else:
+            messagebox.showerror("Error", "No se encontró el estudiante con los datos proporcionados.")
+            return None
+
     def _solo_numeros(self, char_input):
         return char_input.isdigit()
 
