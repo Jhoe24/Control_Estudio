@@ -89,6 +89,15 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
             canvas.yview_scroll(int(-1*(event.delta/2)), "units")
 
     def comando_trayecto(self):
+        # Verificar_codigo
+        codigo = self.datos_pnf.codigo_entry.get().strip()
+        if self.controlador.existe_codigo(codigo):
+            messagebox.showerror("Error", "El código ingresado ya existe. Por favor, ingrese un código único.")
+            return
+        codigo_nacional = self.datos_pnf.codigo_nacional_entry.get().strip()
+        if self.controlador.existe_codigo_nacional(codigo_nacional):
+            messagebox.showerror("Error", "El código nacional ingresado ya existe. Por favor, ingrese un código único.")
+            return
         self.datos_pnf.deshabilitar_campos()
         self.actualizar_cantidad_trayecto()
     

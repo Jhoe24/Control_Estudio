@@ -457,3 +457,23 @@ class ModeloPNF:
         finally:
             if con is not None:
                 con.close()
+    
+    def existe_campo(self,campo, valor):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                f"""
+                SELECT * FROM pnf WHERE {campo} = ?
+                """, (valor,)
+            )
+            row = cursor.fetchone()
+            return row is not None  # Retorna True si existe, False si no
+        except Exception as e:
+            print(f"Error al verificar el campo {campo} del PNF: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
