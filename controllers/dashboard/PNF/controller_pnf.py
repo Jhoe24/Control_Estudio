@@ -314,6 +314,12 @@ class ControllerPNF:
     def obtener_fecha_actual(self):
         return datetime.now().strftime("%Y-%m-%d")
     
+    def existe_codigo(self, codigo):
+        return self.modelo.existe_campo("codigo", codigo)
+    
+    def existe_codigo_nacional(self, codigo_nacional):
+        return self.modelo.existe_campo("codigo_nacional", codigo_nacional)
+    
     #Metodos para el controlador de unidades Curriculares
     def registrar_unidad_curricular(self, datos_uc, vista_formulario=None):
         try:
