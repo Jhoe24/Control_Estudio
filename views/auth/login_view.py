@@ -17,7 +17,7 @@ class LoginView(BaseAuthVisualView):
         # Crear enlace para recuperar contraseña
         self.btn_olvide = self.crear_boton_texto(
             self.frame_contenido,
-            ' Has olvidado tu contraseña?',
+            '¿Has olvidado tu contraseña?',
             "Click Aqui",
             None
         )
@@ -34,7 +34,7 @@ class LoginView(BaseAuthVisualView):
         # Crear enlace para registro
         self.registrarU = self.crear_boton_texto(
             self.frame_contenido,
-            ' No tienes cuenta?',
+            '¿No tienes cuenta?',
             "Registrate Aqui",
             self.controller["Mostrar_Ventanas"].mostrar_vista_registro
         )
@@ -42,7 +42,7 @@ class LoginView(BaseAuthVisualView):
         # Crear enlace de ayuda
         self.btn_ayuda = self.crear_boton_texto(
             self.frame_contenido,
-            ' Necesitas Ayuda?',
+            '¿Necesitas Ayuda?',
             "Click Aqui",
             None
         )
