@@ -47,7 +47,6 @@ class UnidadCurricular(SectionFrameBase):
             ("Nombre corto:", crear_entry, {"width":300,"placeholder_text":"Ingrese el nombre corto"}, 1,  self.scroll, 'nombre_corto_entry'),
             ("Área:", crear_entry, {"width":300,"placeholder_text":"Ingrese área"}, 1, self.scroll, 'area_entry'),
             ("Sub-area:", crear_entry, {"width":300,"placeholder_text":"Ingrese Sub-area"}, 1,  self.scroll, 'subarea_entry'),
-            ("Eje Formativo:", crear_entry, {"width":300,"placeholder_text":"Ingrese el eje formativo"}, 1,  self.scroll, 'eje_formativo_entry'),
         ], es_scroll=True)
         
         # Fila para las horas de la Unidad Curricular
@@ -72,31 +71,10 @@ class UnidadCurricular(SectionFrameBase):
             ("Carácter:", crear_option_menu, {"values": ["Teórica", "Práctica", "Teórico-Práctica", "Laboratorio"], "width":300}, 1,  self.scroll, 'caracter_menu'),
             ("Modalidad de Evaluación:", crear_option_menu, {"values": ["Presencial", "Semi-presencial", "A distancia"], "width":300}, 1,  self.scroll, 'modalidad_menu'),
             ("Complejidad:", crear_option_menu, {"values": ["Básica", "Intermedia", "Avanzada"], "width":300}, 1,  self.scroll, 'complejidad_menu'),
-            ("Prelaciones:", crear_entry, {"width": 300, "placeholder_text": "Ingrese prelaciones"}, 1,  self.scroll, 'prelaciones_entry'),
-        ], es_scroll=True)
-
-        # Fila para competencias y saberes
-        self._crear_fila_widgets([
-            ("Competencias Genéricas:", crear_entry, {"width": 300, "placeholder_text": "Ingrese competencias genéricas"}, 1,  self.scroll, 'competencias_genericas_entry'),
-            ("Competencias Específicas:", crear_entry, {"width": 300, "placeholder_text": "Ingrese competencias específicas"}, 1,  self.scroll, 'competencias_especificas_entry'),
-        ], es_scroll=True)
-        self._crear_fila_widgets([
-            ("Saberes Cognitivos:", crear_entry, {"width": 300, "placeholder_text": "Ingrese saberes cognitivos"}, 1,  self.scroll, 'saberes_cognitivos_entry'),
-            ("Saberes Procedimentales:", crear_entry, {"width": 300, "placeholder_text": "Ingrese saberes procedimentales"}, 1,  self.scroll, 'saberes_procedimentales_entry'),
-            ("Saberes Actitudinales:", crear_entry, {"width": 300, "placeholder_text": "Ingrese saberes actitudinales"}, 1,  self.scroll, 'saberes_actitudinales_entry'),
-        ], es_scroll=True)
-
-        # Fila para estrategias, recursos y evaluación
-        self._crear_fila_widgets([
-            ("Estrategias de Enseñanza:", crear_entry, {"width": 300, "placeholder_text": "Ingrese estrategias de enseñanza"}, 1,  self.scroll, 'estrategias_ensenanza_entry'),
-            ("Recursos Didácticos:", crear_entry, {"width": 300, "placeholder_text": "Ingrese recursos didácticos"}, 1,  self.scroll, 'recursos_didacticos_entry'),
-            ("Evaluación:", crear_entry, {"width": 300, "placeholder_text": "Ingrese criterios de evaluación"}, 1, self.scroll, 'evaluacion_entry'),
         ], es_scroll=True)
 
         # Fila para bibliografía, homologación y clave especial
         self._crear_fila_widgets([
-            ("Bibliografía:", crear_entry, {"width": 300, "placeholder_text": "Ingrese bibliografía"}, 1,  self.scroll, 'bibliografia_entry'),
-            ("Homologación Clave:", crear_entry, {"width": 300, "placeholder_text": "Ingrese clave de homologación"}, 1,  self.scroll, 'homologacion_clave_entry'),
             ("Clave Especial:", crear_entry, {"width": 300, "placeholder_text": "Ingrese clave especial"}, 1, self.scroll, 'clave_especial_entry'),
         ], es_scroll=True)
 
@@ -173,7 +151,6 @@ class UnidadCurricular(SectionFrameBase):
         self.nombre_corto_entry = self.scroll.nombre_corto_entry
         self.area_entry = self.scroll.area_entry
         self.subarea_entry = self.scroll.subarea_entry
-        self.eje_formativo_entry = self.scroll.eje_formativo_entry
 
         self.horas_teoricas_entry = self.scroll.horas_teoricas_entry
         self.horas_practicas_entry = self.scroll.horas_practicas_entry
@@ -182,21 +159,6 @@ class UnidadCurricular(SectionFrameBase):
         self.horas_totales_entry = self.scroll.horas_totales_entry
 
         self.unidades_credito_entry = self.scroll.unidades_credito_entry
-        self.prelaciones_entry = self.scroll.prelaciones_entry
-
-        self.competencias_genericas_entry = self.scroll.competencias_genericas_entry
-        self.competencias_especificas_entry = self.scroll.competencias_especificas_entry
-
-        self.saberes_cognitivos_entry = self.scroll.saberes_cognitivos_entry
-        self.saberes_procedimentales_entry = self.scroll.saberes_procedimentales_entry
-        self.saberes_actitudinales_entry = self.scroll.saberes_actitudinales_entry
-
-        self.estrategias_ensenanza_entry = self.scroll.estrategias_ensenanza_entry
-        self.recursos_didacticos_entry = self.scroll.recursos_didacticos_entry
-        self.evaluacion_entry = self.scroll.evaluacion_entry
-
-        self.bibliografia_entry = self.scroll.bibliografia_entry
-        self.homologacion_clave_entry = self.scroll.homologacion_clave_entry
         self.clave_especial_entry = self.scroll.clave_especial_entry
 
         # self.fecha_creacion_entry = self.scroll.fecha_creacion_entry
@@ -211,12 +173,9 @@ class UnidadCurricular(SectionFrameBase):
         # Bindings para validar al cambiar campos de texto
         for entry_name in [
             'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 'area_entry', 'subarea_entry',
-            'eje_formativo_entry', 'horas_teoricas_entry', 'horas_practicas_entry',
+            'horas_teoricas_entry', 'horas_practicas_entry',
             'horas_laboratorio_entry', 'horas_trabajo_independiente_entry', 'horas_totales_entry',
-            'unidades_credito_entry', 'prelaciones_entry', 'competencias_genericas_entry',
-            'competencias_especificas_entry', 'saberes_cognitivos_entry', 'saberes_procedimentales_entry',
-            'saberes_actitudinales_entry', 'estrategias_ensenanza_entry', 'recursos_didacticos_entry',
-            'evaluacion_entry', 'bibliografia_entry', 'homologacion_clave_entry', 'clave_especial_entry'
+            'unidades_credito_entry', 'clave_especial_entry'
             # 'fecha_creacion_entry', 'fecha_actualizacion_entry'
         ]:
             entry = getattr(self, entry_name, None)
@@ -281,12 +240,9 @@ class UnidadCurricular(SectionFrameBase):
         """
         entradas = [
             'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 'area_entry', 'subarea_entry',
-            'eje_formativo_entry', 'horas_teoricas_entry', 'horas_practicas_entry',
+            'horas_teoricas_entry', 'horas_practicas_entry',
             'horas_laboratorio_entry', 'horas_trabajo_independiente_entry', 'horas_totales_entry',
-            'unidades_credito_entry', 'prelaciones_entry', 'competencias_genericas_entry',
-            'competencias_especificas_entry', 'saberes_cognitivos_entry', 'saberes_procedimentales_entry',
-            'saberes_actitudinales_entry', 'estrategias_ensenanza_entry', 'recursos_didacticos_entry',
-            'evaluacion_entry', 'bibliografia_entry', 'homologacion_clave_entry', 'clave_especial_entry'
+            'unidades_credito_entry', 'clave_especial_entry'
             # 'fecha_creacion_entry', 'fecha_actualizacion_entry'
         ]
         for entry_name in entradas:
@@ -296,10 +252,10 @@ class UnidadCurricular(SectionFrameBase):
 
         # Resetear OptionMenus a valores por defecto
         self.tipo_menu.set("Obligatoria")
-        self.caracter_menu.set("Teórico")
+        self.caracter_menu.set("Teórica")
         self.modalidad_menu.set("Presencial")
-        self.complejidad_menu.set("Baja")
-        self.estado_menu.set("activo")
+        self.complejidad_menu.set("Básica")
+        self.estado_menu.set("activa")
 
     def evento_mouse(self):
         """
@@ -408,3 +364,108 @@ class UnidadCurricular(SectionFrameBase):
 
         # Validar y gestionar el botón
         self.controlador.validar_campos_obligatorios_uc(datos_uc, self)
+    
+    def set_datos(self, datos):
+        """
+        Establece los datos del formulario con un diccionario de datos.
+        """
+        print(f"[INFO] Estableciendo datos en Unidad Curricular: {datos}")
+        self.codigo_entry.delete(0, 'end')
+        self.codigo_entry.insert(0, datos.get('codigo', ''))
+        self.nombre_entry.delete(0, 'end')
+        self.nombre_entry.insert(0, datos.get('nombre', ''))
+        self.nombre_corto_entry.delete(0, 'end')
+        self.nombre_corto_entry.insert(0, datos.get('nombre_corto', ''))
+        self.area_entry.delete(0, 'end')
+        self.area_entry.insert(0, datos.get('area', ''))
+        self.subarea_entry.delete(0, 'end')
+        self.subarea_entry.insert(0, datos.get('subarea', ''))
+
+        # Rellenar horas
+        self.horas_teoricas_entry.delete(0, 'end')
+        self.horas_teoricas_entry.insert(0, str(datos.get('horas_teoricas', 0)))
+        self.horas_practicas_entry.delete(0, 'end')
+        self.horas_practicas_entry.insert(0, str(datos.get('horas_practicas', 0)))
+        self.horas_laboratorio_entry.delete(0, 'end')
+        self.horas_laboratorio_entry.insert(0, str(datos.get('horas_laboratorio', 0)))
+        self.horas_trabajo_independiente_entry.delete(0, 'end')
+        self.horas_trabajo_independiente_entry.insert(0, str(datos.get('horas_trabajo_independiente', 0)))
+        self.horas_totales_entry.delete(0, 'end')
+        self.horas_totales_entry.insert(0, str(datos.get('horas_totales', 0)))
+
+        # Rellenar unidades de crédito
+        self.unidades_credito_entry.delete(0, 'end')
+        self.unidades_credito_entry.insert(0, str(datos.get('unidades_credito', 1)))
+
+        self.clave_especial_entry.delete(0, 'end')
+        self.clave_especial_entry.insert(0, datos.get('clave_especial', ''))
+        # Rellenar fechas
+        # self.fecha_creacion_entry.delete(0, 'end')
+        # self.fecha_creacion_entry.insert(0, datos.get('fecha_creacion', ''))
+        # self.fecha_actualizacion_entry.delete(0, 'end')
+        # self.fecha_actualizacion_entry.insert(0, datos.get('fecha_actualizacion', ''))
+        # Rellenar OptionMenus
+        self.tipo_menu.set(datos.get('tipo', 'Obligatoria'))
+        self.caracter_menu.set(datos.get('caracter', 'Teórica'))
+        self.modalidad_menu.set(datos.get('modalidad', 'Presencial'))
+        self.complejidad_menu.set(datos.get('complejidad', 'Básica'))
+        self.estado_menu.set(datos.get('estado', 'activa'))
+
+    def deshabilitar_campos(self):
+        """
+        Deshabilita todos los campos del formulario.
+        """
+        entradas = [
+            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 'area_entry', 'subarea_entry',
+            'horas_teoricas_entry', 'horas_practicas_entry',
+            'horas_laboratorio_entry', 'horas_trabajo_independiente_entry', 'horas_totales_entry',
+            'unidades_credito_entry', 'clave_especial_entry'
+            # 'fecha_creacion_entry', 'fecha_actualizacion_entry'
+        ]
+        for entry_name in entradas:
+            entry = getattr(self, entry_name, None)
+            if entry:
+                entry.configure(state="disabled")
+
+        # Deshabilitar OptionMenus
+        self.tipo_menu.configure(state="disabled")
+        self.caracter_menu.configure(state="disabled")
+        self.modalidad_menu.configure(state="disabled")
+        self.complejidad_menu.configure(state="disabled")
+        self.estado_menu.configure(state="disabled")
+
+        self.pnfmenu.configure(state="disabled")
+        self.trayectomenu.configure(state="disabled")
+        self.tramomenu.configure(state="disabled")
+        
+        # Deshabilitar botones
+        self.btn_guardar.configure(state="disabled")
+        
+    def habilitar_campos(self):
+        """
+        Habilita todos los campos del formulario.
+        """
+        entradas = [
+            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 'area_entry', 'subarea_entry',
+            'horas_teoricas_entry', 'horas_practicas_entry',
+            'horas_laboratorio_entry', 'horas_trabajo_independiente_entry', 'horas_totales_entry',
+            'unidades_credito_entry', 'clave_especial_entry'
+            # 'fecha_creacion_entry', 'fecha_actualizacion_entry'
+        ]
+        for entry_name in entradas:
+            entry = getattr(self, entry_name, None)
+            if entry:
+                entry.configure(state="normal")
+
+        # Habilitar OptionMenus
+        self.tipo_menu.configure(state="normal")
+        self.caracter_menu.configure(state="normal")
+        self.modalidad_menu.configure(state="normal")
+        self.complejidad_menu.configure(state="normal")
+        self.estado_menu.configure(state="normal")
+        self.pnfmenu.configure(state="normal")
+        self.trayectomenu.configure(state="normal")
+        self.tramomenu.configure(state="normal")
+
+        # Habilitar botón guardar si lo necesitas
+        self.btn_guardar.configure(state="normal")

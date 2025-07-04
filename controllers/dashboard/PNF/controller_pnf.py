@@ -320,6 +320,9 @@ class ControllerPNF:
     def existe_codigo_nacional(self, codigo_nacional):
         return self.modelo.existe_campo("codigo_nacional", codigo_nacional)
     
+#=============================================================================================
+# Controlador de Unidades Curriculares
+#=============================================================================================
     #Metodos para el controlador de unidades Curriculares
     def registrar_unidad_curricular(self, datos_uc, vista_formulario=None):
         try:
@@ -360,7 +363,6 @@ class ControllerPNF:
             "nombre_corto": vista_uc.nombre_corto_entry.get(),
             "area": vista_uc.area_entry.get(),
             "subarea": vista_uc.subarea_entry.get(),
-            "eje_formativo": vista_uc.eje_formativo_entry.get(),
             "horas_teoricas": vista_uc.horas_teoricas_entry.get(),
             "horas_practicas": vista_uc.horas_practicas_entry.get(),
             "horas_laboratorio": vista_uc.horas_laboratorio_entry.get(),
@@ -371,17 +373,6 @@ class ControllerPNF:
             "caracter": vista_uc.caracter_menu.get(),
             "modalidad": vista_uc.modalidad_menu.get(),
             "complejidad": vista_uc.complejidad_menu.get(),
-            "prelaciones": vista_uc.prelaciones_entry.get(),
-            "competencias_genericas": vista_uc.competencias_genericas_entry.get(),
-            "competencias_especificas": vista_uc.competencias_especificas_entry.get(),
-            "saberes_cognitivos": vista_uc.saberes_cognitivos_entry.get(),
-            "saberes_procedimentales": vista_uc.saberes_procedimentales_entry.get(),
-            "saberes_actitudinales": vista_uc.saberes_actitudinales_entry.get(),
-            "estrategias_ensenanza": vista_uc.estrategias_ensenanza_entry.get(),
-            "recursos_didacticos": vista_uc.recursos_didacticos_entry.get(),
-            "evaluacion": vista_uc.evaluacion_entry.get(),
-            "bibliografia": vista_uc.bibliografia_entry.get(),
-            "homologacion_clave": vista_uc.homologacion_clave_entry.get(),
             "clave_especial": vista_uc.clave_especial_entry.get(),
             "estado": vista_uc.estado_menu.get(),
             # "fecha_creacion": vista_uc.fecha_creacion_entry.get(),
@@ -397,12 +388,9 @@ class ControllerPNF:
         """
         campos_obligatorios = [
             'codigo', 'nombre', 'nombre_corto', 'area', 'subarea',
-            'eje_formativo', 'horas_teoricas', 'horas_practicas',
+            'horas_teoricas', 'horas_practicas',
             'horas_laboratorio', 'horas_trabajo_independiente', 'horas_totales',
-            'unidades_credito', 'prelaciones', 'competencias_genericas',
-            'competencias_especificas', 'saberes_cognitivos', 'saberes_procedimentales',
-            'saberes_actitudinales', 'estrategias_ensenanza', 'recursos_didacticos',
-            'evaluacion', 'bibliografia', 'homologacion_clave', 'clave_especial'
+            'unidades_credito', 'clave_especial'
             # 'fecha_creacion', 'fecha_actualizacion'
         ]
 
@@ -433,3 +421,6 @@ class ControllerPNF:
     
     def obtener_UC(self):
         return self.modelo.obtener_UC()
+    
+    def obtener_datos_completos_uc(self, id_uc):
+        return self.modelo.obtener_unidad_curricular(id_uc)

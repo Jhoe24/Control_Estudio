@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
 from views.dashboard.components.widget_utils import *
+from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 
 
 class ListarUC(ctk.CTkScrollableFrame):
@@ -16,6 +17,8 @@ class ListarUC(ctk.CTkScrollableFrame):
 
         self.paginas_mostrar = self.lista_UC[:self.uc_por_pagina]
         self.posicion_actual = len(self.paginas_mostrar)
+        self.button_uc = None
+        self.frame_uc = None
 
         self.fila_datos = []
 
@@ -93,7 +96,115 @@ class ListarUC(ctk.CTkScrollableFrame):
         return celda
     
     def anterior_pagina(self):
-        pass
+        """
+        Retrocede a la página anterior de la tabla.
+        """
+        if self.pagina_actual > 1:
+            self.pagina_actual -= 1
+            nuevo_inicio = (self.pagina_actual - 1) * self.uc_por_pagina
+            nuevo_fin = nuevo_inicio + self.uc_por_pagina
+            self.paginas_mostrar = self.lista_UC[nuevo_inicio:nuevo_fin]
+            self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
+            self.calcular_pagina()
+        
     def siguiente_pagina(self):
-        pass
+        """
+        Avanza a la siguiente página de la tabla.
+        """
+        nuevo_inicio = self.pagina_actual * self.uc_por_pagina
+        nuevo_fin = nuevo_inicio + self.uc_por_pagina
+        if self.pagina_actual < self.total_paginas:
+            self.pagina_actual += 1
+            self.paginas_mostrar = self.lista_UC[nuevo_inicio:nuevo_fin]
+            self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
+            self.calcular_pagina()
     
+    def calcular_pagina(self):
+        """
+        Habilita/deshabilita los botones de paginación según la página actual y muestra el listado.
+        """
+        estado_btn_siguiente = "normal"
+        estado_btn_anterio = "normal"
+        if self.pagina_actual == 1:
+            estado_btn_anterio = "disabled"
+        self.boton_anterior.configure(state=estado_btn_anterio)
+        if self.pagina_actual == self.total_paginas:
+            estado_btn_siguiente = "disabled"
+        self.boton_siguiente.configure(state=estado_btn_siguiente)
+        self.mostrar_listado()
+
+    def ver_datos_completos(self, uc):
+        """
+        Muestra los datos completos de la UC seleccionada.
+        """
+        dic_datos = self.controller.obtener_datos_completos_uc(uc[0])
+        #dic_id = self.controller.obtener_id(dic_datos)
+        top = ctk.CTkToplevel(self, fg_color="White")
+        top.title("Datos Completos de las Unidades Curriculares")
+        ancho = 900
+        alto = 700
+
+        # Centrar ventana
+        top.update_idletasks()
+        screen_width = top.winfo_screenwidth()
+        screen_height = top.winfo_screenheight()
+        x = (screen_width // 2) - (ancho // 2)
+        y = (screen_height // 2) - (alto // 2)
+        top.geometry(f"{ancho}x{alto}+{x}+{y}")
+        top.lift()
+        top.focus_force()
+        top.grab_set()
+
+        # Scroll principal del modal
+        scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
+        scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        def on_close():
+            scroll_frame.unbind_all("<MouseWheel>")
+            top.destroy()
+        top.protocol("WM_DELETE_WINDOW", on_close)
+
+        #Frame de los datos generales de UC
+        self.frame_uc = UnidadCurricular(scroll_frame, self.controller)
+        self.frame_uc.set_datos(dic_datos)
+        self.frame_uc.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Ocultar botones de grabar y limpiar en el modal
+        try:
+            self.frame_uc.btn_guardar.pack_forget()
+            self.frame_uc.btn_cancelar.pack_forget()
+        except AttributeError:
+            pass
+
+        # Frame de botones de acción
+        self.botones_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        self.botones_frame.pack(pady=10)
+
+        self.btn_actualizar = ctk.CTkButton(
+            self.botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_uc(self.frame_uc, top)
+        )
+        self.btn_actualizar.pack(side="left", padx=10)
+
+        ctk.CTkButton(self.botones_frame, text="Editar Campos", command=lambda: self.habilitar_todos(self.frame_uc)).pack(side="left", padx=10)
+        ctk.CTkButton(self.botones_frame, text="Cerrar", command=top.destroy).pack(side="left", padx=10)
+        self.deshabilitar_todos(self.frame_uc)
+        
+    def deshabilitar_todos(self, frame_uc):
+        """
+        Deshabilita todos los campos de edición en el modal y desactiva los botones de acción.
+        """
+        frame_uc.deshabilitar_campos()
+        self.btn_actualizar.configure(state="disabled")
+    
+    def habilitar_todos(self, frame_uc):
+        """
+        Habilita todos los campos de edición en el modal y activa los botones de acción.
+        """
+        frame_uc.habilitar_campos()
+        self.btn_actualizar.configure(state="normal")
+
+    
+
+
+
+

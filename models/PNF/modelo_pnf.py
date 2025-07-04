@@ -404,12 +404,11 @@ class ModeloPNF:
 
                 """
                 INSERT INTO unidades_curriculares
-                (codigo, nombre, nombre_corto, pnf_id, trayecto_id, tramo_id, area, subarea, eje_formativo, horas_teoricas, horas_practicas,
-                horas_laboratorio, horas_trabajo_independiente, horas_totales, unidades_credito, tipo, caracter, modalidad, complejidad,
-                prelaciones, competencias_genericas, competencias_especificas, saberes_cognitivos, saberes_procedimentales, saberes_actitudinales,
-                estrategias_ensenanza, recursos_didacticos, evaluacion, bibliografia, homologacion_clave, clave_especial,
+                (codigo, nombre, nombre_corto, pnf_id, trayecto_id, tramo_id, area, subarea, horas_teoricas, horas_practicas,
+                horas_laboratorio, horas_trabajo_independiente, horas_totales, unidades_credito, tipo, caracter, modalidad, complejidad, 
+                clave_especial,
                 estado, fecha_creacion, fecha_actualizacion)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """,
                 (
                     datos_uc["codigo"],
@@ -420,7 +419,6 @@ class ModeloPNF:
                     datos_uc["id_tramo"],
                     datos_uc["area"],
                     datos_uc["subarea"],
-                    datos_uc["eje_formativo"],
                     datos_uc["horas_teoricas"],
                     datos_uc["horas_practicas"],
                     datos_uc["horas_laboratorio"],
@@ -431,17 +429,6 @@ class ModeloPNF:
                     datos_uc["caracter"],
                     datos_uc["modalidad"],
                     datos_uc["complejidad"],
-                    datos_uc["prelaciones"],
-                    datos_uc["competencias_genericas"],
-                    datos_uc["competencias_especificas"],
-                    datos_uc["saberes_cognitivos"],
-                    datos_uc["saberes_procedimentales"],
-                    datos_uc["saberes_actitudinales"],
-                    datos_uc["estrategias_ensenanza"],
-                    datos_uc["recursos_didacticos"],
-                    datos_uc["evaluacion"],
-                    datos_uc["bibliografia"],
-                    datos_uc["homologacion_clave"],
                     datos_uc["clave_especial"],
                     datos_uc["estado"],
                     fecha_actual,
@@ -495,6 +482,29 @@ class ModeloPNF:
         finally:
             if con is not None:
                 con.close()
+    
+    def obtener_unidad_curricular(self, id_uc):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                "SELECT * FROM unidades_curriculares WHERE id = ?", (id_uc,)
+            )
+            row = cursor.fetchone()
+            if row:
+                columnas = [column[0] for column in cursor.description]
+                return dict(zip(columnas, row))
+            else:
+                return None
+        except Exception as e:
+            print(f"Error al obtener la unidad curricular: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
+
+    
 
 bd = ModeloPNF()
 print(bd.obtener_UC())
