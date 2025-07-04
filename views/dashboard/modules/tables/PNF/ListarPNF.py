@@ -119,6 +119,7 @@ class ListarPNF(ctk.CTkScrollableFrame):
         dic_datos = self.controller.obtener_datos_completos(pnf[0])
         dic_id = self.controller.obtener_id(dic_datos)
         top = ctk.CTkToplevel(self, fg_color="White")
+        top.title("Datos Completos del PNF")
         ancho = 900
         alto = 700
 
