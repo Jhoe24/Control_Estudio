@@ -477,3 +477,24 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
+    def obtener_UC(self):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                f"""
+                SELECT * FROM unidades_curriculares
+                """
+            )
+            respuesta = cursor.fetchall()
+            return respuesta
+        except Exception as e:
+            print(f"Error al obtener la lista de pnf : {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+bd = ModeloPNF()
+print(bd.obtener_UC())

@@ -14,7 +14,9 @@ from views.dashboard.modules.tables.Docentes.ListarDocentes import ListDocenteVi
 
 from views.dashboard.modules.PNF import FormularioPNFPensumView
 from views.dashboard.modules.tables.PNF.ListarPNF import ListarPNF
+
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
+from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
 
 
 class AdminDashboardView(BaseDashboardView):
@@ -108,3 +110,12 @@ class AdminDashboardView(BaseDashboardView):
         self.controller['PNF'].actualizar_listado()
         unid_Curr = ListarPNF(self.cuerpo_principal, self.controller["PNF"])
         unid_Curr.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def listar_uc(self):
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+        
+        listar_uc = ListarUC(self.cuerpo_principal, self.controller['PNF'])
+        listar_uc.pack(fill="both", expand=True, padx=10, pady=10)
+
+    

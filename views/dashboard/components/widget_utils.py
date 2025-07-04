@@ -2,6 +2,7 @@ from tkcalendar import Calendar
 import customtkinter as ctk
 import tkinter as tk
 from tkcalendar import Calendar
+import os
 
 # --- CONSTANTES DE COLOR Y FUENTE ---
 COLOR_FONDO_FORMULARIO = "white"
@@ -65,3 +66,7 @@ def seleccionar_fecha(ventana, x=0 ,y=0):
     boton_guardar = ctk.CTkButton(frame, text="Guardar Fecha", command=guardar_fecha)
     boton_guardar.pack(pady=10)
     return fecha_dict['fecha']
+
+def cargar_icono(icon_name):
+    icon_path = os.path.join(os.path.dirname(__file__), '../../../resources/icons', icon_name)
+    return os.path.abspath(icon_path) if os.path.exists(icon_path) else None 

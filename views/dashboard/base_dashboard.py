@@ -172,6 +172,7 @@ class BaseDashboardView(BaseView):
                             ("Registrar P.N.F", "uc_icon", self.pnf),
                             ("Listas de P.N.F", "uc_icon", self.list_pnf),
                             ("Unidades Curriculares", "uc_icon", self.unid_Curr),
+                            ("Listar U.C","uc_icon",self.listar_uc)
                         ]
                 
                 # Crear botones del submenú
@@ -312,6 +313,7 @@ class BaseDashboardView(BaseView):
     def pnf(self): pass
     def list_pnf(self):pass
     def unid_Curr(self): pass
+    def listar_uc(self): pass
     def sedes(self): pass
     def perfil(self): pass
     def notas(self): pass

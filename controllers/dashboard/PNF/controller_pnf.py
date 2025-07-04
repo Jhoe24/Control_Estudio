@@ -430,3 +430,6 @@ class ControllerPNF:
 
     def obtener_tramos_por_trayecto(self, id_trayecto):
         return self.modelo.obtener_lista_tramo(id_trayecto)
+    
+    def obtener_UC(self):
+        return self.modelo.obtener_UC()

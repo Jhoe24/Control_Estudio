@@ -4,15 +4,17 @@ import threading
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame
 from views.dashboard.modules.RegistrarEstudiantes import FormularioEstudianteView
+from views.dashboard.modules.forms.Estudiantes.asignar_pnf import AsignarPNFFrame
 
 
 class ListEstudiantesView(ctk.CTkScrollableFrame):
-    def __init__(self, master, controlador):
+    def __init__(self, master, controlador,controller_pnf = None):
         super().__init__(master, fg_color="white")
         self.furmulario_estudiante = FormularioEstudianteView(master, controlador)
         self.master = master
         self.controlador = controlador
-        
+        if controller_pnf is None:
+            self.controller_pnf = controller_pnf
         self.filas_datos = []
         self.cantidad_estudiantes = self.controlador.modelo.obtener_cantidad_estudiantes()
         self.pagina_actual = 1
@@ -169,14 +171,28 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
                 self._crear_celda(i, 3, estudiante['apellidos']),
                 self._crear_celda(i, 4, estudiante['codigo_unico']),
             ]
+
             celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
-            celda_btn.grid(row=i, column=5, padx=1, pady=1, sticky="nsew")
+            celda_btn.grid(row=i, column=5, padx=(1, 0), pady=1, sticky="nsew")
+
+            # Frame interno para centrar los botones
+            frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
+            frame_botones.pack(expand=True)
+
             boton = ctk.CTkButton(
-                celda_btn, text="Ver datos", width=100,
+                frame_botones, text="Ver datos", width=100,
                 text_color=COLOR_ENTRY_BG,
-                command=lambda est=estudiante: self.furmulario_estudiante.ver_datos_completos(est,self)
+                command=lambda est=estudiante: self.furmulario_estudiante.ver_datos_completos(est, self)
             )
-            boton.pack(padx=10, pady=5)
+            btn_pnf = ctk.CTkButton(
+                frame_botones, text="Agregar a PNF", width=100, 
+                text_color=COLOR_ENTRY_BG,
+                command=lambda est=estudiante: self.cargar_pnf(est)
+            )
+
+            boton.pack(side="left", padx=(0, 4), pady=5)
+            btn_pnf.pack(side="left", pady=5)
+
             fila_widgets.append(celda_btn)
             self.filas_datos.append(fila_widgets)
             
@@ -197,4 +213,34 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         label.pack(padx=10, pady=5)
         return celda
 
-    
+    def cargar_pnf(self, estudiante):
+        """
+        Abre el formulario para asignar un PNF al estudiante seleccionado.
+        """
+        # Si ya hay un formulario abierto, lo destruye 
+        top = ctk.CTkToplevel(self, fg_color="White")
+        top.title("Asignar PNF")
+        icon_path = cargar_icono("pnf.png")
+        if icon_path:
+            top.iconbitmap(icon_path)
+        ancho = 900
+        alto = 700
+
+        # Centrar ventana
+        top.update_idletasks()
+        screen_width = top.winfo_screenwidth()
+        screen_height = top.winfo_screenheight()
+        x = (screen_width // 2) - (ancho // 2)
+        y = (screen_height // 2) - (alto // 2)
+        top.geometry(f"{ancho}x{alto}+{x}+{y}")
+        top.lift()
+        top.focus_force()
+        top.grab_set()
+
+        # Scroll principal del modal
+        scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
+        scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Crea el frame para asignar PNF
+        asignar_pnf_frame = AsignarPNFFrame(scroll_frame, self.controlador,self.controller_pnf, estudiante)
+        asignar_pnf_frame.pack(fill="both", expand=True)
