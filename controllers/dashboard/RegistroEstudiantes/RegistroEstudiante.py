@@ -231,3 +231,4 @@ class EstudianteController:
         #         vista_formulario.datos_personales_frame.nombre_entry.focus_set()
         vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
         vista_formulario.datos_personales_frame.nro_documento_entry.configure(state="normal")
+

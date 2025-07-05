@@ -222,10 +222,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
     
     #Crear un método para establecer la fecha de resolución
     def set_fecha_resolucion(self,fecha):
-        # if fecha:
-        #     self.fecha_resolucion = fecha
-        #     print("Fecha de resolución establecida:", self.fecha_resolucion)
-        #     self.fecha_resolucion_label.configure(text=f"Fecha de Resolución: {self.fecha_resolucion}")
         if fecha:
             self.fecha_resolucion = fecha
             print("Fecha de resolución establecida:", self.fecha_resolucion)

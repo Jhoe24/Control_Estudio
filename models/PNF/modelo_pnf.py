@@ -504,7 +504,251 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
-    
+    def update_unidad_curricular(self, datos_uc, id_uc):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                UPDATE unidades_curriculares SET
+                    codigo = ?,
+                    nombre = ?,
+                    nombre_corto = ?,
+                    area = ?,
+                    subarea = ?,
+                    horas_teoricas = ?,
+                    horas_practicas = ?,
+                    horas_laboratorio = ?,
+                    horas_trabajo_independiente = ?,
+                    horas_totales = ?,
+                    unidades_credito = ?,
+                    tipo = ?,
+                    caracter = ?,
+                    modalidad = ?,
+                    complejidad = ?,
+                    clave_especial = ?,
+                    estado = ?,
+                    pnf_id = ?,
+                    trayecto_id = ?,
+                    tramo_id = ?
+                    
+                WHERE id = ?
+                """,
+                (
+                    datos_uc["codigo"],
+                    datos_uc["nombre"],
+                    datos_uc["nombre_corto"],
+                    datos_uc["area"],
+                    datos_uc["subarea"],
+                    datos_uc["horas_teoricas"],
+                    datos_uc["horas_practicas"],
+                    datos_uc["horas_laboratorio"],
+                    datos_uc["horas_trabajo_independiente"],
+                    datos_uc["horas_totales"],
+                    datos_uc["unidades_credito"],
+                    datos_uc["tipo"],
+                    datos_uc["caracter"],
+                    datos_uc["modalidad"],
+                    datos_uc["complejidad"],
+                    datos_uc["clave_especial"],
+                    datos_uc["estado"],
+                    datos_uc["pnf_id"],
+                    datos_uc["trayecto_id"],
+                    datos_uc["tramo_id"],
+                    id_uc
+                )
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al actualizar la Unidad Curricular: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
 
-bd = ModeloPNF()
-print(bd.obtener_UC())
+    #==========================================================================================
+
+    def registrar_asignacion_estudiante_pnf(self, datos_asignacion):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            
+            cursor.execute(
+                """
+                INSERT INTO estudiante_pnf 
+                (estudiante_id, pnf_id, fecha_inicio, fecha_fin, trayecto_actual, tramo_actual, cohorte, turno, 
+                creditos_aprobados, creditos_cursados, promedio_general, estado, observaciones) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    datos_asignacion["estudiante_id"],
+                    datos_asignacion["pnf_id"],
+                    datos_asignacion["fecha_inicio"],
+                    datos_asignacion["fecha_fin"],
+                    datos_asignacion["trayecto_actual"],
+                    datos_asignacion["tramo_actual"],
+                    datos_asignacion["cohorte"],
+                    datos_asignacion["turno"],
+                    datos_asignacion["creditos_aprobados"],
+                    datos_asignacion["creditos_cursados"],
+                    datos_asignacion["promedio_general"],
+                    datos_asignacion["estado"],
+                    datos_asignacion["observaciones"]
+                )
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al registrar la asignación del PNF: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+    def registrar_asignacion_docente_pnf(self, datos):
+        """
+        Registra una asignación de PNF para un docente en la tabla docente_sede_pnf.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                INSERT INTO docente_sede_pnf 
+                (docente_id, pnf_id, fecha_asignacion, fecha_desasignacion, coordinador, activo, observaciones)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    datos["docente_id"],
+                    datos["pnf_id"],
+                    datos["fecha_asignacion"],
+                    datos["fecha_desasignacion"],
+                    int(datos["coordinador"]),  # Asegúrate de que sea 0 o 1
+                    int(datos["activo"]),       # Asegúrate de que sea 0 o 1
+                    datos["observaciones"]
+                )
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al registrar la asignación del PNF al docente: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+    def tiene_pnf_asignado(self, id_estudiante,tabla="estudiante_pnf"):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            if tabla != "estudiante_pnf":
+                columna = "docente_id"
+            else:
+                columna = "estudiante_id"
+            cursor.execute(
+                f"""
+                SELECT * FROM {tabla} WHERE {columna} = ?
+                """, (id_estudiante,)
+            )
+            row = cursor.fetchone()
+            return row is not None  # Retorna True si tiene PNF asignado, False si no
+        except Exception as e:
+            print(f"Error al verificar si el estudiante tiene PNF asignado: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+    
+    def obtener_pnf_asignado(self, id_estudiante):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM estudiante_pnf WHERE estudiante_id = ?
+                """, (id_estudiante,)
+            )
+            return cursor.fetchone()  # Retorna un diccionario o None
+        except Exception as e:
+            print(f"Error al obtener el PNF asignado: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
+        
+    def obtener_pnf_asignado_docente(self, docente_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM docente_sede_pnf WHERE docente_id = ?
+                """, (docente_id,)
+            )
+            return cursor.fetchone()  # Retorna un diccionario o None
+        except Exception as e:
+            print(f"Error al obtener el PNF asignado: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
+
+    def update_pnf_asignado(self, estudiante_id, datos_asignacion):
+        """
+        Actualiza la asignación de PNF de un estudiante en la tabla estudiante_pnf.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                UPDATE estudiante_pnf SET
+                    pnf_id = ?,
+                    fecha_inicio = ?,
+                    fecha_fin = ?,
+                    trayecto_actual = ?,
+                    tramo_actual = ?,
+                    cohorte = ?,
+                    turno = ?,
+                    creditos_aprobados = ?,
+                    creditos_cursados = ?,
+                    promedio_general = ?,
+                    estado = ?,
+                    observaciones = ?
+                WHERE estudiante_id = ?
+                """,
+                (
+                    datos_asignacion["pnf_id"],
+                    datos_asignacion["fecha_inicio"],
+                    datos_asignacion["fecha_fin"],
+                    datos_asignacion["trayecto_actual"],
+                    datos_asignacion["tramo_actual"],
+                    datos_asignacion["cohorte"],
+                    datos_asignacion["turno"],
+                    datos_asignacion["creditos_aprobados"],
+                    datos_asignacion["creditos_cursados"],
+                    datos_asignacion["promedio_general"],
+                    datos_asignacion["estado"],
+                    datos_asignacion["observaciones"],
+                    estudiante_id
+                )
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al actualizar la asignación del PNF: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+            

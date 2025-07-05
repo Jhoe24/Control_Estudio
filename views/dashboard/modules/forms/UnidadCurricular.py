@@ -8,7 +8,7 @@ import pprint
 from config.app_config import AppConfig
 
 class UnidadCurricular(SectionFrameBase):
-    def __init__(self, master, vcmd_num, controlador=None):
+    def __init__(self, master, vcmd_num, controlador=None, mostrar_botones=True):
         super().__init__(master, "Unidad Curricular PNF")
         self.vcmd_num = vcmd_num # Validación para números
 
@@ -69,7 +69,7 @@ class UnidadCurricular(SectionFrameBase):
              {'validate': 'key', 'validatecommand': (self.vcmd_num, '%P')}),
             ("Tipo de U.C:", crear_option_menu, {"values": ["Obligatoria", "Electiva"], "width":300}, 1,  self.scroll, 'tipo_menu'),
             ("Carácter:", crear_option_menu, {"values": ["Teórica", "Práctica", "Teórico-Práctica", "Laboratorio"], "width":300}, 1,  self.scroll, 'caracter_menu'),
-            ("Modalidad de Evaluación:", crear_option_menu, {"values": ["Presencial", "Semi-presencial", "A distancia"], "width":300}, 1,  self.scroll, 'modalidad_menu'),
+            ("Modalidad de Evaluación:", crear_option_menu, {"values": ["Presencial", "Semipresencial", "Virtual"], "width":300}, 1,  self.scroll, 'modalidad_menu'),
             ("Complejidad:", crear_option_menu, {"values": ["Básica", "Intermedia", "Avanzada"], "width":300}, 1,  self.scroll, 'complejidad_menu'),
         ], es_scroll=True)
 
@@ -132,18 +132,23 @@ class UnidadCurricular(SectionFrameBase):
 
 
         # Empacar los frames
-        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.button_frame.pack(pady=(25, 20))
+        if mostrar_botones:
+            self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+            self.button_frame.pack(pady=(25, 20))
 
-        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.procesar_formulario,
-                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, 
-                                        text_color=COLOR_BOTON_PRIMARIO_TEXT, state="disabled")
-        self.btn_guardar.pack(side="left", padx=10)
+            self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.procesar_formulario,
+                                            font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, 
+                                            text_color=COLOR_BOTON_PRIMARIO_TEXT, state="disabled")
+            self.btn_guardar.pack(side="left", padx=10)
 
-        self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Limpiar Campos", width=140, command=self.limpiar_formulario_completo,
-                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, 
-                                        text_color=COLOR_BOTON_SECUNDARIO_TEXT)
-        self.btn_cancelar.pack(side="left", padx=10)
+            self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Limpiar Campos", width=140, command=self.limpiar_formulario_completo,
+                                            font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, 
+                                            text_color=COLOR_BOTON_SECUNDARIO_TEXT)
+            self.btn_cancelar.pack(side="left", padx=10)
+        else:
+            self.button_frame = None
+            self.btn_guardar = None
+            self.btn_cancelar = None
 
         # Crear alias en self para que el controlador acceda directo a los widgets dentro del scroll
         self.codigo_entry = self.scroll.codigo_entry
@@ -369,6 +374,9 @@ class UnidadCurricular(SectionFrameBase):
         """
         Establece los datos del formulario con un diccionario de datos.
         """
+        pnf_nombre_por_id = {v: k for k, v in self.pnf_id_por_nombre.items()}
+        trayecto_nombre_por_id = {v: k for k, v in self.trayecto_id_por_nombre.items()}
+        tramo_nombre_por_id = {v: k for k, v in self.tramo_id_por_nombre.items()}
         print(f"[INFO] Estableciendo datos en Unidad Curricular: {datos}")
         self.codigo_entry.delete(0, 'end')
         self.codigo_entry.insert(0, datos.get('codigo', ''))
@@ -411,6 +419,23 @@ class UnidadCurricular(SectionFrameBase):
         self.complejidad_menu.set(datos.get('complejidad', 'Básica'))
         self.estado_menu.set(datos.get('estado', 'activa'))
 
+        # Rellenar PNF, Trayecto y Tramo
+        pnf_nombre = pnf_nombre_por_id.get(datos.get("pnf_id"), "Sin opciones disponibles")
+        trayecto_nombre = trayecto_nombre_por_id.get(datos.get("trayecto_id"), "Sin opciones disponibles")
+
+        self.pnfmenu.set(pnf_nombre)
+        self.trayectomenu.set(trayecto_nombre)
+
+        # --- ACTUALIZA LOS TRAMOS SEGÚN EL TRAYECTO ---
+        # Esto asegura que el OptionMenu de tramo tenga los valores correctos
+        self.actualizar_tramos_por_trayecto(trayecto_nombre)
+
+        # Ahora puedes crear el mapeo inverso de tramos actualizado
+        tramo_nombre_por_id = {v: k for k, v in self.tramo_id_por_nombre.items()}
+        tramo_nombre = tramo_nombre_por_id.get(datos.get("tramo_id"), "Sin opciones disponibles")
+        self.tramomenu.set(tramo_nombre)
+
+
     def deshabilitar_campos(self):
         """
         Deshabilita todos los campos del formulario.
@@ -438,8 +463,11 @@ class UnidadCurricular(SectionFrameBase):
         self.trayectomenu.configure(state="disabled")
         self.tramomenu.configure(state="disabled")
         
-        # Deshabilitar botones
-        self.btn_guardar.configure(state="disabled")
+        # Deshabilitar botones solo si existen
+        if self.btn_guardar:
+            self.btn_guardar.configure(state="disabled")
+        if self.btn_cancelar:
+            self.btn_cancelar.configure(state="disabled")
         
     def habilitar_campos(self):
         """
@@ -468,4 +496,7 @@ class UnidadCurricular(SectionFrameBase):
         self.tramomenu.configure(state="normal")
 
         # Habilitar botón guardar si lo necesitas
-        self.btn_guardar.configure(state="normal")
+        if self.btn_guardar:
+            self.btn_guardar.configure(state="normal")
+        if self.btn_cancelar:
+            self.btn_cancelar.configure(state="normal")

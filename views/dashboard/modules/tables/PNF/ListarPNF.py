@@ -33,11 +33,11 @@ class ListarPNF(ctk.CTkScrollableFrame):
             toplevel = self.winfo_toplevel()
             self.vcmd_num_val = toplevel.register(self.controller._solo_numeros)
             self.vcmd_fecha_val = toplevel.register(self.controller._numeros_y_barras)
-            self.vcmd_decimal_val = toplevel.register(self.controller._solo_decimal)
+            self.vcmd_decimal_val = toplevel.register(self.controller.solo_decimal)
         except Exception:
             self.vcmd_num_val = master.register(self.controller._solo_numeros)
             self.vcmd_fecha_val = master.register(self.controller._numeros_y_barras)
-            self.vcmd_decimal_val = master.register(self.controller._solo_decimal)
+            self.vcmd_decimal_val = master.register(self.controller.solo_decimal)
 
         # Primeras páginas a mostrar
         self.paginas_mostrar = self.lista_pnf[:self.cantidad_mostrar]

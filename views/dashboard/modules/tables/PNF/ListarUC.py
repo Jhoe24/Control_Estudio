@@ -4,6 +4,7 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 
 
+
 class ListarUC(ctk.CTkScrollableFrame):
 
     def __init__(self, master, controller):
@@ -69,9 +70,9 @@ class ListarUC(ctk.CTkScrollableFrame):
         for fila, tupla_uc in enumerate(self.paginas_mostrar, start=2):
             fila_widgets = [
                 self._crear_celda(fila, 0, tupla_uc[0]),  # Código
-                self._crear_celda(fila, 1, tupla_uc[1]),  # Nombre
-                self._crear_celda(fila, 2, tupla_uc[2]),  # Crédito
-                self._crear_celda(fila, 3, tupla_uc[3]),  # Horas
+                self._crear_celda(fila, 1, tupla_uc[2]),  # Nombre
+                self._crear_celda(fila, 2, tupla_uc[15]),  # Crédito
+                self._crear_celda(fila, 3, tupla_uc[14]),  # Horas
             ]
             celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
             celda_btn.grid(row=fila, column=4, padx=1, pady=1, sticky="nsew")
@@ -143,6 +144,9 @@ class ListarUC(ctk.CTkScrollableFrame):
         top.title("Datos Completos de las Unidades Curriculares")
         ancho = 900
         alto = 700
+        # top.resizable(False, False)
+        # top.minsize(ancho, alto)
+        # top.maxsize(ancho, alto)
 
         # Centrar ventana
         top.update_idletasks()
@@ -154,20 +158,21 @@ class ListarUC(ctk.CTkScrollableFrame):
         top.lift()
         top.focus_force()
         top.grab_set()
+        
 
         # Scroll principal del modal
-        scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
-        scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        content_frame = ctk.CTkFrame(top, fg_color="white")
+        content_frame.pack(fill="both", expand=True)
 
         def on_close():
-            scroll_frame.unbind_all("<MouseWheel>")
+            #content_frame.unbind_all("<MouseWheel>")
             top.destroy()
         top.protocol("WM_DELETE_WINDOW", on_close)
 
         #Frame de los datos generales de UC
-        self.frame_uc = UnidadCurricular(scroll_frame, self.controller)
+        self.frame_uc = UnidadCurricular(content_frame, self.controller, mostrar_botones=False)
         self.frame_uc.set_datos(dic_datos)
-        self.frame_uc.pack(fill="both", expand=True, padx=10, pady=10)
+        self.frame_uc.pack(fill="both", expand=True, padx=0, pady=0)
 
         # Ocultar botones de grabar y limpiar en el modal
         try:
@@ -176,12 +181,15 @@ class ListarUC(ctk.CTkScrollableFrame):
         except AttributeError:
             pass
 
+        # al abrir el modal:
+        self.id_uc_modal = uc[0]
+
         # Frame de botones de acción
-        self.botones_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        self.botones_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
         self.botones_frame.pack(pady=10)
 
         self.btn_actualizar = ctk.CTkButton(
-            self.botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_uc(self.frame_uc, top)
+            self.botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_uc(self.frame_uc, None, self.id_uc_modal, top)
         )
         self.btn_actualizar.pack(side="left", padx=10)
 
@@ -203,6 +211,21 @@ class ListarUC(ctk.CTkScrollableFrame):
         frame_uc.habilitar_campos()
         self.btn_actualizar.configure(state="normal")
 
+    def actualizar_uc(self, frame_uc, datos_uc, id_uc, top):
+        """
+        Actualiza los datos de UC en la base de datos.
+        """
+        datos_uc = self.controller.getUnidadCurricular(frame_uc)
+        print("Datos UC a actualizar:")
+        exito = self.controller.update_unidad_curricular(datos_uc, id_uc, top)
+        if exito:
+            top.destroy()
+            self.lista_uc = self.controller.obtener_lista_uc()
+            #actualiza la paginacion y muestra el listado
+            self.total_paginas = (len(self.lista_uc) + self.uc_por_pagina - 1) // self.uc_por_pagina
+            self.paginas_mostrar = self.lista_uc[(self.pagina_actual-1)*self.uc_por_pagina:self.pagina_actual*self.uc_por_pagina]
+            self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
+            self.mostrar_listado()
     
 
 

@@ -4,17 +4,20 @@ import threading
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame
 from views.dashboard.modules.RegistrarDocentes import FormularioDocenteView
+from views.dashboard.modules.forms.Docentes.asignar_pnf_docente import AsignarDocentePNFFrame
 
 class ListDocenteView(ctk.CTkScrollableFrame):
-    def __init__(self, master, controlador):
+    def __init__(self, master, controlador, controller_pnf):
         super().__init__(master, fg_color="white")
         self.formulario_docente = FormularioDocenteView(master, controlador)
         self.master = master
         self.controlador = controlador
+        self.controller_pnf = controller_pnf
         self.filas_datos = []
         self.cantidad_docente = self.controlador.modelo_docente.obtener_cantidad_docente()
         self.pagina_actual = 1
         self.primer_id_table = self.controlador.modelo_docente.obtener_primer_id()
+
         self.docente = self.controlador.obtener_lista_docentes(0)
         self.registros_por_pagina = 10
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
@@ -74,11 +77,12 @@ class ListDocenteView(ctk.CTkScrollableFrame):
         # Deshabilita el botón "Siguiente" si es la última página
         self.boton_siguiente.configure(state="disabled" if self.pagina_actual == self.cantidad_total_paginas else "normal")
 
-        self.mostrar_pagina()
+        if self.cantidad_docente != 0:
+            self.mostrar_pagina()
 
     def mostrar_pagina(self):
         """
-        Muestra los estudiantes de la página actual y actualiza el estado de los botones.
+        Muestra los docentes de la página actual y actualiza el estado de los botones.
         """
         self.cargar_datos(self.docente)
         self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
@@ -89,7 +93,7 @@ class ListDocenteView(ctk.CTkScrollableFrame):
 
     def mostrar_resultado_busqueda(self, lista_docentes):
         """
-        Muestra solo los estudiantes pasados en la lista (por ejemplo, el resultado de una búsqueda).
+        Muestra solo los docentes pasados en la lista (por ejemplo, el resultado de una búsqueda).
         Deshabilita la paginación y actualiza la tabla.
         """
         self.pagina_actual = 1  # <-- Reinicia la página actual
@@ -100,7 +104,7 @@ class ListDocenteView(ctk.CTkScrollableFrame):
         
     def siguiente_pagina(self):
         """
-        Avanza a la siguiente página de estudiantes.
+        Avanza a la siguiente página de docentes.
         """
         # Asegura que no se exceda la cantidad total de páginas
         if self.pagina_actual < self.cantidad_total_paginas:
@@ -130,7 +134,7 @@ class ListDocenteView(ctk.CTkScrollableFrame):
         self.boton_siguiente.configure(state="disabled")
         
         def tarea():
-            # Obtiene la lista de estudiantes usando el offset calculado
+            # Obtiene la lista de docentes usando el offset calculado
             self.docente = self.controlador.obtener_lista_docentes(offset)
             # Actualiza la interfaz de usuario en el hilo principal
             self.after(0, self.mostrar_pagina)
@@ -164,11 +168,36 @@ class ListDocenteView(ctk.CTkScrollableFrame):
             ]
             celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
             celda_btn.grid(row=i, column=5, padx=1, pady=1, sticky="nsew")
+
+            # Frame interno para centrar los botones
+            frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
+            frame_botones.pack(expand=True)
+
             boton = ctk.CTkButton(
-                celda_btn, text="Ver datos", width=100,
+                frame_botones, text="Ver datos", width=100,
                 text_color=COLOR_ENTRY_BG,
                 command=lambda est=docente: self.formulario_docente.ver_datos_completos(est)
             )
+
+            # averiguar si el docente tiene un PNF asignado
+            if not self.controller_pnf.modelo.tiene_pnf_asignado(docente['id'],"docente_sede_pnf"):
+                text = "Asignar PNF"
+                callback = lambda est=docente: self.cargar_pnf(est)
+            else:
+                text = "Ver PNF"
+                callback = lambda est=docente: self.cargar_pnf(est,para_edicion=True)
+
+            btn_pnf = ctk.CTkButton(
+                frame_botones, text=text, width=100,
+                text_color="#ffffff",
+                fg_color=COLOR_BOTON_FONDO,
+                hover_color=COLOR_BOTON_FONDO_HOVER,
+                command=callback
+            )
+
+            boton.pack(side="left", padx=(0, 4), pady=5)
+            btn_pnf.pack(side="left", pady=5)
+
             boton.pack(padx=10, pady=5)
             fila_widgets.append(celda_btn)
             self.filas_datos.append(fila_widgets)
@@ -188,5 +217,52 @@ class ListDocenteView(ctk.CTkScrollableFrame):
         label = ctk.CTkLabel(celda, text=texto, text_color=COLOR_TEXTO_PRINCIPAL)
         label.pack(padx=10, pady=5)
         return celda
+    
+    def cargar_pnf(self,docente,para_edicion=False):
+        """
+        Abre el formulario para asignar un PNF aldocente seleccionado.
+        """
+        # Si ya hay un formulario abierto, lo destruye 
+        top = ctk.CTkToplevel(self, fg_color="White")
+        top.title("Asignar PNF")
+        icon_path = cargar_icono("pnf.png")
+        if icon_path:
+            top.iconbitmap(icon_path)
+        ancho = 900
+        alto = 500
+
+        # Centrar ventana
+        top.update_idletasks()
+        screen_width = top.winfo_screenwidth()
+        screen_height = top.winfo_screenheight()
+        x = (screen_width // 2) - (ancho // 2) + 100
+        y = (screen_height // 2) - (alto // 2)
+        top.geometry(f"{ancho}x{alto}+{x}+{y}")
+        top.lift()
+        top.focus_force()
+        top.grab_set()
+
+        # Scroll principal del modal
+        scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
+        scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        if para_edicion:
+            titulo = "Editar PNF dedocente"
+        else:
+            titulo = "Asignar PNF adocente"
+
+        ctk.CTkLabel(scroll_frame, text=titulo, font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).pack(pady=(10, 20), padx=20, anchor="w")
+
+        # Crea el frame para asignar PNF
+        
+        if para_edicion:
+            asignar_pnf_frame = AsignarDocentePNFFrame(scroll_frame, self.controlador,self.controller_pnf,docente,True)
+            # Si es para edición, carga los datos del PNF asignado
+            asignar_pnf_frame.cargar_datos_pnf(docente['id'])
+            pass
+        else:
+            asignar_pnf_frame = AsignarDocentePNFFrame(scroll_frame, self.controlador,self.controller_pnf,docente,False)
+            asignar_pnf_frame.pack(fill="both", expand=True)
+            pass
 
     

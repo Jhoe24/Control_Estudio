@@ -1,7 +1,9 @@
 import tkinter.messagebox as messagebox
+import customtkinter as ctk
 from models.PNF.modelo_pnf import ModeloPNF
 from datetime import datetime
 from pprint import pprint
+import re
 class ControllerPNF:
     
     def __init__(self):
@@ -218,15 +220,30 @@ class ControllerPNF:
     def _numeros_y_barras(self, char_input):
         return char_input.isdigit() or char_input in "-/"
 
-    def _solo_decimal(self, valor_actual, char_input):
-        if char_input in "0123456789":
+    def solo_decimal(self,new_text):
+        """
+        Función de validación para asegurar que solo se ingresen números (enteros o reales).
+        Permite:
+        - Dígitos (0-9)
+        - Un punto decimal opcional
+        - Un signo negativo opcional al principio
+        - Cadena vacía (para permitir borrar el contenido)
+        """
+        if new_text == "":  # Permite borrar el contenido del entry
             return True
-        if char_input == "." and "." not in valor_actual:
+        
+        # Expresión regular para números enteros o flotantes
+        # ^: inicio de la cadena
+        # -?: un signo negativo opcional
+        # \d+: uno o más dígitos
+        # (\.\d*)?: un punto seguido de cero o más dígitos, opcionalmente
+        # $: fin de la cadena
+        pattern = r"^-?\d*\.?\d*$"
+        
+        if re.fullmatch(pattern, new_text):
             return True
-        if char_input == "":
-            return True  # Permitir borrar
-        return False
-
+        else:
+            return False
     def validar_campos_obligatorios_tramos(self, datos_tramos, vista_formulario):
         try:
             campos_a_validar = [
@@ -375,6 +392,9 @@ class ControllerPNF:
             "complejidad": vista_uc.complejidad_menu.get(),
             "clave_especial": vista_uc.clave_especial_entry.get(),
             "estado": vista_uc.estado_menu.get(),
+            "pnf_id": vista_uc.pnf_id_por_nombre.get(vista_uc.pnfmenu.get()),
+            "trayecto_id": vista_uc.trayecto_id_por_nombre.get(vista_uc.trayectomenu.get()),
+            "tramo_id": vista_uc.tramo_id_por_nombre.get(vista_uc.tramomenu.get()),
             # "fecha_creacion": vista_uc.fecha_creacion_entry.get(),
             # "fecha_actualizacion": vista_uc.fecha_actualizacion_entry.get(),
         }
@@ -406,11 +426,13 @@ class ControllerPNF:
 
         if campos_faltantes or not tramo_valido:
             # Deshabilitar botón
-            vista.btn_guardar.configure(state="disabled")
+            if hasattr(vista, "btn_guardar") and vista.btn_guardar:
+                vista.btn_guardar.configure(state="disabled")
             return False
         else:
             # Habilitar botón
-            vista.btn_guardar.configure(state="normal")
+            if hasattr(vista, "btn_guardar") and vista.btn_guardar:
+                vista.btn_guardar.configure(state="normal")
             return True
     
     def obtener_trayectos_por_pnf(self, id_pnf):
@@ -424,3 +446,65 @@ class ControllerPNF:
     
     def obtener_datos_completos_uc(self, id_uc):
         return self.modelo.obtener_unidad_curricular(id_uc)
+    
+    def existe_codigo_uc(self, codigo):
+        return self.modelo.existe_campo("codigo", codigo, tabla="unidad_curricular")
+    
+    def obtener_lista_uc(self):
+        return self.modelo.obtener_UC()
+
+    def obtener_nombres_pnf(self):
+        nombres_pnf = []
+        for tuple in self.listado_pnf:
+            nombres_pnf.append(tuple[2])  # Asumiendo que el nombre del PNF está en la posición 2
+        return nombres_pnf
+
+    # obtener los datos de la asignacion del pnf
+    def obtener_asignacion_pnf(self,vista_formulario):
+        """
+        Obtiene los datos de la asignación del PNF desde los widgets de la vista.
+        """
+        try:
+            return {
+                "estudiante_id": vista_formulario.id_estudiante,
+                "trayecto_actual": vista_formulario.var_trayecto.get(),
+                "tramo_actual": vista_formulario.var_tramo.get(),
+                "fecha_inicio": vista_formulario.fecha_inicio,
+                "fecha_fin": vista_formulario.fecha_fin,
+                "cohorte": vista_formulario.cohorte_entry.get(),
+                "turno": vista_formulario.var_turno.get(),
+                "creditos_aprobados": vista_formulario.creditos_aprobados_entry.get(),
+                "creditos_cursados": vista_formulario.creditos_cursados_entry.get(),
+                "promedio_general": float(vista_formulario.promedio_general_entry.get()) if vista_formulario.promedio_general_entry.get() else 0.0,
+                "estado": vista_formulario.var_estado.get(),
+                "observaciones": vista_formulario.observaciones_entry.get()
+            }
+           
+
+        except Exception as e:
+            print(f"Error al obtener los datos de la asignación del PNF: {e}")
+            messagebox.showerror("Error", f"Ocurrió un error al obtener los datos: {e}", parent=vista_formulario)
+            return None
+    
+
+    def validar_campos_obligatorios_asignacion(self, datos_asignacion, vista_formulario):
+        """
+        Valida los campos obligatorios de la asignación del PNF.
+        """
+        try:
+            campos_obligatorios = [
+                "trayecto_actual", "tramo_actual",
+                "fecha_inicio", "fecha_fin", "cohorte",
+                "turno","estado"
+            ]
+
+            for campo in campos_obligatorios:
+                if not datos_asignacion.get(campo):
+                    messagebox.showwarning("Campo Vacío", f"El campo '{campo}' es obligatorio.", parent=vista_formulario)
+                    return False
+
+            return True
+
+        except Exception as e:
+            print(f"Error al validar los campos de la asignación del PNF: {e}")
+            return False

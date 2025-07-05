@@ -20,6 +20,8 @@ class DocenteController:
         #Obtener 10 registro de docentes
         nmin = 0
         nmax = self.modelo_docente.obtener_id_ultimo()
+        if nmax == None:
+            return []
         if desde < nmin : desde = nmin
         if desde > (nmax) : desde = nmax-1
         resultado = self.modelo_docente.lista_Docentes(desde)
