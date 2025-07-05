@@ -206,9 +206,7 @@ class ControllerPNF:
             "fecha_resolucion": vista_pnf.fecha_resolucion,
             "titulo_otorga": vista_pnf.titulo_otorga_entry.get(),
             "perfil_egreso": vista_pnf.perfil_egreso_entry.get(),
-            "resolucion": vista_pnf.resolucion_entry.get(),
             "version_pensum": vista_pnf.version_pensum_entry.get(),
-            "coordinador_nacional": vista_pnf.coordinador_nacional_entry.get(),
             "estado": vista_pnf.estado_menu.get(),
             "lista_trayectos": lista_trayectos  
         }
@@ -312,9 +310,7 @@ class ControllerPNF:
                 ("fecha_resolucion", "Fecha de Resolución"),
                 ("titulo_otorga", "Título que Otorga"),
                 ("perfil_egreso", "Perfil de Egreso"),
-                ("resolucion", "Resolución"),
                 ("version_pensum", "Versión del Pensum"),
-                ("coordinador_nacional", "Coordinador Nacional"),
                 ("estado", "Estado")
             ]
 
