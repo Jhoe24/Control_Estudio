@@ -12,6 +12,21 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.vcmd_num = self.register(self.solo_numeros) 
         self.vcmd_fecha = vcmd_fecha # Guardar para usar en fechas
        
+        self.dict_trayectos = {
+            "I": 1,
+            "II": 2,
+            "III": 3,
+            "IV": 4,
+            "V": 5
+        }
+        self.dict_trayectos_invertido = {
+            1: "I",
+            2: "II",
+            3: "III",
+            4: "IV",
+            5: "V"
+        }
+
         self.fecha_resolucion = None  # Inicializar la variable fecha_resolucion
         self.cal = None
         # --- Fila para codigo del PNF ---
@@ -56,6 +71,7 @@ class DatosPNFPensumFrame(SectionFrameBase):
 
         # 3. Crear los entries dentro del mismo frame
         self.var_cantidad_trayectos = ctk.StringVar(value="I")  # Valor por defecto para trayectos
+        self.var_cantidad_tramos = ctk.StringVar(value="I")
 
         self.label_trayectos = ctk.CTkLabel(self.duracion_contenedor, text="Trayectos",text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 12, "bold"))
         self.label_trayectos.pack(side="left", padx=(0, 15))
@@ -69,6 +85,18 @@ class DatosPNFPensumFrame(SectionFrameBase):
             
         )
         self.duracion_trayectos_entry.pack(side="left", padx=(0, 10))
+
+        self.label_tramos = ctk.CTkLabel(self.duracion_contenedor, text="Tramos",text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 12, "bold"))
+        self.label_tramos.pack(side="left", padx=(0, 15))
+        self.duracion_tramos_entry = crear_option_menu(
+            self.duracion_contenedor,
+            width=40,
+            values=["I", "II", "III"],
+            variable=self.var_cantidad_tramos,
+            #command=self.on_trayecto_selected
+            
+        )
+        self.duracion_tramos_entry.pack(side="left", padx=(0, 10))
 
         self.label_semanas = ctk.CTkLabel(self.duracion_contenedor, text="Semanas", text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 12, "bold"))
         self.label_semanas.pack(side="left", padx=(0, 15))
@@ -112,7 +140,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
             ('Titulo a Otorgar:', crear_entry, {"width":300,"placeholder_text":"Ingrese titulo"}, 1, self, 'titulo_otorga_entry'),
             ("Perfil Egresado:", crear_entry, {"width":300,"placeholder_text":"Ingrese perfil del egresado"}, 1, self, 'perfil_egreso_entry'),
             #("Campo Ocupacional:", crear_entry, {"width":300,"placeholder_text":"Ingrese campo ocupacional"}, 1, self, 'campo_ocupacional_entry'),
-            ("Resolución - Creación:", crear_entry, {"width":300,"placeholder_text":"Ingrese resolución"}, 1, self, 'resolucion_entry'),
         ])
 
         self.registrar_fecha(self.set_fecha_resolucion,"Fecha Resolución")  # Registrar la fecha de resolución
@@ -125,7 +152,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
 
         self._crear_fila_widgets([
             ("Versión del Pensum:", crear_entry, {"width":300,"placeholder_text":"Ingrese versión"}, 1, self, 'version_pensum_entry'),
-            ("Coordinador Nacional:", crear_entry, {"width":300,"placeholder_text":"Ingrese nombre del coordinador"}, 1, self, 'coordinador_nacional_entry'),
             ("Estado:", crear_option_menu, {"values":["activo", "anactivo", "revision"], "command": lambda v: setattr(self.estado_menu, '_current_value',v)}, 1, self, 'estado_menu')
         ])
         
@@ -139,9 +165,7 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.duracion_horas_entry,
             self.titulo_otorga_entry,
             self.perfil_egreso_entry,
-            self.resolucion_entry,
             self.version_pensum_entry,
-            self.coordinador_nacional_entry,
         ]
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
@@ -211,14 +235,14 @@ class DatosPNFPensumFrame(SectionFrameBase):
     
     def get_trayecto(self):
         """Obtener el valor del trayecto seleccionado."""
-        dict_trayectos = {
+        self.dict_trayectos = {
             "I": 1,
             "II": 2,
             "III": 3,
             "IV": 4,
             "V": 5
         }
-        return dict_trayectos.get(self.var_cantidad_trayectos.get(), 1)
+        return self.dict_trayectos.get(self.var_cantidad_trayectos.get(), 1)
     
     #Crear un método para establecer la fecha de resolución
     def set_fecha_resolucion(self,fecha):
@@ -264,9 +288,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.area_conocimiento_entry.insert(0, datos.get("area_conocimiento", ""))
         self.area_conocimiento_entry.configure(state="disabled")
 
-        self.duracion_trayectos_entry.set(str(datos.get("duracion_trayectos", "")))
-        self.duracion_trayectos_entry.configure(state="disabled")
-
         self.duracion_semanas_entry.set(str(datos.get("duracion_semanas", "")))
         self.duracion_semanas_entry.configure(state="disabled")
 
@@ -284,15 +305,8 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.perfil_egreso_entry.insert(0, datos.get("perfil_egreso", ""))
         self.perfil_egreso_entry.configure(state="disabled")
 
-        # Si tienes campo ocupacional, agrégalo si tienes el entry
-        self.resolucion_entry.insert(0, datos.get("resolucion_creacion", ""))
-        self.resolucion_entry.configure(state="disabled")
-
         self.version_pensum_entry.insert(0, datos.get("version_pensum", ""))
         self.version_pensum_entry.configure(state="disabled")
-
-        self.coordinador_nacional_entry.insert(0, datos.get("coordinador_nacional", ""))
-        self.coordinador_nacional_entry.configure(state="disabled")
 
         self.estado_menu.set(datos.get("estado", "activo"))
         self.estado_menu.configure(state="disabled")
@@ -302,6 +316,21 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.set_fecha_resolucion(datos["fecha_resolucion"])
         self.btn_fecha.configure(state="disabled")
 
+        cantidad = self.dict_trayectos_invertido[len(datos["lista_trayectos"])]
+        if cantidad:
+            self.var_cantidad_trayectos.set(cantidad)
+            self.duracion_trayectos_entry.configure(state="disabled")
+        
+        for trayecto in datos["lista_trayectos"]:
+            if trayecto["lista_tramos"]:
+                cantidad_tramos = len(trayecto["lista_tramos"])
+                break
+
+        self.var_cantidad_tramos.set(self.dict_trayectos_invertido[cantidad_tramos])
+        self.duracion_tramos_entry.configure(state="disabled")
+
+
+
     def habilitar_campos(self):
         for campo in self.entries_a_validar:
             campo.configure(state="normal")
@@ -310,5 +339,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.btn_fecha.configure(state="normal")
             self.estado_menu.configure(state="normal")
             self.tipo_pnf_menu.configure(state="normal")
+            self.duracion_tramos_entry.configure("normal")
            
         # Habilitar el botón de grabar Trayecto si existe

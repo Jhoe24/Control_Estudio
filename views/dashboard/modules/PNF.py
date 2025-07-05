@@ -21,12 +21,28 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         self.datos_cantidad_trayecto = 0
         self.listado_trayectos = []
         self.evento_mouse()
+
+        self.dict_trayectos_invertido = {
+            1: "I",
+            2: "II",
+            3: "III",
+            4: "IV",
+            5: "V"
+        }
+
+        self.dict_trayectos = {
+            "I": 1,
+            "II": 2,
+            "III": 3,
+            "IV": 4,
+            "V": 5
+        }
         
         try:
             toplevel = self.winfo_toplevel()
             self.vcmd_num_val = toplevel.register(self.controlador._solo_numeros)
             self.vcmd_fecha_val = toplevel.register(self.controlador._numeros_y_barras)
-            self.vcmd_decimal_val = toplevel.register(self.controlador._solo_decimal)
+            self.vcmd_decimal_val = toplevel.register(self.controlador.solo_decimal)
         except Exception: # Fallback si no es un toplevel (ej. si el master es el root)
             self.vcmd_num_val = master.register(self.controlador._solo_numeros)
             self.vcmd_fecha_val = master.register(self.controlador._numeros_y_barras)
@@ -59,14 +75,14 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
 
         self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.obtener_datos_trayecto,
                                         font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT,
-                                        state="disabled", )
+                                        state="disabled")
         self.btn_guardar.pack(side="left", padx=10)
 
         self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Limpiar Campos", width=140, #command=self.limpiar_formulario_completo,
                                         font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT,
                                         state="disabled")
         self.btn_cancelar.pack(side="left", padx=10)
-        self.btn_guardar.configure(state="desabled")  # Deshabilitar el botón de guardar al inicio
+        self.btn_guardar.configure(state="disabled")  # Deshabilitar el botón de guardar al inicio
         
         
     def evento_mouse(self):
@@ -112,6 +128,7 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         if self.datos_cantidad_trayecto > 0:
             for i in range(self.datos_cantidad_trayecto):
                 self.listado_trayectos.append(FrameTrayecto(self, self.controlador, self.vcmd_num_val, self.vcmd_fecha_val, titulo=f"Trayecto #{i+1}"))
+
                 self.listado_trayectos[i].pack(fill="x", padx=10, pady=(10, 0))
 
                 
@@ -151,8 +168,12 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         if self.datos_cantidad_trayecto > 0:
             for i in range(self.datos_cantidad_trayecto):
                 self.listado_trayectos.append(FrameTrayecto(self, self.controlador, self.vcmd_num_val, self.vcmd_fecha_val, titulo=f"Trayecto #{i+1}"))
-                self.listado_trayectos[i].numero_entry.insert(0, i+1)
-                self.listado_trayectos[i].numero_entry.configure(state="disabled")  
+                self.listado_trayectos[i].numero_entry.insert(0,i+1)
+                self.listado_trayectos[i].nombre_entry.insert(0,f"Trayecto {self.dict_trayectos_invertido[i+1]}")
+                self.listado_trayectos[i].nombre_entry.configure(state="disabled")
+                self.listado_trayectos[i].numero_entry.configure(state="disabled")
+                self.listado_trayectos[i].numero_tramos_menu.set(str(self.dict_trayectos[self.datos_pnf.duracion_tramos_entry.get()]))  
+                self.listado_trayectos[i].numero_tramos_menu.configure(state="disabled")
                 self.listado_trayectos[i].pack(fill="x", padx=10, pady=(10, 0))
                 
         # Habilita los botones después de grabar trayecto
@@ -173,7 +194,7 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
                     trayectos_ok = False
                     break
         # Habilita o deshabilita el botón
-        if todos_llenos and fecha_ok and trayectos_ok and self.listado_trayectos:
+        if todos_llenos and fecha_ok and trayectos_ok and self.listado_trayectos != []:
             self.btn_guardar.configure(state="normal")
         else:
             self.btn_guardar.configure(state="disabled")

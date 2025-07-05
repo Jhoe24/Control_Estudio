@@ -16,9 +16,9 @@ class ModeloPNF:
                 """
                 INSERT INTO pnf 
                 (codigo, codigo_nacional, nombre, nombre_corto, nivel,area_conocimiento, duracion_trayectos,
-                duracion_semanas, total_creditos,total_horas, titulo_otorga, perfil_egreso, resolucion_creacion,
-                fecha_resolucion, version_pensum, coordinador_nacional, fecha_creacion,fecha_actualizacion, estado) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                duracion_semanas, total_creditos,total_horas, titulo_otorga, perfil_egreso,
+                fecha_resolucion, version_pensum, fecha_creacion,fecha_actualizacion, estado) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     datos_pnf["codigo"],
@@ -33,10 +33,8 @@ class ModeloPNF:
                     datos_pnf["duracion_horas"],
                     datos_pnf["titulo_otorga"],
                     datos_pnf["perfil_egreso"],
-                    datos_pnf["resolucion"],
                     datos_pnf["fecha_resolucion"],
                     datos_pnf["version_pensum"],
-                    datos_pnf["coordinador_nacional"],
                     fecha_creacion,
                     fecha_creacion,
                     datos_pnf["estado"]
@@ -230,10 +228,8 @@ class ModeloPNF:
                     total_horas = ?,
                     titulo_otorga = ?,
                     perfil_egreso = ?,
-                    resolucion_creacion = ?,
                     fecha_resolucion = ?,
                     version_pensum = ?,
-                    coordinador_nacional = ?,
                     estado = ?
                 WHERE id = ?
                 """,
@@ -250,10 +246,8 @@ class ModeloPNF:
                     datos_pnf["duracion_horas"],
                     datos_pnf["titulo_otorga"],
                     datos_pnf["perfil_egreso"],
-                    datos_pnf["resolucion"],
                     datos_pnf["fecha_resolucion"],
                     datos_pnf["version_pensum"],
-                    datos_pnf["coordinador_nacional"],
                     datos_pnf["estado"],
                     id
                 )
@@ -752,3 +746,40 @@ class ModeloPNF:
             if con is not None:
                 con.close()
             
+    def update_pnf_asignado_docente(self, docente_id, datos):
+        """
+        Actualiza la asignación de PNF de un docente en la tabla docente_sede_pnf.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                UPDATE docente_sede_pnf SET
+                    pnf_id = ?,
+                    fecha_asignacion = ?,
+                    fecha_desasignacion = ?,
+                    coordinador = ?,
+                    activo = ?,
+                    observaciones = ?
+                WHERE docente_id = ?
+                """,
+                (
+                    datos["pnf_id"],
+                    datos["fecha_asignacion"],
+                    datos["fecha_desasignacion"],
+                    int(datos["coordinador"]),
+                    int(datos["activo"]),
+                    datos["observaciones"],
+                    docente_id
+                )
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al actualizar la asignación del PNF al docente: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()

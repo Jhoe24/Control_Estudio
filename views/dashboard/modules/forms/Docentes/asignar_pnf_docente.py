@@ -184,8 +184,8 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             "activo": self.var_activo.get(),
             "observaciones": self.var_observaciones.get(),
         }
-        if not self.controller_pnf.validar_campos_obligatorios_asignacion(datos, self):
-            print("Error: Los datos de la asignación del PNF no son válidos.")
+        if not self.fecha_asignacion or not self.fecha_desasignacion:
+            messagebox.showerror("Error", "Los campos de las fechas son obligatorios.", parent=self)
             return
         if self.controller_pnf.modelo.update_pnf_asignado_docente(self.id_docente, datos):
             messagebox.showinfo("Éxito", "La actualización se realizó exitosamente.", parent=self)

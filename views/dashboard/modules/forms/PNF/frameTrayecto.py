@@ -500,3 +500,6 @@ class FrameTrayecto(SectionFrameBase):
         self.para_edicion = True
 
         self.btn_agregar_nuevos_tramos.pack(side="left")
+    
+    def cargar_datos_defaul(self,):
+        pass
