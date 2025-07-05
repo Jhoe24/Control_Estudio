@@ -360,7 +360,7 @@ class ControllerPNF:
     
     def update_unidad_curricular(self, datos_uc, id_uc, top):
         try:
-            exito = self.modelo.update_unidad_curricular(datos_uc, id_uc)
+            exito = self.modelo.update_unidad_curricular(datos_uc, id_uc, self.obtener_fecha_actual())
             if exito:
                 messagebox.showinfo("Éxito", "Unidad Curricular actualizada correctamente.", parent=top)
                 return True

@@ -504,7 +504,7 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
-    def update_unidad_curricular(self, datos_uc, id_uc):
+    def update_unidad_curricular(self, datos_uc, id_uc, fecha_actual):
         con = None
         try:
             con = sql.connect(self.db_ruta)
@@ -531,7 +531,8 @@ class ModeloPNF:
                     estado = ?,
                     pnf_id = ?,
                     trayecto_id = ?,
-                    tramo_id = ?
+                    tramo_id = ?,
+                    fecha_actualizacion = ?
                     
                 WHERE id = ?
                 """,
@@ -556,6 +557,7 @@ class ModeloPNF:
                     datos_uc["pnf_id"],
                     datos_uc["trayecto_id"],
                     datos_uc["tramo_id"],
+                    fecha_actual,
                     id_uc
                 )
             )

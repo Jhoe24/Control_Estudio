@@ -216,7 +216,6 @@ class ListarUC(ctk.CTkScrollableFrame):
         Actualiza los datos de UC en la base de datos.
         """
         datos_uc = self.controller.getUnidadCurricular(frame_uc)
-        print("Datos UC a actualizar:")
         exito = self.controller.update_unidad_curricular(datos_uc, id_uc, top)
         if exito:
             top.destroy()

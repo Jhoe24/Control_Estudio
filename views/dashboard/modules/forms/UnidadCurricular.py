@@ -226,7 +226,7 @@ class UnidadCurricular(SectionFrameBase):
         datos_uc['id_trayecto'] = id_trayecto
         datos_uc['id_tramo'] = id_tramo
 
-        pprint.pprint(datos_uc)  # Para verificar en consola
+        # pprint.pprint(datos_uc)  # Para verificar en consola
 
         # Valida campos obligatorios
         if not self.controlador.validar_campos_obligatorios_uc(datos_uc, self):
@@ -377,7 +377,7 @@ class UnidadCurricular(SectionFrameBase):
         pnf_nombre_por_id = {v: k for k, v in self.pnf_id_por_nombre.items()}
         trayecto_nombre_por_id = {v: k for k, v in self.trayecto_id_por_nombre.items()}
         tramo_nombre_por_id = {v: k for k, v in self.tramo_id_por_nombre.items()}
-        print(f"[INFO] Estableciendo datos en Unidad Curricular: {datos}")
+        #print(f"[INFO] Estableciendo datos en Unidad Curricular: {datos}")
         self.codigo_entry.delete(0, 'end')
         self.codigo_entry.insert(0, datos.get('codigo', ''))
         self.nombre_entry.delete(0, 'end')
