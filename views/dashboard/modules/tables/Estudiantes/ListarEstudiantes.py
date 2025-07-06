@@ -31,9 +31,7 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         # Validación de campos
         try:
             toplevel = self.winfo_toplevel()
-            
-            
-            
+
             self.vcmd_num_val = toplevel.register(self.controlador._solo_numeros)
             self.vcmd_fecha_val = toplevel.register(self.controlador._numeros_y_barras)
             self.vcmd_decimal_val = toplevel.register(self.controlador._solo_decimal)

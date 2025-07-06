@@ -437,8 +437,16 @@ class ControllerPNF:
     def obtener_tramos_por_trayecto(self, id_trayecto):
         return self.modelo.obtener_lista_tramo(id_trayecto)
     
-    def obtener_UC(self):
-        return self.modelo.obtener_UC()
+    def obtener_UC(self,tupla_datos = None):
+        if not tupla_datos:
+            return self.modelo.obtener_UC()
+        else:
+            sentencia_sql = """
+            SELECT * FROM unidades_curriculares
+            WHERE pnf_id = ? AND trayecto_id = ? AND tramo_id = ?
+            """
+            return self.modelo.buscar_uc_por_pnf(sentencia_sql,tupla_datos,True)
+    
     
     def obtener_datos_completos_uc(self, id_uc):
         return self.modelo.obtener_unidad_curricular(id_uc)

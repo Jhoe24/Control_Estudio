@@ -232,3 +232,9 @@ class EstudianteController:
         vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
         vista_formulario.datos_personales_frame.nro_documento_entry.configure(state="normal")
 
+    def obtener_estudiantes_pnf(self,tupla_datos):
+        resultado = self.modelo.obtener_estudiantes_pnf(pnf_id=tupla_datos[0],trayecto_actual=tupla_datos[1],tramo_actual=tupla_datos[2])
+        if resultado:
+            return resultado
+        else: 
+            return []

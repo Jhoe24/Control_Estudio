@@ -486,7 +486,30 @@ class ModelRegistroEstudiantes:
         finally:
             if con is not None:
                 con.close()
-                           
+    
+
+    #==========Asignacion del pnf a estudiantes=======================
+
+    # def obtener_estudiantes_pnf(self,tupla_datos):
+    #     con = None
+    #     try:
+    #         con = sql.connect(self.db_ruta)
+    #         con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+    #         cursor = con.cursor()
+    #         cursor.execute(
+    #             """
+    #             SELECT * FROM estudiante_pnf WHERE pnf_id = ? AND trayecto_actual = ? AND tramo_actual = ?
+    #             """, tupla_datos
+    #         )
+    #         return cursor.fetchall()  # Retorna un diccionario o None
+    #     except Exception as e:
+    #         print(f"Error al obtener el PNF asignado: {e}")
+    #         return None
+    #     finally:
+    #         if con is not None:
+    #             con.close()
+
+
                            
     # def obtener_campo(self, table, columna, value):
     #     try:
@@ -506,3 +529,53 @@ class ModelRegistroEstudiantes:
     #         print(f"Error en la consulta {table}: {e}") 
     #         return False
 
+    def obtener_estudiantes_pnf(self, pnf_id, trayecto_actual, tramo_actual):
+        """
+        Obtiene información detallada de estudiantes inscritos en un PNF, trayecto y tramo específicos.
+        Los resultados se devuelven como una lista de diccionarios.
+        """
+        instruccion = '''
+        SELECT
+            epnf.id, epnf.estudiante_id, epnf.pnf_id, epnf.sede_id, epnf.fecha_inicio,
+            epnf.fecha_fin, epnf.cohorte, epnf.turno, epnf.trayecto_actual,
+            epnf.tramo_actual, epnf.creditos_aprobados, epnf.promedio_general,
+            epnf.estado,
+            est.codigo_unico, est.codigo_estudiantil, est.tipo_ingreso,
+            est.fecha_ingreso, est.situacion_academica,
+            ip.documento_identidad, ip.nombres, ip.apellidos, ip.fecha_nacimiento,
+            ip.correo_electronico, ip.correo_institucional, ip.sexo, ip.nacionalidad
+        FROM
+            estudiante_pnf AS epnf
+        JOIN
+            estudiantes AS est ON epnf.estudiante_id = est.id
+        JOIN
+            informacion_personal AS ip ON est.persona_id = ip.id
+        WHERE
+            epnf.pnf_id = ? AND epnf.trayecto_actual = ? AND epnf.tramo_actual = ?;
+        '''
+        parametros = (pnf_id, trayecto_actual, tramo_actual)
+        
+        db_ruta = os.path.join('db', 'sistema_academico.db')
+        con = sql.connect(db_ruta)
+        cursor = con.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;")
+        
+        try:
+            cursor.execute(instruccion, parametros)
+            
+            # Obtener los nombres de las columnas para usarlos como claves del diccionario
+            column_names = [description[0] for description in cursor.description]
+            
+            resultados_diccionarios = []
+            for fila in cursor.fetchall():
+                resultados_diccionarios.append(dict(zip(column_names, fila)))
+            
+            return resultados_diccionarios
+        except Exception as e:
+            print(f"Error al obtener estudiantes con detalle: {e}")
+            raise
+        finally:
+            con.close()
+
+bd = ModelRegistroEstudiantes()
+print(bd.obtener_estudiantes_pnf(1,"Trayecto II", "Tramo II"))
