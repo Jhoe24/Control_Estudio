@@ -563,6 +563,23 @@ class ModeloPNF:
         finally:
             if con is not None:
                 con.close()
+    
+    def buscar_uc_por_pnf(self, sentencia_sql, tuple_id):
+        """
+        Busca las Unidades Curriculares asociadas a un PNF específico.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(sentencia_sql, tuple_id)
+            return cursor.fetchall()  # Retorna una lista de diccionarios
+        except Exception as e:
+            print(f"Error al buscar UC por PNF: {e}")
+            return []
+        finally:
+            if con is not None:
+                con.close()
 
     #==========================================================================================
 

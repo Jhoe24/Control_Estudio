@@ -2,7 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
-
+from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
 
 
 class ListarUC(ctk.CTkScrollableFrame):
@@ -16,10 +16,14 @@ class ListarUC(ctk.CTkScrollableFrame):
         self.uc_por_pagina = 10
         self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
 
+
         self.paginas_mostrar = self.lista_UC[:self.uc_por_pagina]
         self.posicion_actual = len(self.paginas_mostrar)
         self.button_uc = None
         self.frame_uc = None
+
+        self.busqueda_frame = FiltradoPNFFrame(self, self.controller)
+        self.busqueda_frame.grid(row=0, column=0, columnspan=5, padx=15, pady=(10, 0), sticky="ew")
 
         self.fila_datos = []
 
@@ -41,7 +45,12 @@ class ListarUC(ctk.CTkScrollableFrame):
         self.frame_paginacion.grid_columnconfigure(2, weight=0)
         self.frame_paginacion.grid_columnconfigure(3, weight=0)
         self.frame_paginacion.grid_columnconfigure(4, weight=1)
-
+        if len(self.lista_UC) <= self.uc_por_pagina:
+            self.frame_paginacion.grid_remove()
+        else:
+            self.frame_paginacion.grid()
+     
+            # Botones de paginación
         self.boton_anterior = ctk.CTkButton(self.frame_paginacion, text="Anterior", command=self.anterior_pagina)
         self.label_pagina = ctk.CTkLabel(self.frame_paginacion, text=f"{self.pagina_actual} de {self.total_paginas}", text_color="#222")
         self.boton_siguiente = ctk.CTkButton(self.frame_paginacion, text="Siguiente", command=self.siguiente_pagina)
@@ -52,7 +61,12 @@ class ListarUC(ctk.CTkScrollableFrame):
 
         # Coloca el frame de paginación al final de la tabla
         fila_paginacion = len(self.paginas_mostrar) + 2
-        self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=4, pady=15, sticky="ew")
+        self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=5, pady=15, sticky="ew")
+
+        if len(self.lista_UC) <= self.uc_por_pagina:
+            self.frame_paginacion.grid_remove()
+        else:
+            self.frame_paginacion.grid()
 
         # Lista para almacenar las filas de datos
         self.mostrar_listado()
@@ -61,29 +75,44 @@ class ListarUC(ctk.CTkScrollableFrame):
         """
         Muestra la lista de UC en la tabla, con sus botones de acción.
         """
-        # Limpia las filas anteriores
-        for fila in self.fila_datos:
-            for widget in fila:
-                widget.destroy()
-        self.fila_datos.clear()
-        # Empieza en la fila 2 porque la fila 1 es el encabezado
-        for fila, tupla_uc in enumerate(self.paginas_mostrar, start=2):
-            fila_widgets = [
-                self._crear_celda(fila, 0, tupla_uc[0]),  # Código
-                self._crear_celda(fila, 1, tupla_uc[2]),  # Nombre
-                self._crear_celda(fila, 2, tupla_uc[15]),  # Crédito
-                self._crear_celda(fila, 3, tupla_uc[14]),  # Horas
-            ]
-            celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
-            celda_btn.grid(row=fila, column=4, padx=1, pady=1, sticky="nsew")
-            boton = ctk.CTkButton(
-                celda_btn, text="Ver datos", width=100,
-                text_color="#222",
-                command=lambda uc=tupla_uc: self.ver_datos_completos(uc)
-            )
-            boton.pack(padx=10, pady=5)
-            fila_widgets.append(celda_btn)
-            self.fila_datos.append(fila_widgets)
+        if self.busqueda_frame.pnf_var.get() == "Seleccione un PNF":
+            self.paginas_mostrar = []
+            self.total_paginas = 0
+            self.pagina_actual = 0
+            self.label_pagina.configure(text="0 de 0")
+            self.boton_anterior.configure(state="disabled")
+            self.boton_siguiente.configure(state="disabled")
+        # Si hay un PNF seleccionado, filtra la lista de UC de acuerdo al PNF
+        if self.busqueda_frame.pnf_var.get() != "Seleccione un PNF":    
+            # Limpia las filas anteriores
+            for fila in self.fila_datos:
+                for widget in fila:
+                    widget.destroy()
+            self.fila_datos.clear()
+            # Empieza en la fila 2 porque la fila 1 es el encabezado
+            for fila, tupla_uc in enumerate(self.paginas_mostrar, start=2):
+                fila_widgets = [
+                    self._crear_celda(fila, 0, tupla_uc[1]),  # Código
+                    self._crear_celda(fila, 1, tupla_uc[2]),  # Nombre
+                    self._crear_celda(fila, 2, tupla_uc[15]),  # Crédito
+                    self._crear_celda(fila, 3, tupla_uc[14]),  # Horas
+                ]
+                celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
+                celda_btn.grid(row=fila, column=4, padx=1, pady=1, sticky="nsew")
+                boton = ctk.CTkButton(
+                    celda_btn, text="Ver datos", width=100,
+                    text_color="#222",
+                    command=lambda uc=tupla_uc: self.ver_datos_completos(uc)
+                )
+                boton.pack(padx=10, pady=5)
+                fila_widgets.append(celda_btn)
+                self.fila_datos.append(fila_widgets)
+        else:
+            # Deja la tabla vacía si no hay PNF seleccionado y los botones de paginación deshabilitados
+            for fila in self.fila_datos:
+                for widget in fila:
+                    widget.destroy()
+            self.fila_datos.clear()
 
 
     def _crear_celda(self, row, col, texto):
@@ -120,19 +149,43 @@ class ListarUC(ctk.CTkScrollableFrame):
             self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
             self.calcular_pagina()
     
-    def calcular_pagina(self):
+    def calcular_pagina(self, lista_uc=None):
         """
         Habilita/deshabilita los botones de paginación según la página actual y muestra el listado.
         """
-        estado_btn_siguiente = "normal"
-        estado_btn_anterio = "normal"
-        if self.pagina_actual == 1:
-            estado_btn_anterio = "disabled"
-        self.boton_anterior.configure(state=estado_btn_anterio)
-        if self.pagina_actual == self.total_paginas:
-            estado_btn_siguiente = "disabled"
-        self.boton_siguiente.configure(state=estado_btn_siguiente)
+        if lista_uc is not None:
+            self.lista_UC = lista_uc
+
+        total_registros = len(self.lista_UC)
+        self.total_paginas = (total_registros + self.uc_por_pagina - 1) // self.uc_por_pagina if total_registros > 0 else 0
+
+        # Ajustar página actual
+        if self.total_paginas == 0:
+            self.pagina_actual = 0
+        elif self.pagina_actual > self.total_paginas:
+            self.pagina_actual = self.total_paginas
+        elif self.pagina_actual < 1:
+            self.pagina_actual = 1
+
+        inicio = (self.pagina_actual - 1) * self.uc_por_pagina if self.pagina_actual > 0 else 0
+        fin = inicio + self.uc_por_pagina
+        self.paginas_mostrar = self.lista_UC[inicio:fin] if self.total_paginas > 0 else []
+
+        # Actualizar label de paginación
+        self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
+
+        # Mostrar/ocultar frame de paginación
+        if self.total_paginas <= 1:
+            self.frame_paginacion.grid_remove()
+        else:
+            self.frame_paginacion.grid()
+
+        # Actualizar estados de botones
+        self.boton_anterior.configure(state="disabled" if self.pagina_actual <= 1 else "normal")
+        self.boton_siguiente.configure(state="disabled" if self.pagina_actual >= self.total_paginas else "normal")
+
         self.mostrar_listado()
+
 
     def ver_datos_completos(self, uc):
         """
@@ -219,14 +272,55 @@ class ListarUC(ctk.CTkScrollableFrame):
         exito = self.controller.update_unidad_curricular(datos_uc, id_uc, top)
         if exito:
             top.destroy()
-            self.lista_uc = self.controller.obtener_lista_uc()
+            #self.lista_uc = self.controller.obtener_lista_uc()
             #actualiza la paginacion y muestra el listado
             self.total_paginas = (len(self.lista_uc) + self.uc_por_pagina - 1) // self.uc_por_pagina
             self.paginas_mostrar = self.lista_uc[(self.pagina_actual-1)*self.uc_por_pagina:self.pagina_actual*self.uc_por_pagina]
             self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
             self.mostrar_listado()
     
+    def mostrar_resultado_busqueda(self, lista_uc):
+        """
+        Muestra el resultado filtrado por PNF.
+        """
+        self.pagina_actual = 1
+        self.total_paginas = (len(lista_uc) + self.uc_por_pagina - 1) // self.uc_por_pagina
+        self.paginas_mostrar = lista_uc[:self.uc_por_pagina]
+        self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
 
+        # Ocultar paginación si no es necesaria
+        if len(self.lista_UC) <= self.uc_por_pagina:
+            self.frame_paginacion.grid_remove()
+        else:
+            self.frame_paginacion.grid()
+
+        self.mostrar_listado()
+
+
+    def actualizar_pagina(self):
+        """
+        Actualiza la página actual y muestra el listado.
+        """
+        self.paginas_mostrar = self.lista_UC[(self.pagina_actual-1)*self.uc_por_pagina:self.pagina_actual*self.uc_por_pagina]
+        self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
+        self.calcular_pagina()
+
+    def actualizar_botones_paginacion(self):
+        """
+        Habilita o deshabilita los botones de paginación según la página actual y el total de páginas.
+        """
+        # deshabilita los botones si no hay registros en la lista
+        if not self.lista_UC or len(self.lista_UC) <= 0:
+            self.frame_paginacion.grid_remove()
+            self.boton_anterior.configure(state="disabled")
+            self.boton_siguiente.configure(state="disabled")
+        else:
+            self.frame_paginacion.grid()
+            self.boton_anterior.configure(state="disabled" if self.pagina_actual <= 1 else "normal")
+            self.boton_siguiente.configure(state="disabled" if self.pagina_actual >= self.total_paginas else "normal")
+            # Actualiza el estado de los botones de paginación
+            self.boton_anterior.configure(state="normal" if self.pagina_actual > 1 else "disabled")
+            self.boton_siguiente.configure(state="normal" if self.pagina_actual < self.total_paginas else "disabled")
 
 
 

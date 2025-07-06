@@ -18,6 +18,8 @@ from views.dashboard.modules.tables.PNF.ListarPNF import ListarPNF
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
 
+from views.dashboard.modules.Carga_notas import CargaNotasView
+
 
 class AdminDashboardView(BaseDashboardView):
     
@@ -117,5 +119,11 @@ class AdminDashboardView(BaseDashboardView):
         
         listar_uc = ListarUC(self.cuerpo_principal, self.controller['PNF'])
         listar_uc.pack(fill="both", expand=True, padx=10, pady=10)
-
+    
+    def carga_notas(self): 
+        for widget in self.cuerpo_principal.winfo_children():
+                    widget.pack_forget()
+                
+        carga_notas = CargaNotasView(self.cuerpo_principal,self.controller["Estudiantes"], self.controller['PNF'])
+        carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
     

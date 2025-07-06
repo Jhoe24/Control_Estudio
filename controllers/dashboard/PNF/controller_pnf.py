@@ -448,6 +448,31 @@ class ControllerPNF:
     
     def obtener_lista_uc(self):
         return self.modelo.obtener_UC()
+    
+    def buscar_uc_por_pnf_trayecto_tramo(self, id_pnf, id_trayecto=None, id_tramo=None):
+        """
+        Busca las Unidades Curriculares asociadas a un PNF específico.
+        """
+        if id_trayecto is not None and id_tramo is not None:
+            sentencia_sql = """
+            SELECT * FROM unidades_curriculares
+            WHERE pnf_id = ? AND trayecto_id = ? AND tramo_id = ?
+            """
+            respuesta = self.modelo.buscar_uc_por_pnf(sentencia_sql,(id_pnf, id_trayecto, id_tramo))
+        elif id_trayecto is not None:
+            sentencia_sql = """
+            SELECT * FROM unidades_curriculares
+            WHERE pnf_id = ? AND trayecto_id = ?
+            """
+            respuesta = self.modelo.buscar_uc_por_pnf(sentencia_sql, (id_pnf, id_trayecto))
+        else:
+            sentencia_sql = """
+            SELECT * FROM unidades_curriculares
+            WHERE pnf_id = ?
+            """
+            respuesta = self.modelo.buscar_uc_por_pnf(sentencia_sql, (id_pnf,))
+        return respuesta
+
 
     def obtener_nombres_pnf(self):
         nombres_pnf = []
