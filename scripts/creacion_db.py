@@ -237,7 +237,7 @@ class SistemaAcademicoDB:
             duracion_trayectos INTEGER,
             duracion_semanas INTEGER,
             total_creditos INTEGER,
-            total_horas INTEGER,
+            total_horas INTEGER DEFAULT 0,
             modalidad TEXT DEFAULT 'Presencial' 
                 CHECK (modalidad IN ('Presencial', 'Semipresencial', 'Virtual', 'Mixta')),
             titulo_otorga TEXT,
@@ -282,11 +282,11 @@ class SistemaAcademicoDB:
             numero INTEGER,
             nombre TEXT,
             tipo TEXT CHECK (tipo IN ('Inicial', 'Profesional', 'Especialización', 'Investigación')),
-            duracion_semanas INTEGER,
-            duracion_horas INTEGER,
-            creditos_minimos INTEGER,
-            creditos_maximos INTEGER,
-            numero_tramos INTEGER,
+            duracion_semanas INTEGER DEFAULT 0,
+            duracion_horas INTEGER DEFAULT 0,
+            creditos_minimos INTEGER DEFAULT 0,
+            creditos_maximos INTEGER DEFAULT 0,
+            numero_tramos INTEGER DEFAULT 0,
             objetivos TEXT,
             competencias TEXT,
             perfil_egreso TEXT,
@@ -305,9 +305,9 @@ class SistemaAcademicoDB:
             trayecto_id INTEGER,
             numero INTEGER,
             nombre TEXT,
-            duracion_semanas INTEGER,
-            duracion_horas INTEGER,
-            creditos INTEGER,
+            duracion_semanas INTEGER DEFAULT 0,
+            duracion_horas INTEGER DEFAULT 0,
+            creditos INTEGER DEFAULT 0,
             objetivos TEXT,
             competencias TEXT,
             estado TEXT DEFAULT 'activo' CHECK (estado IN ('activo', 'inactivo')),
@@ -329,18 +329,20 @@ class SistemaAcademicoDB:
             area TEXT,
             subarea TEXT,
             eje_formativo TEXT,
-            horas_teoricas INTEGER DEFAULT 0,
-            horas_practicas INTEGER DEFAULT 0,
-            horas_laboratorio INTEGER DEFAULT 0,
-            horas_trabajo_independiente INTEGER DEFAULT 0,
-            horas_totales INTEGER,
+            horas_teoricas REAL DEFAULT 0,
+            horas_practicas REAL DEFAULT 0,
+            horas_laboratorio REAL DEFAULT 0,
+            horas_trabajo_independiente REAL DEFAULT 0,
+            horas_totales REAL DEFAULT 0,
             unidades_credito INTEGER,
             tipo TEXT DEFAULT 'Obligatoria' 
                 CHECK (tipo IN ('Obligatoria', 'Electiva', 'Proyecto', 'Pasantía', 'Trabajo Especial')),
-            caracter TEXT CHECK (caracter IN ('Teórica', 'Práctica', 'Teórico-Práctica', 'Laboratorio')),
+            caracter TEXT DEFAULT 'Teórica'
+                CHECK (caracter IN ('Teórica', 'Práctica', 'Teórico-Práctica', 'Laboratorio')),
             modalidad TEXT DEFAULT 'Presencial' 
                 CHECK (modalidad IN ('Presencial', 'Semipresencial', 'Virtual')),
-            complejidad TEXT CHECK (complejidad IN ('Básica', 'Intermedia', 'Avanzada')),
+            complejidad TEXT DEFAULT 'Básica'
+                CHECK (complejidad IN ('Básica', 'Intermedia', 'Avanzada')),
             prelaciones TEXT,
             competencias_genericas TEXT,
             competencias_especificas TEXT,
@@ -359,7 +361,7 @@ class SistemaAcademicoDB:
             FOREIGN KEY (pnf_id) REFERENCES pnf(id),
             FOREIGN KEY (trayecto_id) REFERENCES trayectos(id),
             FOREIGN KEY (tramo_id) REFERENCES tramos(id),
-            UNIQUE(codigo, pnf_id)
+            UNIQUE(codigo, pnf_id, tramo_id)
         );'''
         self.ejecutar_consulta(instruccion6)
 

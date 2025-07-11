@@ -239,12 +239,12 @@ class DatosPersonalesFrame(SectionFrameBase):
             print(fecha_nacimiento)
         self.fnac_entry.configure(state="disabled")
 
-        #Configuracion del lugar de nacimiento
+        #Configuracion del lugar de nacimiento - CORREGIDO
+        self.lugar_nac_entry.configure(state="normal")  # Asegurar que esté habilitado
         self.lugar_nac_entry.delete(0, ctk.END)
-        if estudiante.get('lugar_nacimiento') != None:
-            self.lugar_nac_entry.insert(0,estudiante.get("lugar_nacimiento"))
-        else:
-            self.lugar_nac_entry.insert("")
+        lugar_nac = estudiante.get('lugar_nacimiento', '')
+        if lugar_nac:  # Solo insertar si hay contenido
+            self.lugar_nac_entry.insert(0, lugar_nac)
         self.lugar_nac_entry.configure(state="disabled")
 
         #Configuracion de la fecha de ingreso
@@ -256,16 +256,15 @@ class DatosPersonalesFrame(SectionFrameBase):
             print(fecha_ingreso)
         self.fingreso_entry.configure(state="disabled")
 
-        #Configuaracion correoelectronico
-        self.correo_electronico_entry.delete(0,ctk.END)
-        if estudiante.get('correo_electronico') != None:
-            self.correo_electronico_entry.insert(0,estudiante.get('correo_electronico'))
-        self.correo_electronico_entry.configure(state="disabled")
-        
-        self.correo_electronico_entry.insert(0, estudiante.get('correo_electronico'))
+        #Configuracion correo electronico - CORREGIDO
+        self.correo_electronico_entry.configure(state="normal")  # Asegurar que esté habilitado
+        self.correo_electronico_entry.delete(0, ctk.END)
+        correo = estudiante.get('correo_electronico', '')
+        if correo:  # Solo insertar si hay contenido
+            self.correo_electronico_entry.insert(0, correo)
         self.correo_electronico_entry.configure(state="disabled")
 
-         # --- Teléfonos dinámicos: mostrar todos los guardados ---
+        # --- Teléfonos dinámicos: mostrar todos los guardados ---
         self.limpiar_telefonos()
         telefonos = estudiante.get('telefonos', [])
         for tipo, numero, principal in telefonos:
@@ -281,8 +280,6 @@ class DatosPersonalesFrame(SectionFrameBase):
                     widget.configure(state="disabled")
         # Deshabilita el botón agregar teléfono en modo solo lectura
         self.btn_agregar_telefono.configure(state="disabled")
-            # --- Fin de la carga de teléfonos ---
-
         
 
     #metodo para habilitar la edicion de los campos sin eliminar el contenido
