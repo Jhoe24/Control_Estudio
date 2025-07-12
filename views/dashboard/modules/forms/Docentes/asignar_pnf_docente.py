@@ -165,9 +165,6 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             "activo": self.var_activo.get(),
             "observaciones": self.var_observaciones.get(),
         }
-        if not self.fecha_asignacion or not self.fecha_desasignacion:
-            messagebox.showerror("Error", "Los campos de las fechas son obligatorios.", parent=self)
-            return
         if self.controller_pnf.modelo.registrar_asignacion_docente_pnf(datos):
             messagebox.showinfo("Éxito", "La asignación se realizó exitosamente.", parent=self)
             self.winfo_toplevel().destroy()
@@ -184,9 +181,6 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             "activo": self.var_activo.get(),
             "observaciones": self.var_observaciones.get(),
         }
-        if not self.fecha_asignacion or not self.fecha_desasignacion:
-            messagebox.showerror("Error", "Los campos de las fechas son obligatorios.", parent=self)
-            return
         if self.controller_pnf.modelo.update_pnf_asignado_docente(self.id_docente, datos):
             messagebox.showinfo("Éxito", "La actualización se realizó exitosamente.", parent=self)
             self.winfo_toplevel().destroy()

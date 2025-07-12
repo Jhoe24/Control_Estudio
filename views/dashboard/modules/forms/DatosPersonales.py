@@ -50,7 +50,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         # --- Fila para genero, estado civil ---
         self._crear_fila_widgets([
             ("Género:", crear_option_menu, {"values":["M", "F"],'variable': self.var_sexo,"command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu'),
-            ("Edo Civil:", crear_option_menu, {"values":["Soltero", "Casado", "Divorciado"],"variable":self.var_estadoCivil ,"command": lambda v: setattr(self.edo_civil_menu, '_current_value',v)}, 1, self, 'edo_civil_menu')
+            ("Edo Civil:", crear_option_menu, {"values":["Soltero", "Casado", "Divorciado","Viudo"],"variable":self.var_estadoCivil ,"command": lambda v: setattr(self.edo_civil_menu, '_current_value',v)}, 1, self, 'edo_civil_menu')
         ])
 
         # --- Fila para nacionalidad ---

@@ -523,7 +523,7 @@ class ControllerPNF:
         try:
             campos_obligatorios = [
                 "trayecto_actual", "tramo_actual",
-                "fecha_inicio", "fecha_fin", "cohorte",
+                "cohorte",
                 "turno","estado"
             ]
 

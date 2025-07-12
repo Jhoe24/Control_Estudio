@@ -44,16 +44,24 @@ class CargaNotasFrame(SectionFrameBase):
 
     def set_trayecto(self, value):
             tupla_trayectos = self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[value])
+            self.trayecto_id_por_nombre = {trayecto[1]: trayecto[0] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])}  # nombre: id
             self.valores_trayecto = [trayecto[1] for trayecto in tupla_trayectos]  # Obtener solo los nombres de los trayectos
             self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")  # Valor por defecto para el trayecto
+
             self.trayecto_menu.configure(values=self.valores_trayecto)
             print("Trayectos disponibles:", self.valores_trayecto)
 
     def set_tramo(self, value):
         tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[value])
         self.valores_tramos = [tramo[1] for tramo in tupla_tramos]
+        self.tramo_id_por_nombre = {tupla[1]: tupla[0] for tupla in self.tupla_tramos}  # nombre: id
         self.var_tramo.set(self.valores_tramos[0] if self.valores_tramos else "Tramo")
         self.tramo_menu.configure(values=self.valores_tramos)
 
     def obtener_tupla_pnf(self):
+        self.trayecto_id_por_nombre = {trayecto[1]: trayecto[0] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])}  # nombre: id
+        self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[self.var_trayecto.get()])
+        self.tramo_id_por_nombre = {tupla[1]: tupla[0] for tupla in self.tupla_tramos}  # nombre: id
+
+
         return (self.pnf_id_por_nombre[self.pnf_menu.get()],self.trayecto_id_por_nombre[self.trayecto_menu.get()],self.tramo_id_por_nombre[self.tramo_menu.get()],self.trayecto_menu.get(),self.tramo_menu.get())

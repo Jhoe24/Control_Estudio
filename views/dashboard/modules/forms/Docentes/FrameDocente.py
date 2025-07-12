@@ -21,7 +21,7 @@ class FrameDocente(SectionFrameBase):
         self.var_tipo_contrato = ctk.StringVar(value='Tiempo completo')  # Valor por defecto para el tipo de contrato
         self.var_dedicacion = ctk.StringVar(value='Exclusiva')  # Valor por defecto para la dedicación
         self._crear_fila_widgets([
-            ("Abreviatura de Título:", crear_option_menu, {"values":["Prof.", "Ing.", "Lic.", "Abog.", "TSU.", "Otros"],'variable': self.var_abre_titulo,"command": lambda v: setattr(self.abreviatura_menu, '_current_value',v)}, 1, self, 'abreviatura_menu'),
+            ("Abreviatura de Título:", crear_option_menu, {"values":["Prof.", "Ing.", "Lcdo.", "Abog.", "TSU.", "Otros"],'variable': self.var_abre_titulo,"command": lambda v: setattr(self.abreviatura_menu, '_current_value',v)}, 1, self, 'abreviatura_menu'),
             ("Especialidad:", crear_entry, {"width":220}, 1, self, 'especialidad_entry')
         ])
         #("Cédula:", crear_entry, {"width":220, "validate":"key", "validatecommand":(vcmd_num, '%P')}, 1, self, 'cedula_entry')
