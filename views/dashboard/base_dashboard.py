@@ -87,6 +87,7 @@ class BaseDashboardView(BaseView):
         if self.user_role.lower() in ["admin", "administrador"]:
             menu_items = [
                 ("Inicio", "home_icon", self.inicio, False),
+                ("Periodos", "pnf_icon", self.periodo, False),
                 ("Estudiantes", "estudiantes_icon", None, True),  # Submenú
                 ("Docentes", "docentes_icon", self.docentes, True),
                 ("Carga de Notas", "carga_notas_icon", self.carga_notas, False),
@@ -303,6 +304,7 @@ class BaseDashboardView(BaseView):
 
     
     def inicio(self): pass
+    def periodo(self): pass
     def docentes(self): pass
     def list_docente(self): pass
     def estudiantes(self): pass
