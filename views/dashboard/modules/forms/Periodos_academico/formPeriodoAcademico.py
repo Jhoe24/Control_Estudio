@@ -18,9 +18,13 @@ class FormPeriodoAcademico(SectionFrameBase):
         self.fecha_fin_clases = None
         self.fecha_inicio_evaluaciones = None
         self.fecha_fin_evaluaciones = None
+        # Evento de mouse para el formulario
+        #self.evento_mouse()
 
         # Variables de control
         self.var_tipo = ctk.StringVar(value="Regular")
+        self.var_estado = ctk.StringVar(value="Planificación")
+        
 
         self._crear_fila_widgets([
             ("Codigo", crear_entry, {"width": 300, "placeholder_text": "Ingrese el codigo"}, 1, self, "codigo_entry"),
@@ -68,8 +72,8 @@ class FormPeriodoAcademico(SectionFrameBase):
         self.fecha_fin_evaluaciones_label.pack(pady=(5, 0), padx=20, anchor="w")
         
         self._crear_fila_widgets([
-            ("Duración en semanas", crear_option_menu, {"values": [str(i) for i in range(4, 41)], "width": 200},1,self,"duracion_semanas_menu"),
-            ("Estado", crear_option_menu, {"values": ["Planificación","Inscripción","En Curso","Evaluaciones","Finalizado","Cerrado"], "width": 200},1,self,"estado_menu"),
+            ("Duración en semanas", crear_entry, {"width": 200, "placeholder_text": "Ingrese la duración en semanas"},1,self,"duracion_semanas_entry"),
+            ("Estado", crear_option_menu, {"values": ["Planificación","Inscripción","En Curso","Evaluaciones","Finalizado","Cerrado"],"variable": self.var_estado, "width": 200},1,self,"estado_menu"),
             ("Observación",crear_entry,{"width": 300, "placeholder_text": "Ingrese observaciones"},1,self,"observacion_entry")
         ])
 
@@ -167,3 +171,5 @@ class FormPeriodoAcademico(SectionFrameBase):
         btn_fecha.pack(side="left", pady=(10, 0), anchor="w")
         if attr_name:
             setattr(self, attr_name, btn_fecha)
+
+    

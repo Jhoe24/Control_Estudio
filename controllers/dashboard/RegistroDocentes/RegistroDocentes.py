@@ -1,4 +1,3 @@
-
 import tkinter.messagebox as messagebox
 
 from models.Docentes.RegistroDocentes import ModeloDocente
@@ -16,6 +15,7 @@ class DocenteController:
         else:
             messagebox.showerror("Error de Registro", "No se pudo registrar el docente. Por favor, intente nuevamente.", parent=vista_formulario)
         print(dic_docentes)
+        
     def obtener_lista_docentes(self,desde=0):
         #Obtener 10 registro de docentes
         nmin = 0

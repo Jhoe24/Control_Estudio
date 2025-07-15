@@ -5,11 +5,13 @@ from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from ..DatosPersonales import DatosPersonalesFrame
 
 class CargaNotasFrame(SectionFrameBase):
-    def __init__(self, master, controller_estudiante, controller_pnf):
+    def __init__(self, master, controller_periodos_academicos, controller_pnf):
         super().__init__(master, "Gestion De Carga de Notas")
         self.controller_pnf = controller_pnf
-
-        self.var_periodo = ctk.StringVar(value="Periodo I")
+        self.controller_periodos_academicos = controller_periodos_academicos
+        self.nombres_periodos = self.controller_periodos_academicos.obtener_nombres_periodos()
+        self.var_periodo = ctk.StringVar(value=self.nombres_periodos[0])
+        
         self.nombres_pnf = self.controller_pnf.obtener_nombres_pnf()
         self.var1 = ctk.StringVar(value=self.nombres_pnf[0] if self.nombres_pnf else "") # Valor por defecto para el PNF
         self.tuple_pnf = self.controller_pnf.listado_pnf
@@ -31,8 +33,9 @@ class CargaNotasFrame(SectionFrameBase):
         self.var_tramo = ctk.StringVar(value=self.valores_tramos[0] if self.valores_tramos else "No seleccionado")  # Valor por defecto para el tramo
 
         self._crear_fila_widgets([
-            ("Seleccionar Periodo Academico",crear_option_menu,{"values":["Periodo I","Periodo II","Periodo III"]}, 1, self, 'periodo_menu')
+            ("Seleccionar Periodo Academico",crear_option_menu,{"values":self.nombres_periodos, "variable":self.var_periodo}, 1, self, 'periodo_menu')
         ])
+
         self._crear_fila_widgets([
                 ("Seleccione un P.N.F:", crear_option_menu, {"values":self.nombres_pnf, "variable":self.var1, "command": self.set_trayecto  }, 1, self, 'pnf_menu'),
                 ("Trayecto Actual:", crear_option_menu, {"values": self.valores_trayecto, "variable": self.var_trayecto,"command": self.set_tramo}, 1, self, 'trayecto_menu'),

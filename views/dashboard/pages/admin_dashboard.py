@@ -23,6 +23,9 @@ from views.dashboard.modules.Carga_notas import CargaNotasView
 
 from views.dashboard.modules.Freame_periodos_academicos import PeriodoAcademicoView
 
+from views.dashboard.modules.SeccionesView import SeccionView
+
+
 
 class AdminDashboardView(BaseDashboardView):
     
@@ -127,15 +130,22 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
                 
-        carga_notas = CargaNotasView(self.cuerpo_principal,self.controller["Estudiantes"], self.controller['PNF'])
+        carga_notas = CargaNotasView(self.cuerpo_principal,self.controller["Periodos"], self.controller['PNF'])
         carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
     
     def periodo(self):
         for widget in self.cuerpo_principal.winfo_children():
              widget.pack_forget()
 
-        periodo_academico = PeriodoAcademicoView(self.cuerpo_principal,None)
+        periodo_academico = PeriodoAcademicoView(self.cuerpo_principal,self.controller["Periodos"])
         periodo_academico.pack(fill="both", expand=True, padx=10, pady=10)
+    
+    def secciones(self):
+        for widget in self.cuerpo_principal.winfo_children():
+             widget.pack_forget()
+
+        secciones = SeccionView(self.cuerpo_principal,self.controller["Docentes"],self.controller["PNF"])
+        secciones.pack(fill="both", expand=True, padx=10, pady=10)
         
     
     # def sedes(self):

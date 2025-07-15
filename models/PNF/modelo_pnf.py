@@ -657,6 +657,7 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
+
     def tiene_pnf_asignado(self, id_estudiante,tabla="estudiante_pnf"):
         con = None
         try:
@@ -679,7 +680,8 @@ class ModeloPNF:
         finally:
             if con is not None:
                 con.close()
-    
+
+
     def obtener_pnf_asignado(self, id_estudiante):
         con = None
         try:
@@ -805,3 +807,6 @@ class ModeloPNF:
         finally:
             if con is not None:
                 con.close()
+
+test = ModeloPNF()
+pprint(test.obtener_pnf_asignado_docente(1))    

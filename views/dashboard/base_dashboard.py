@@ -172,6 +172,7 @@ class BaseDashboardView(BaseView):
                         submenu_items= [
                             ("Registrar P.N.F", "uc_icon", self.pnf),
                             ("Listas de P.N.F", "uc_icon", self.list_pnf),
+                            ("Secciones", "uc_icon", self.secciones),
                             ("Unidades Curriculares", "uc_icon", self.unid_Curr),
                             ("Listar U.C","uc_icon",self.listar_uc)
                         ]
@@ -314,6 +315,7 @@ class BaseDashboardView(BaseView):
     def carga_notas(self): pass
     def pnf(self): pass
     def list_pnf(self):pass
+    def secciones(self): pass
     def unid_Curr(self): pass
     def listar_uc(self): pass
     def sedes(self): pass

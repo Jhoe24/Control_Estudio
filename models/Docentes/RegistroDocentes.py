@@ -253,6 +253,33 @@ class ModeloDocente:
             print(f"Error al realizar la consulta: {e}") 
             return False
        
+    def obtener_nombres_docentes(self, id_pnf=None):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("""
+                           SELECT ip.nombres, ip.apellidos, d.id
+                           FROM informacion_personal ip
+                           JOIN docentes d ON ip.id= d.persona_id
+                           JOIN docente_sede_pnf dsp ON d.id = dsp.docente_id
+                           WHERE ip.tipo='docente' AND dsp.pnf_id = ?
+                           ORDER BY ip.nombres, ip.apellidos                        
+                            """,(id_pnf,))
+            return [{
+                'nombres': row[0],
+                'apellidos': row[1],
+                'id': row[2]
+            } for row in cursor.fetchall()]
+        
+        except Exception as e:
+            print(f"Error al obtener los nombres de los docentes: {e}") 
+            return []
+        finally:
+            if con is not None:
+                con.close()
+
+
     
     def buscar_estudiante(self, tipo_documento, nro_documento):
         try:
@@ -522,5 +549,5 @@ class ModeloDocente:
     #         return False
         
               
-# test = ModeloDocente()
-# pprint(test.lista_Docentes())
+test = ModeloDocente()
+pprint(test.obtener_nombres_docentes(1))
