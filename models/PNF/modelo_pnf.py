@@ -712,7 +712,7 @@ class ModeloPNF:
                 SELECT * FROM docente_sede_pnf WHERE docente_id = ?
                 """, (docente_id,)
             )
-            return cursor.fetchone()  # Retorna un diccionario o None
+            return cursor.fetchall()  # Retorna un diccionario o None
         except Exception as e:
             print(f"Error al obtener el PNF asignado: {e}")
             return None
@@ -808,5 +808,3 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
-test = ModeloPNF()
-pprint(test.obtener_pnf_asignado_docente(1))    

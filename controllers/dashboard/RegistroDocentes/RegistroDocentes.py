@@ -107,6 +107,15 @@ class DocenteController:
         except Exception as e:
             print(e)
 
+    def obtener_solo_nombres_docentes_por_pnf(self, pnf_id):
+        dic_nombres = self.modelo_docente.obtener_nombres_docentes(pnf_id)
+        nombres = []
+        
+        for dic_doc in dic_nombres:
+            nombres.append(dic_doc["nombres"]+" "+dic_doc["apellidos"])
+            
+        return nombres
+
     def obtener_todos_los_datos(self, vista_formulario):
         # Extrae los teléfonos de la vista dinámica
         # telefonos = [

@@ -7,16 +7,13 @@ from controllers.dashboard.PNF.controller_pnf import ControllerPNF
 from ..DatosPersonales import DatosPersonalesFrame
 
 class FremeSecciones(SectionFrameBase):
-    def __init__(self, master, controlador_docentes, controlador_pnf, titulo="Datos de Secciones"):
+    def __init__(self, master, controlador_docentes, controlador_pnf, controller_seccion, titulo="Datos de Secciones"):
         super().__init__(master, titulo)
         self.controlador_Doc = controlador_docentes
-        self.nombres_docentes = self.controlador_Doc.obtener_nombres_docentes()
-        
-        self.controller_pnf = controlador_pnf
-        self.nombres_pnf = self.controlador_pnf.obtener_nombres_pnf()
-
+        self.controller_pnf = controlador_pnf   
+        self        
         #variables de control
-        self.var_docente = ctk.StringVar(value=self.nombres_docentes[0])
+        
         self.var_turno = ctk.StringVar(value="Diurno")
         self.var_modalidad = ctk.StringVar(value="Presencial")
         self.var_estado = ctk.StringVar(value="Planificación")
@@ -28,9 +25,13 @@ class FremeSecciones(SectionFrameBase):
         self.tuple_pnf = self.controller_pnf.listado_pnf
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.tuple_pnf}  # nombre: id
 
+        self.nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(self.pnf_id_por_nombre[self.var1.get()])
+        self.var_docente = ctk.StringVar(value=self.nombres_docentes[0])
+
         self.trayecto_id_por_nombre = {trayecto[1]: trayecto[0] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])}  # nombre: id
         self.valores_trayecto = [trayecto[1] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])]  # Obtener los trayectos para el PNF seleccionado
-
+        
+        self.var_trayecto = ctk.StringVar(value=self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")  # Valor por defecto para el trayecto
         self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[self.var_trayecto.get()])  # Obtener los tramos para el trayecto seleccionado
         self.tramo_id_por_nombre = {tupla[1]: tupla[0] for tupla in self.tupla_tramos}  # nombre: id
         self.valores_tramos = [tramo[1] for tramo in self.tupla_tramos]
@@ -60,6 +61,8 @@ class FremeSecciones(SectionFrameBase):
         self.valores_trayecto = [trayecto[1] for trayecto in tupla_trayectos]  # Obtener solo los nombres de los trayectos
         self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")  # Valor por defecto para el trayecto
 
+        self.nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(self.pnf_id_por_nombre[value])
+        self.var_docente.set(self.nombres_docentes[0] if self.nombres_docentes else "Docente")
         self.trayecto_menu.configure(values=self.valores_trayecto)
         print("Trayectos disponibles:", self.valores_trayecto)
 
@@ -74,4 +77,7 @@ class FremeSecciones(SectionFrameBase):
         self.trayecto_id_por_nombre = {trayecto[1]: trayecto[0] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])}  # nombre: id
         self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[self.var_trayecto.get()])
         self.tramo_id_por_nombre = {tupla[1]: tupla[0] for tupla in self.tupla_tramos}  # nombre: id
-        return (self.pnf_id_por_nombre[self.pnf_menu.get()],self.trayecto_id_por_nombre[self.trayecto_menu.get()],self.tramo_id_por_nombre[self.tramo_menu.get()],self.trayecto_menu.get(),self.tramo_menu.get())
+        return (self.pnf_id_por_nombre[self.pnf_menu.get()],self.trayecto_id_por_nombre[self.trayecto_menu.get()],self.tramo_id_por_nombre[self.tramo_menu.get()])
+    
+    def obtener_datos_vista(self):
+        return self.controlador_D

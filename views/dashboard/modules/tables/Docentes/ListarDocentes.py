@@ -4,7 +4,7 @@ import threading
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame
 from views.dashboard.modules.RegistrarDocentes import FormularioDocenteView
-from views.dashboard.modules.forms.Docentes.asignar_pnf_docente import AsignarDocentePNFFrame
+from views.dashboard.modules.forms.Docentes.listaAsignacion import ListaAsignacionPNF
 
 class ListDocenteView(ctk.CTkScrollableFrame):
     def __init__(self, master, controlador, controller_pnf):
@@ -180,19 +180,13 @@ class ListDocenteView(ctk.CTkScrollableFrame):
             )
 
             # averiguar si el docente tiene un PNF asignado
-            if not self.controller_pnf.modelo.tiene_pnf_asignado(docente['id'],"docente_sede_pnf"):
-                text = "Asignar PNF"
-                callback = lambda est=docente: self.cargar_pnf(est)
-            else:
-                text = "Ver PNF"
-                callback = lambda est=docente: self.cargar_pnf(est,para_edicion=True)
-
             btn_pnf = ctk.CTkButton(
-                frame_botones, text=text, width=100,
+                frame_botones, text="Gestion P.N.F", width=100,
                 text_color="#ffffff",
                 fg_color=COLOR_BOTON_FONDO,
                 hover_color=COLOR_BOTON_FONDO_HOVER,
-                command=callback
+                command=lambda est=docente: self.cargar_pnf(est)
+
             )
 
             boton.pack(side="left", padx=(0, 4), pady=5)
@@ -218,7 +212,7 @@ class ListDocenteView(ctk.CTkScrollableFrame):
         label.pack(padx=10, pady=5)
         return celda
     
-    def cargar_pnf(self,docente,para_edicion=False):
+    def cargar_pnf(self,docente):
         """
         Abre el formulario para asignar un PNF aldocente seleccionado.
         """
@@ -246,23 +240,8 @@ class ListDocenteView(ctk.CTkScrollableFrame):
         scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
         scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        if para_edicion:
-            titulo = "Editar PNF dedocente"
-        else:
-            titulo = "Asignar PNF adocente"
-
-        ctk.CTkLabel(scroll_frame, text=titulo, font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).pack(pady=(10, 20), padx=20, anchor="w")
-
         # Crea el frame para asignar PNF
-        
-        if para_edicion:
-            asignar_pnf_frame = AsignarDocentePNFFrame(scroll_frame, self.controlador,self.controller_pnf,docente,True)
-            # Si es para edición, carga los datos del PNF asignado
-            asignar_pnf_frame.cargar_datos_pnf(docente['id'])
-            pass
-        else:
-            asignar_pnf_frame = AsignarDocentePNFFrame(scroll_frame, self.controlador,self.controller_pnf,docente,False)
-            asignar_pnf_frame.pack(fill="both", expand=True)
-            pass
+        lista_asignacion = ListaAsignacionPNF(scroll_frame,self.controller_pnf,docente)
 
+       
     
