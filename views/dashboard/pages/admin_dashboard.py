@@ -22,6 +22,7 @@ from views.dashboard.modules.Carga_notas import CargaNotasView
 #from views.dashboard.modules.Sedes import ListSedesView
 
 from views.dashboard.modules.Freame_periodos_academicos import PeriodoAcademicoView
+from views.dashboard.modules.tables.PeriodosAcademicos.ListPeriodoAcademicoView import ListPeriodoAcademicoView
 
 from views.dashboard.modules.SeccionesView import SeccionView
 
@@ -137,7 +138,7 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
              widget.pack_forget()
 
-        periodo_academico = PeriodoAcademicoView(self.cuerpo_principal,self.controller["Periodos"])
+        periodo_academico = ListPeriodoAcademicoView(self.cuerpo_principal,self.controller["Periodos"])
         periodo_academico.pack(fill="both", expand=True, padx=10, pady=10)
     
     def secciones(self):

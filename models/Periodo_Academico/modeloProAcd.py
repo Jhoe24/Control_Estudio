@@ -51,11 +51,12 @@ class ModeloProAcademico:
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
-            cursor.execute('SELECT id, nombre, codigo FROM periodos_academicos ORDER BY nombre')
+            cursor.execute('SELECT id, nombre, codigo, estado FROM periodos_academicos ORDER BY nombre')
             return [{
                 "id": row[0],
                 "nombre": row[1],
-                "codigo": row[2]
+                "codigo": row[2],
+                "estado": row[3]
             } for row in cursor.fetchall()]
                 
         except Exception as e:
@@ -64,5 +65,42 @@ class ModeloProAcademico:
         finally:
             if con is not None:
                 con.close()
+#=======================================================================================================================================================
+
+    def actualizar_periodo_academico(self, id_periodo, datos):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("""
+                    UPDATE periodos_academicos
+                    SET codigo=?, nombre=?, tipo=?, fecha_inicio=?, fecha_fin=?, fecha_inicio_inscripcion=?, fecha_fin_inscripcion=?,
+                        fecha_inicio_clases=?, fecha_fin_clases=?, fecha_inicio_evaluaciones=?, fecha_fin_evaluaciones=?,
+                        duracion_semanas=?, estado=?, observaciones=?
+                    WHERE id=?
+                """, (
+                    datos["codigo"], 
+                    datos["nombre"], 
+                    datos["tipo"],
+                    datos["fecha_inicio"], 
+                    datos["fecha_fin"],
+                    datos["fecha_inicio_inscripcion"], 
+                    datos["fecha_fin_inscripcion"],
+                    datos["fecha_inicio_clases"], 
+                    datos["fecha_fin_clases"],
+                    datos["fecha_inicio_evaluaciones"], 
+                    datos["fecha_fin_evaluaciones"],
+                    datos["duracion_semanas"], 
+                    datos["estado"], 
+                    datos["observaciones"],
+                    id_periodo
+                )
+                )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al actualizar período académico: {e}")
+            return False
+
 
 

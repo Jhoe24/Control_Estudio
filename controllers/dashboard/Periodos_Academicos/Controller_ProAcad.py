@@ -25,6 +25,7 @@ class PeriodoAcademicoController:
             "Finalizado": "finalizado",
             "Cerrado": "cerrado"
         }
+        print("Estado seleccionado:", vista_formulario.var_estado.get())
         datos_periodo = {
             "codigo": vista_formulario.codigo_entry.get(),
             "nombre": vista_formulario.nombre_entry.get(),
@@ -46,4 +47,20 @@ class PeriodoAcademicoController:
     def obtener_nombres_periodos(self):
         dic_periodos = self.modelo_pa.obtener_periodos_academicos()
         return [periodo["nombre"] for periodo in dic_periodos]
+    
+    #================================================================================================================================================================================
+    
+    def obtener_periodos_academicos(self):
+        """Retorna todos los periodos académicos completos como lista de dicts."""
+        return self.modelo_pa.obtener_periodos_academicos()
+
+    def actualizar_periodo_academico(self, id_periodo, datos_actualizados, ventana):
+        resultado = self.modelo_pa.actualizar_periodo_academico(id_periodo, datos_actualizados)
+        if resultado:
+            messagebox.showinfo("Actualización exitosa", "El período académico ha sido actualizado correctamente.", parent=ventana)
+            return True
+        else:
+            messagebox.showerror("Error", "No se pudo actualizar el período académico.", parent=ventana)
+            return False
+
     

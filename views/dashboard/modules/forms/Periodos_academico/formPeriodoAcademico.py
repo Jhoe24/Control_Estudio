@@ -172,4 +172,18 @@ class FormPeriodoAcademico(SectionFrameBase):
         if attr_name:
             setattr(self, attr_name, btn_fecha)
 
-    
+    def habilitar_campos(self):
+        self.codigo_entry.configure(state="normal")
+        self.nombre_entry.configure(state="normal")
+        self.tipo_menu.configure(state="normal")
+        self.duracion_semanas_entry.configure(state="normal")
+        self.estado_menu.configure(state="normal")
+        self.observacion_entry.configure(state="normal")
+        
+    def deshabilitar_campos(self):
+        self.codigo_entry.configure(state="disabled")
+        self.nombre_entry.configure(state="disabled")
+        self.tipo_menu.configure(state="disabled")
+        self.duracion_semanas_entry.configure(state="disabled")
+        self.estado_menu.configure(state="disabled")
+        self.observacion_entry.configure(state="disabled")
