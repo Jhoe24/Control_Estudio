@@ -1,3 +1,4 @@
+# archivo : views/dashboard/pages/admin_dashboard.py
 import customtkinter as ctk
 from views.dashboard.base_dashboard import BaseDashboardView
 from config.settings import Settings
@@ -25,7 +26,7 @@ from views.dashboard.modules.Freame_periodos_academicos import PeriodoAcademicoV
 from views.dashboard.modules.tables.PeriodosAcademicos.ListPeriodoAcademicoView import ListPeriodoAcademicoView
 
 from views.dashboard.modules.SeccionesView import SeccionView
-
+from views.dashboard.modules.tables.Sedes.ListSedesView import ListSedesView
 
 
 class AdminDashboardView(BaseDashboardView):
@@ -147,6 +148,13 @@ class AdminDashboardView(BaseDashboardView):
 
         secciones = SeccionView(self.cuerpo_principal,self.controller["Docentes"],self.controller["PNF"])
         secciones.pack(fill="both", expand=True, padx=10, pady=10)
+    
+    def sedes(self):
+        for widget in self.cuerpo_principal.winfo_children():
+             widget.pack_forget()
+
+        sedes = ListSedesView(self.cuerpo_principal, self.controller["Sedes"])
+        sedes.pack(fill="both", expand=True, padx=10, pady=10)
         
     
     # def sedes(self):

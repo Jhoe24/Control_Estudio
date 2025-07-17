@@ -12,7 +12,7 @@ from controllers.dashboard.RegistroEstudiantes.RegistroEstudiante import Estudia
 from controllers.dashboard.RegistroDocentes.RegistroDocentes import DocenteController
 from controllers.dashboard.PNF.controller_pnf import ControllerPNF
 from controllers.dashboard.Periodos_Academicos.Controller_ProAcad import PeriodoAcademicoController
-
+from controllers.dashboard.Sedes.Controllers_sedes import ControladorSedes
 
 
 
@@ -55,7 +55,8 @@ class MainWindow(ctk.CTk):
             "Estudiantes": EstudianteController(),
             "Docentes":  DocenteController(),
             "PNF": ControllerPNF(),
-            "Periodos": PeriodoAcademicoController()
+            "Periodos": PeriodoAcademicoController(),
+            "Sedes": ControladorSedes() ,
             }  # Aquí se inicializa el controlador del dashboard, que es el panel de control de la aplicación. 
         # El servicio de usuario se inyecta en el controlador de autenticación, cuya funcion es manejar la lógica de autenticación y autorización de usuarios. 
 
