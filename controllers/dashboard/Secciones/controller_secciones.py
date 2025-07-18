@@ -1,9 +1,7 @@
 import tkinter.messagebox as messagebox
 
 class ControllerSecciones:
-    def __init__(self, modelo_secciones):
-        pass
-
+    
     def obtener_datos_vista(self, vista):
         datos = {
             "codigo": vista.codigo_entry.get(),
@@ -17,3 +15,4 @@ class ControllerSecciones:
             "trayecto_id": vista.trayecto_id_por_nombre[vista.var_trayecto.get()],
             "tramo_id": vista.tramo_id_por_nombre[vista.var_tramo.get()]
         }
+        return datos

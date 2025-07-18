@@ -11,7 +11,8 @@ class FremeSecciones(SectionFrameBase):
         super().__init__(master, titulo)
         self.controlador_Doc = controlador_docentes
         self.controller_pnf = controlador_pnf   
-        self        
+        self.controller_secciones = controller_seccion
+        
         #variables de control
         
         self.var_turno = ctk.StringVar(value="Diurno")
@@ -80,4 +81,4 @@ class FremeSecciones(SectionFrameBase):
         return (self.pnf_id_por_nombre[self.pnf_menu.get()],self.trayecto_id_por_nombre[self.trayecto_menu.get()],self.tramo_id_por_nombre[self.tramo_menu.get()])
     
     def obtener_datos_vista(self):
-        return self.controlador_D
+        return self.controller_secciones.obtener_datos_vista(self)

@@ -146,7 +146,7 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
              widget.pack_forget()
 
-        secciones = SeccionView(self.cuerpo_principal,self.controller["Docentes"],self.controller["PNF"])
+        secciones = SeccionView(self.cuerpo_principal,self.controller["Docentes"],self.controller["PNF"],self.controller["Secciones"])
         secciones.pack(fill="both", expand=True, padx=10, pady=10)
     
     def sedes(self):
