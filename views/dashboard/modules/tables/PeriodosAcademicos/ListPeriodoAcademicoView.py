@@ -245,13 +245,13 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
         form.pack(fill="both", expand=True, padx=10, pady=10)
 
         try:
-            # 1️⃣ Limpiar campos
+            # Limpiar campos
             form.codigo_entry.delete(0, "end")
             form.nombre_entry.delete(0, "end")
             form.duracion_semanas_entry.delete(0, "end")
             form.observacion_entry.delete(0, "end")
 
-            # 2️⃣ Insertar datos
+            # Insertar datos
             form.codigo_entry.insert(0, periodo.get("codigo", ""))
             form.nombre_entry.insert(0, periodo.get("nombre", ""))
             form.var_tipo.set(periodo.get("tipo", "Regular"))
@@ -288,7 +288,7 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
             if periodo.get("fecha_fin_evaluaciones"):
                 form.set_fecha_fin_evaluaciones(periodo["fecha_fin_evaluaciones"])
 
-            # 3️⃣ AHORA bloquear campos
+            # AHORA bloquear campos
             form.deshabilitar_campos()
 
         except Exception as e:

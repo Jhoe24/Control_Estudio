@@ -27,8 +27,8 @@ class PeriodoAcademicoController:
         }
         print("Estado seleccionado:", vista_formulario.var_estado.get())
         datos_periodo = {
-            "codigo": vista_formulario.codigo_entry.get(),
-            "nombre": vista_formulario.nombre_entry.get(),
+            "codigo": vista_formulario.codigo_entry.get().strip(),
+            "nombre": vista_formulario.nombre_entry.get().strip(),
             "tipo": vista_formulario.var_tipo.get(),
             "fecha_inicio": vista_formulario.fecha_inicio,
             "fecha_fin": vista_formulario.fecha_fin,
@@ -38,9 +38,9 @@ class PeriodoAcademicoController:
             "fecha_fin_clases": vista_formulario.fecha_fin_clases,
             "fecha_inicio_evaluaciones": vista_formulario.fecha_inicio_evaluaciones,
             "fecha_fin_evaluaciones": vista_formulario.fecha_fin_evaluaciones,
-            "duracion_semanas": vista_formulario.duracion_semanas_entry.get(),
+            "duracion_semanas": vista_formulario.duracion_semanas_entry.get().strip(),
             "estado": dic_estado.get(vista_formulario.var_estado.get(),"planificacion"),
-            "observaciones": vista_formulario.observacion_entry.get()
+            "observaciones": vista_formulario.observacion_entry.get().strip(),
         }
         return datos_periodo
     
@@ -62,5 +62,26 @@ class PeriodoAcademicoController:
         else:
             messagebox.showerror("Error", "No se pudo actualizar el período académico.", parent=ventana)
             return False
+        
+    def validar_campos_obligatorios(self, datos_periodo_academico, vista_formulario):
+        try:
+            campos_a_validar = [
+                ("codigo", "Codigo"),
+                ("nombre", "Nombre"),
+                ("duracion_semanas", "Duración en Semanas"),
+                ("observaciones", "Observación"),
+            ]   
+            
+            for campo, nombre_campo in campos_a_validar:
+                valor_campo = datos_periodo_academico.get(campo, None)
+                if isinstance(valor_campo, str):
+                    valor_campo = valor_campo.strip()
 
+                if not valor_campo:  # detecta None o ""
+                    messagebox.showwarning("Campo Vacío", f"El campo '{nombre_campo}' es obligatorio.", parent=vista_formulario)
+                    return False
+            return True
     
+        except Exception as e:
+            print(e)
+            return False

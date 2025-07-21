@@ -26,6 +26,15 @@ class PeriodoAcademicoView(ctk.CTkScrollableFrame):
     
     def procesar_formulario(self):
         datos_periodo = self.controlador.obtener_datos_vista(self.datos_periodo)
+
+        # Validar campos obligatorios antes de registrar
+        campos_completos = self.controlador.validar_campos_obligatorios(
+            datos_periodo,
+            self
+        )
+        if not campos_completos:
+            return  # No continúa si faltan campos
+    
         exito = self.controlador.registrar_periodo_academico(datos_periodo, self)
         if exito:
             messagebox.showinfo("Registro Exitoso", "El periodo académico ha sido registrado exitosamente.")

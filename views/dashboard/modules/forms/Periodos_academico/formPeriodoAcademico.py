@@ -4,6 +4,7 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from ..DatosPersonales import DatosPersonalesFrame
 
+
 class FormPeriodoAcademico(SectionFrameBase):
     def __init__(self, master, controller):
         super().__init__(master, header_text="Gestión de Períodos Académicos")
