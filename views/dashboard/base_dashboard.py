@@ -94,7 +94,7 @@ class BaseDashboardView(BaseView):
                 ("P.N.F", "pnf_icon", self.pnf, True),
                 ("Sedes", "sedes_icon", self.sedes, False),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
-                ("Configuración", "configuracion_icon", self.configuracion, False),
+                ("Configuración", "configuracion_icon", self.configuracion, True),
                 ("Cerrar Sesión", "cerrar_sesion_icon", self._confirmar_logout, False),
             ]
         elif self.user_role.lower() == "student":
@@ -103,7 +103,7 @@ class BaseDashboardView(BaseView):
                 ("Mi Perfil", "perfil_icon", self.perfil, False),
                 ("Mis Notas", "notas_icon", self.notas, False),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
-                ("Configuración", "configuracion_icon", self.configuracion, False),
+                ("Configuración", "configuracion_icon", self.configuracion, True),
                 ("Cerrar Sesión", "cerrar_sesion_icon", self._confirmar_logout, False),
             ]
         else:  # teacher o otros roles
@@ -112,7 +112,7 @@ class BaseDashboardView(BaseView):
                 ("Estudiantes", "estudiantes_icon", None, True),  # Submenú
                 ("Mis Clases", "clases_icon", self.mis_clases, False),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
-                ("Configuración", "configuracion_icon", self.configuracion, False),
+                ("Configuración", "configuracion_icon", self.configuracion, True),
                 ("Cerrar Sesión", "cerrar_sesion_icon", self._confirmar_logout, False),
             ]
         
@@ -175,6 +175,12 @@ class BaseDashboardView(BaseView):
                             ("Secciones", "uc_icon", self.secciones),
                             ("Unidades Curriculares", "uc_icon", self.unid_Curr),
                             ("Listar U.C","uc_icon",self.listar_uc)
+                        ] 
+                elif texto == "Configuración":
+                    if self.user_role.lower() in ["admin", "administrador"]:
+                        submenu_items = [
+                            ("Cambio de Datos Personales", "configuracion_icon", self.configuracion),
+                            ("Cambio de Contraseña", "configuracion_icon", self.configuracion)
                         ]
                 
                 # Crear botones del submenú

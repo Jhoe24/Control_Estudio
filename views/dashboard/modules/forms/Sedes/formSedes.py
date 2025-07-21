@@ -58,3 +58,85 @@ class FormSedes(SectionFrameBase):
         self.coordinador_academico_entry.configure(state="disabled")
         self.estado_menu.configure(state="disabled")
         self.observacion_entry.configure(state="disabled")
+
+
+    def cargar_datos(self, datos):
+        try:
+            # Código Entry
+            self.codigo_entry.delete(0, "end")
+            codigo_val = datos.get("codigo", "")
+            if codigo_val: # Solo inserta si no es nulo o cadena vacía
+                self.codigo_entry.insert(0, codigo_val)
+            self.codigo_entry.configure(state="disabled")
+
+            # Nombre Entry
+            self.nombre_entry.delete(0, "end")
+            nombre_val = datos.get("nombre", "")
+            if nombre_val: # Solo inserta si no es nulo o cadena vacía
+                self.nombre_entry.insert(0, nombre_val)
+            self.nombre_entry.configure(state="disabled")
+
+            # Nombre Corto Entry
+            self.nombre_corto_entry.delete(0, "end")
+            nombre_corto_val = datos.get("nombre_corto", "")
+            if nombre_corto_val: # Solo inserta si no es nulo o cadena vacía
+                self.nombre_corto_entry.insert(0, nombre_corto_val)
+            self.nombre_corto_entry.configure(state="disabled")
+
+            # Tipo Entry
+            self.tipo_entry.delete(0, "end")
+            tipo_val = datos.get("tipo", "")
+            if tipo_val: # Solo inserta si no es nulo o cadena vacía
+                self.tipo_entry.insert(0, tipo_val)
+            self.tipo_entry.configure(state="disabled")
+
+            # Dirección Entry
+            self.direccion_entry.delete(0, "end")
+            direccion_val = datos.get("direccion", "")
+            if direccion_val: # Solo inserta si no es nulo o cadena vacía
+                self.direccion_entry.insert(0, direccion_val)
+            self.direccion_entry.configure(state="disabled")
+
+            # Teléfono Entry
+            self.telefono_entry.delete(0, "end")
+            telefono_val = datos.get("telefono", "")
+            if telefono_val: # Ya tenías esta validación, la mantengo
+                self.telefono_entry.insert(0, str(telefono_val))
+            self.telefono_entry.configure(state="disabled")
+
+            # Correo Entry
+            self.correo_entry.delete(0, "end")
+            correo_val = datos.get("correo", "")
+            if correo_val: # Solo inserta si no es nulo o cadena vacía
+                self.correo_entry.insert(0, correo_val)
+            self.correo_entry.configure(state="disabled")
+
+            # Director Entry
+            self.director_entry.delete(0, "end")
+            director_val = datos.get("director", "")
+            if director_val: # Solo inserta si no es nulo o cadena vacía
+                self.director_entry.insert(0, director_val)
+            self.director_entry.configure(state="disabled")
+
+            # Coordinador Académico Entry
+            self.coordinador_academico_entry.delete(0, "end")
+            coordinador_academico_val = datos.get("coordinador_academico", "")
+            if coordinador_academico_val: # Solo inserta si no es nulo o cadena vacía
+                self.coordinador_academico_entry.insert(0, coordinador_academico_val)
+            self.coordinador_academico_entry.configure(state="disabled")
+
+            # Observación Entry
+            self.observacion_entry.delete(0, "end")
+            observacion_val = datos.get("observaciones", "")
+            if observacion_val: # Solo inserta si no es nulo o cadena vacía
+                self.observacion_entry.insert(0, observacion_val)
+            self.observacion_entry.configure(state="disabled")
+
+            # Estado Menu
+            self.var_estado.set(datos.get("estado", "Planificación"))
+            self.estado_menu.configure(state="disabled")
+
+        except Exception as e:
+            print(f"Error al cargar datos en el formulario: {e}")
+
+                

@@ -13,25 +13,27 @@ class ListSedesView(ctk.CTkScrollableFrame):
         self.master = master
         self.controlador = controlador
         self.filas_datos = []
-        self.sedes = [{
-            "codigo": "S001",
-            "nombre": "Sede Central",
-            "tipo": "Universidad",
-            "direccion": "Calle Principal, Ciudad",
-            "estado": "Planificación",
-        }, {
-            "codigo": "S002",
-            "nombre": "Sede Norte",
-            "tipo": "Instituto",
-            "direccion": "Avenida Norte, Ciudad",
-            "estado": "Planificación",
-        }, {
-            "codigo": "S003",
-            "nombre": "Sede Sur",
-            "tipo": "Escuela",
-            "direccion": "Calle Sur, Ciudad",
-            "estado": "Planificación",
-        }]
+        # self.sedes = [{
+        #     "codigo": "S001",
+        #     "nombre": "Sede Central",
+        #     "tipo": "Universidad",
+        #     "direccion": "Calle Principal, Ciudad",
+        #     "estado": "Planificación",
+        # }, {
+        #     "codigo": "S002",
+        #     "nombre": "Sede Norte",
+        #     "tipo": "Instituto",
+        #     "direccion": "Avenida Norte, Ciudad",
+        #     "estado": "Planificación",
+        # }, {
+        #     "codigo": "S003",
+        #     "nombre": "Sede Sur",
+        #     "tipo": "Escuela",
+        #     "direccion": "Calle Sur, Ciudad",
+        #     "estado": "Planificación",
+        # }]
+
+        self.sedes = self.controlador.listar_sedes()
         self.cantidad_sedes = len(self.sedes)
         self.sedes_por_pagina = 10  # Número de sedes por página
         self.pagina_actual = 1      # Página actual
@@ -223,17 +225,30 @@ class ListSedesView(ctk.CTkScrollableFrame):
 
         form = FormSedes(scrollable_frame, self.controlador)
         form.pack(fill="both", expand=True)
-
+        
+        frame_btn = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
+        frame_btn.pack(pady=10)
         # Botón guardar
         btn_guardar = ctk.CTkButton(
-            top, text="Guardar",
+            frame_btn, text="Guardar",
             fg_color=COLOR_BOTON_PRIMARIO_FG,
             font=FUENTE_BOTON,
             hover_color=COLOR_BOTON_PRIMARIO_HOVER,
             text_color=COLOR_BOTON_PRIMARIO_TEXT,
             command=lambda: self.guardar_sede(form, top)
         )
-        btn_guardar.pack(pady=10)
+        btn_guardar.pack(side="left", pady=10)
+
+        btn_cerrar = ctk.CTkButton(
+            frame_btn, text="Cerrar",
+            fg_color=COLOR_BOTON_SECUNDARIO_FG,
+            font=FUENTE_BOTON,
+            hover_color=COLOR_BOTON_SECUNDARIO_HOVER,
+            text_color=COLOR_BOTON_SECUNDARIO_TEXT,
+            command=top.destroy
+        )
+        btn_cerrar.pack(side="left",pady=10)
+
 
     def guardar_sede(self, form, ventana):
         """
@@ -259,28 +274,8 @@ class ListSedesView(ctk.CTkScrollableFrame):
         contenedor_scroll.pack(fill="both", expand=True, padx=10, pady=10)
 
         form = FormSedes(contenedor_scroll, self.controlador)
+        form.cargar_datos(sede)
         form.pack(fill="both", expand=True, padx=10, pady=10)
-
-        try:
-            # 1️⃣ Limpiar campos
-            form.codigo_entry.delete(0, "end")
-            form.nombre_entry.delete(0, "end")
-            form.tipo_entry.delete(0, "end")  # Asumiendo que es un Entry, podría ser un ComboBox
-            form.direccion_entry.delete(0, "end")
-            form.estado_entry.delete(0, "end")  # Asumiendo que es un Entry, podría ser un ComboBox
-
-            # 2️⃣ Insertar datos
-            form.codigo_entry.insert(0, sede.get("codigo", ""))
-            form.nombre_entry.insert(0, sede.get("nombre", ""))
-            form.tipo_entry.insert(0, sede.get("tipo", ""))
-            form.direccion_entry.insert(0, sede.get("direccion", ""))
-            form.estado_entry.insert(0, sede.get("estado", ""))
-
-            # 3️⃣ Deshabilitar campos
-            form.deshabilitar_campos()
-
-        except Exception as e:
-            print(f"Error al cargar datos en el formulario de vista completa: {e}")
 
         botones_frame = ctk.CTkFrame(contenedor_scroll, fg_color="transparent")
         botones_frame.pack(pady=10)
@@ -309,6 +304,16 @@ class ListSedesView(ctk.CTkScrollableFrame):
                 return
             exito = self.controlador.actualizar_sede(sede_id, datos_actualizados, ventana)
             if exito:
+                self.actualizar_listado()
                 ventana.destroy()
-                self.sedes = self.controlador.obtener_sedes()
-                self.mostrar_sedes()
+                
+    
+    def actualizar_listado(self):
+        self.sedes = self.controlador.listar_sedes()
+        self.lista_sedes = self.sedes
+        self.calcular_pagina(self.sedes)
+        self.mostrar_sedes()
+        self.frame_paginacion.grid()
+        self.frame_paginacion.grid_remove()
+        self.frame_paginacion.grid()
+        
