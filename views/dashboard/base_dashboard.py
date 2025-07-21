@@ -179,8 +179,8 @@ class BaseDashboardView(BaseView):
                 elif texto == "Configuración":
                     if self.user_role.lower() in ["admin", "administrador"]:
                         submenu_items = [
-                            ("Cambio de Datos Personales", "configuracion_icon", self.configuracion),
-                            ("Cambio de Contraseña", "configuracion_icon", self.configuracion)
+                            ("Usuarios", "configuracion_icon", self.configuracion_usuarios),
+                            ("Respaldos", "configuracion_icon", self.configuracion_respaldos)
                         ]
                 
                 # Crear botones del submenú
@@ -329,4 +329,6 @@ class BaseDashboardView(BaseView):
     def notas(self): pass
     def mis_clases(self): pass
     def configuracion(self): pass
+    def configuracion_usuarios(self): pass
+    def configuracion_respaldos(self): pass
     def _mostrar_ayuda(self): pass

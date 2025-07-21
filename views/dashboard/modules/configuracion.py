@@ -9,7 +9,7 @@ from config.app_config import AppConfig
 
 class Config_user(ctk.CTkFrame):
     def __init__(self, master):
-        super().__init__(master)
+        super().__init__(master, fg_color="transparent")
         self.master = master
 
         ctk.CTkLabel(
@@ -51,6 +51,8 @@ class Config_user(ctk.CTkFrame):
         self.contenido_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.contenido_frame.pack(fill="both", expand=True, pady=(10, 0))
 
+        
+
     def limpiar_contenido_frame(self):
         for widget in self.contenido_frame.winfo_children():
             widget.destroy()
@@ -58,13 +60,19 @@ class Config_user(ctk.CTkFrame):
     def mostrar_cambiar_contrasena(self):
         self.limpiar_contenido_frame()
 
-        # Campos de contraseña actual y nueva
+        # Frame interno para campos (para alinearlos arriba)
+        form_frame = ctk.CTkFrame(self.contenido_frame, fg_color="transparent")
+        form_frame.pack(anchor="n", pady=20, fill="both", expand=True)
+        form_frame.grid_columnconfigure(0, weight=1)
+        form_frame.grid_columnconfigure(1, weight=1)
+
+        # Campos de contraseña actual y nueva en form_frame
         self._crear_fila_widgets([
-            ("Contraseña actual:", crear_entry, {"width": 300}, 1, self.contenido_frame, 'password_hash_entry'),
-            ("Contraseña nueva:", crear_entry, {"width": 300}, 1, self.contenido_frame, 'cambiar_password_entry')
+            ("Contraseña actual:", crear_entry, {"width": 300}, 1, form_frame, 'password_hash_entry'),
+            ("Contraseña nueva:", crear_entry, {"width": 300}, 1, form_frame, 'cambiar_password_entry')
         ])
 
-        # Botón actualizar
+        # Botón actualizar debajo de form_frame
         btn_actualizar = ctk.CTkButton(
             self.contenido_frame, text="Actualizar Contraseña",
             command=lambda: messagebox.showinfo("Info", "Contraseña actualizada correctamente"),
@@ -72,18 +80,24 @@ class Config_user(ctk.CTkFrame):
             hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT
         )
         btn_actualizar.pack(pady=10)
-        
+
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
+        
 
     def mostrar_cambiar_datos_personales(self):
         self.limpiar_contenido_frame()
 
-        label = ctk.CTkLabel(
-            self.contenido_frame,
-            font=FUENTE_LABEL_CAMPO,
-            text_color=COLOR_TEXTO_PRINCIPAL
-        )
-        label.pack(pady=20)
+        form_frame = ctk.CTkFrame(self.contenido_frame, fg_color="transparent")
+        form_frame.pack(anchor="n", pady=20, fill="both", expand=True)
+        form_frame.grid_columnconfigure(0, weight=1)
+        form_frame.grid_columnconfigure(1, weight=1)
+
+        self._crear_fila_widgets([
+            ("Usuario:", crear_entry, {"width": 300}, 1, form_frame, 'nombre_usuario_entry'),
+            ("Nombres:", crear_entry, {"width": 300}, 1, form_frame, 'nombres_entry'),
+            ("Apellidos:", crear_entry, {"width": 300}, 1, form_frame, 'apellidos_entry'),
+            ("Correo Electrónico:", crear_entry, {"width": 300}, 1, form_frame, 'correo_electronico_entry')
+        ])
 
         btn_actualizar = ctk.CTkButton(
             self.contenido_frame, text="Actualizar Datos Personales",
@@ -92,16 +106,14 @@ class Config_user(ctk.CTkFrame):
             hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT
         )
         btn_actualizar.pack(pady=10)
+    _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
+
+
 
     def mostrar_desbloqueo_usuarios(self):
         self.limpiar_contenido_frame()
 
-        label = ctk.CTkLabel(
-            self.contenido_frame,
-            font=FUENTE_LABEL_CAMPO,
-            text_color=COLOR_TEXTO_PRINCIPAL
-        )
-        label.pack(pady=20)
+        #Apartado para mostrar a los usuarios bloqueados y desbloquearlos
 
         btn_desbloquear = ctk.CTkButton(
             self.contenido_frame, text="Desbloquear Usuario",

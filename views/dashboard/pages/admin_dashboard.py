@@ -28,6 +28,9 @@ from views.dashboard.modules.tables.PeriodosAcademicos.ListPeriodoAcademicoView 
 from views.dashboard.modules.SeccionesView import SeccionView
 from views.dashboard.modules.tables.Sedes.ListSedesView import ListSedesView
 
+from views.dashboard.modules.configuracion import Config_user
+
+
 
 class AdminDashboardView(BaseDashboardView):
     
@@ -155,6 +158,13 @@ class AdminDashboardView(BaseDashboardView):
 
         sedes = ListSedesView(self.cuerpo_principal, self.controller["Sedes"])
         sedes.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def configuracion_usuarios(self):
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+        
+        configuracion = Config_user(self.cuerpo_principal)
+        configuracion.pack(fill="both", expand=True, padx=10, pady=10)
         
     
     # def sedes(self):
