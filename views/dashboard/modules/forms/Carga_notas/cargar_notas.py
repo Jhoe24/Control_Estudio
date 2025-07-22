@@ -31,16 +31,19 @@ class CargaNotasFrame(SectionFrameBase):
         self.valores_tramos = [tramo[1] for tramo in self.tupla_tramos]
     
         self.var_tramo = ctk.StringVar(value=self.valores_tramos[0] if self.valores_tramos else "No seleccionado")  # Valor por defecto para el tramo
-
-        self._crear_fila_widgets([
-            ("Seleccionar Periodo Academico",crear_option_menu,{"values":self.nombres_periodos, "variable":self.var_periodo}, 1, self, 'periodo_menu')
-        ])
-
-        self._crear_fila_widgets([
-                ("Seleccione un P.N.F:", crear_option_menu, {"values":self.nombres_pnf, "variable":self.var1, "command": self.set_trayecto  }, 1, self, 'pnf_menu'),
-                ("Trayecto Actual:", crear_option_menu, {"values": self.valores_trayecto, "variable": self.var_trayecto,"command": self.set_tramo}, 1, self, 'trayecto_menu'),
-                ("Tramo Actual:", crear_option_menu, {"values": self.valores_tramos, "variable": self.var_tramo}, 1, self, 'tramo_menu'),
-            ])
+        
+        # self._crear_fila_widgets([
+        #     ("Seleccionar Periodo Academico",crear_option_menu,{"values":self.nombres_periodos, "variable":self.var_periodo}, 1, self, 'periodo_menu')
+        # ])
+        self.periodo_menu = create_option_menu_row(self, "Seleccionar Periodo Academico", self.nombres_periodos, self.var_periodo)
+        self.pnf_menu = create_option_menu_row(self, "Seleccione un P.N.F:", self.nombres_pnf, self.var1, funcion=self.set_trayecto)
+        self.trayecto_menu = create_option_menu_row(self, "Trayecto Actual:", self.valores_trayecto,self.var_trayecto,funcion=self.set_tramo)
+        self.tramo_menu = create_option_menu_row(self, "Tramo Actual:", self.valores_tramos, self.var_tramo)
+        # self._crear_fila_widgets([
+        #         #("Seleccione un P.N.F:", crear_option_menu, {"values":self.nombres_pnf, "variable":self.var1, "command": self.set_trayecto  }, 1, self, 'pnf_menu'),
+        #         #("Trayecto Actual:", crear_option_menu, {"values": self.valores_trayecto, "variable": self.var_trayecto,"command": self.set_tramo}, 1, self, 'trayecto_menu'),
+        #         ("Tramo Actual:", crear_option_menu, {"values": self.valores_tramos, "variable": self.var_tramo}, 1, self, 'tramo_menu'),
+        #     ])
         
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets

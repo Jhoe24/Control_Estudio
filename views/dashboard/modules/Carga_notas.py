@@ -30,14 +30,21 @@ class CargaNotasView(ctk.CTkFrame):
         self.datos_carga_notas = CargaNotasFrame(self.frame_contenedor_carga_notas,controlador_estudiante,controlador_pnf)
         self.datos_carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
 
+        #Frame para los botones
+        self.btn_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.btn_frame.pack(fill="x", pady=10)
+
+
         self.btn_siguiente = ctk.CTkButton(
-            self, text="Siguiente", width=100,
+            self.btn_frame, 
+            text="Siguiente", width=150,
+            height=40,
             text_color="#ffffff",
             fg_color=COLOR_BOTON_FONDO,
             hover_color=COLOR_BOTON_FONDO_HOVER,
             command=self.mostrar_listado
         )
-        self.btn_siguiente.pack(side="right", padx=(0, 4), pady=5)
+        self.btn_siguiente.pack(side="top", padx=(0, 4), pady=5)
 
         self.btn_volver = ctk.CTkButton(
             self, text="Volver", width=100,
@@ -58,7 +65,9 @@ class CargaNotasView(ctk.CTkFrame):
 
         
         self.btn_siguiente = ctk.CTkButton(
-            self, text="Siguiente", width=100,
+            self, text="Siguiente", 
+            width=150,
+            height=40,
             text_color="#ffffff",
             fg_color=COLOR_BOTON_FONDO,
             hover_color=COLOR_BOTON_FONDO_HOVER,

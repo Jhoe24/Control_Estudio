@@ -95,7 +95,7 @@ class ListarPNF(ctk.CTkScrollableFrame):
             celda_btn.grid(row=fila, column=3, padx=1, pady=1, sticky="nsew")
             boton = ctk.CTkButton(
                 celda_btn, text="Ver datos", width=100,
-                text_color="#222",
+                text_color="#f5f5f5",
                 command=lambda pnf=tupla_pnf: self.ver_datos_completos(pnf)
             )
             boton.pack(padx=10, pady=5)

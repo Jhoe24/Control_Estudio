@@ -53,6 +53,9 @@ class PeriodoAcademicoController:
     def obtener_periodos_academicos(self):
         """Retorna todos los periodos académicos completos como lista de dicts."""
         return self.modelo_pa.obtener_periodos_academicos()
+    
+    def obtener_periodo_academico_datos(self, id_periodo):
+        return self.modelo_pa.obtener_periodo_academico_datos(id_periodo)
 
     def actualizar_periodo_academico(self, id_periodo, datos_actualizados, ventana):
         resultado = self.modelo_pa.actualizar_periodo_academico(id_periodo, datos_actualizados)
@@ -69,7 +72,6 @@ class PeriodoAcademicoController:
                 ("codigo", "Codigo"),
                 ("nombre", "Nombre"),
                 ("duracion_semanas", "Duración en Semanas"),
-                ("observaciones", "Observación"),
             ]   
             
             for campo, nombre_campo in campos_a_validar:

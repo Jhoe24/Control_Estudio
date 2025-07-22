@@ -88,6 +88,14 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
         """
         Muestra los períodos académicos de la página actual.
         """
+        dic_estado_invertido = {
+            "planificacion": "Planificación",
+            "inscripcion": "Inscripción",
+            "en_curso": "En Curso",
+            "evaluaciones": "Evaluaciones",
+            "finalizado": "Finalizado",
+            "cerrado": "Cerrado"
+        }
         # Limpiar registros anteriores
         for fila in self.filas_datos:
             for widget in fila:
@@ -102,7 +110,7 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
             fila_widgets = [
                 self._crear_celda(idx, 0, periodo["codigo"]),
                 self._crear_celda(idx, 1, periodo["nombre"]),
-                self._crear_celda(idx, 2, periodo["estado"]),
+                self._crear_celda(idx, 2, dic_estado_invertido.get(periodo["estado"],"No Seleccionado")),
             ]
 
             celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
@@ -112,10 +120,11 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
                 celda_btn,
                 text="Ver datos",
                 width=100,
+                height=30,
                 text_color=COLOR_ENTRY_BG,
-                command=lambda p=periodo: self.ver_datos_completos_periodo(p)
+                command=lambda p=periodo: self.ver_datos_completos_periodo(id_periodo=p["id"])
             )
-            btn_ver.pack(fill="x", padx=10, pady=5)
+            btn_ver.pack(padx=10, pady=5)
 
             fila_widgets.append(celda_btn)
             self.filas_datos.append(fila_widgets)
@@ -224,16 +233,35 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
         )
         btn_guardar.pack(pady=10)
 
+        btn_cerrar_ventana = ctk.CTkButton(
+            top, text="Cerrar",
+            fg_color=COLOR_BOTON_SECUNDARIO_FG,
+            font=FUENTE_BOTON,
+            hover_color=COLOR_BOTON_SECUNDARIO_HOVER,
+            text_color=COLOR_BOTON_SECUNDARIO_TEXT,
+            command=top.destroy
+        )
+        btn_cerrar_ventana.pack(pady=10)
+
     def guardar_periodo(self, form, ventana):
         datos = self.controlador.obtener_datos_vista(form)
-        exito = self.controlador.registrar_periodo_academico(datos, ventana)
-        if exito:
-            ventana.destroy()
-            self.periodos = self.controlador.obtener_periodos_academicos()
-            self.mostrar_periodos()
+        if self.controlador.validar_campos_obligatorios(datos,ventana):
+            exito = self.controlador.registrar_periodo_academico(datos, ventana)
+            if exito:
+                ventana.destroy()
+                self.periodos = self.controlador.obtener_periodos_academicos()
+                self.mostrar_periodos()
 
-    def ver_datos_completos_periodo(self, periodo):
+    def ver_datos_completos_periodo(self, id_periodo):
+        periodo = self.controlador.obtener_periodo_academico_datos(id_periodo)
         ventana = ctk.CTkToplevel(self)
+
+        if not periodo:
+            messagebox.showerror("Error", "No se encontraron datos para este período académico.", parent=ventana)
+            return
+        
+        periodo = periodo[0]
+
         ventana.title(f"Detalles del Período Académico: {periodo.get('nombre', '')}")
         ventana.geometry("850x750")
         ventana.grab_set()
@@ -258,7 +286,7 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
             form.duracion_semanas_entry.insert(0, str(periodo.get("duracion_semanas", "")))
 
             estado_db = periodo.get("estado", "")
-            dic_estado_inverso = {
+            dic_estado_invertido = {
                 "planificacion": "Planificación",
                 "inscripcion": "Inscripción",
                 "en_curso": "En Curso",
@@ -266,7 +294,7 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
                 "finalizado": "Finalizado",
                 "cerrado": "Cerrado"
             }
-            form.var_estado.set(dic_estado_inverso.get(estado_db, "Planificación"))
+            form.var_estado.set(dic_estado_invertido.get(estado_db, "Planificación"))
 
             form.observacion_entry.insert(0, periodo.get("observaciones", ""))
 
@@ -314,7 +342,7 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
 
         def actualizar_periodo():
             datos_actualizados = self.controlador.obtener_datos_vista(form)
-            periodo_id = periodo.get("id") or periodo.get("periodo_id")
+            periodo_id = periodo.get("id") 
 
             if not periodo_id:
                 print("Error: No se pudo identificar el ID del período para actualizar.")
@@ -324,5 +352,5 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
             exito = self.controlador.actualizar_periodo_academico(periodo_id, datos_actualizados, ventana)
             if exito:
                 ventana.destroy()
-                self.periodos = self.controlador.obtener_periodos_academicos()
+                self.periodos = self.controlador.obtener_periodo_academico_datos(periodo_id)
                 self.mostrar_periodos()

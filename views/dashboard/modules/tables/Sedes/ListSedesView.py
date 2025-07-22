@@ -129,10 +129,11 @@ class ListSedesView(ctk.CTkScrollableFrame):
                 celda_btn,
                 text="Ver datos",
                 width=100,
+                height=30,
                 text_color=COLOR_ENTRY_BG,
                 command=lambda p=sede: self.ver_datos_completos_sede(p)
             )
-            btn_ver.pack(fill="x", padx=10, pady=5)
+            btn_ver.pack(padx=10, pady=5)
             fila_widgets.append(celda_btn)
             self.filas_datos.append(fila_widgets)
 

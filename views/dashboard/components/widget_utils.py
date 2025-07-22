@@ -49,29 +49,40 @@ def crear_check_box(master, **kwargs):
 def crear_radio_button(master, **kwargs):
     return ctk.CTkRadioButton(master, font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL, border_color=COLOR_ENTRY_BORDER, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, **kwargs)
 
-def seleccionar_fecha(ventana, x=0 ,y=0):
-    
+def create_option_menu_row(parent_frame, label_text, options, variable, width=350, font_size=15, funcion = None):
+    """
+    Crea una fila con una etiqueta y un CTkOptionMenu con tamaños ajustados.
+    """
+    frame = ctk.CTkFrame(parent_frame, fg_color="transparent")
+    frame.pack(pady=10, fill="x", anchor="center") # Aumentar pady para más espacio vertical
 
-    fecha_dict = {'fecha': ''}
-    frame = ctk.CTkFrame(ventana, fg_color="transparent")
-    label = ctk.CTkLabel(frame, text="Selecciona una fecha", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
-    cal = Calendar(frame, locale='es_ES', date_pattern='yyyy-mm-dd')
+    # Fuente para la etiqueta
+    label_font = ("Roboto", font_size) # Usar la misma fuente y tamaño que el optionmenu para consistencia
 
-    def mostrar_fecha(date):
-        label.configure(text=f"Fecha seleccionada: {date}")
+    label = ctk.CTkLabel(frame, text=label_text, font=label_font,text_color=COLOR_TEXTO_PRINCIPAL)
+    label.pack(side="left", padx=(20, 10)) # Aumentar padx para más espacio horizontal
 
-    def guardar_fecha():
-        fecha_dict['fecha'] = cal.get_date()
-        frame.destroy()
+    # Fuente para el OptionMenu
+    optionmenu_font = ("Roboto", font_size)
 
-    frame.pack(anchor="e", pady=20, padx=20)
-    label.pack(pady=10)
-    cal.pack(pady=20)
-    cal.bind("<<CalendarSelected>>", lambda e: mostrar_fecha(cal.get_date()))
-    boton_guardar = ctk.CTkButton(frame, text="Guardar Fecha", command=guardar_fecha)
-    boton_guardar.pack(pady=10)
-    return fecha_dict['fecha']
+    optionmenu = ctk.CTkOptionMenu(
+        frame,
+        values=options,
+        variable=variable,
+        command=funcion,
+        width=width,  # Aumentar el ancho fijo para los OptionMenu
+        height=font_size + 20, # Aumentar la altura basada en el tamaño de la fuente
+        font=optionmenu_font,
+        dropdown_font=optionmenu_font, # También el tamaño de la fuente del desplegable
+        dropdown_fg_color=("lightgray", "gray25"),
+        dropdown_hover_color=("gray75", "gray40"),
+        dropdown_text_color=("black", "white"),
+        fg_color="SkyBlue",
+        button_color="#1074ad",
+        button_hover_color="steelblue",
+        text_color="black",
+        corner_radius=8 # Un poco más redondeado para un look más moderno si lo deseas
+    )
+    optionmenu.pack(side="right", expand=False, fill="x", padx=(0, 20)) # Aumentar padx en el lado derecho del optionmenu
 
-def cargar_icono(icon_name):
-    icon_path = os.path.join(os.path.dirname(__file__), '../../../resources/icons', icon_name)
-    return os.path.abspath(icon_path) if os.path.exists(icon_path) else None 
+    return optionmenu
