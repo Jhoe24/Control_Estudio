@@ -139,8 +139,37 @@ class ModeloProAcademico:
             print(f"Error al actualizar período académico: {e}")
             return False
 
+    def obtener_codigos(self):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute('SELECT codigo FROM periodos_academicos')
+            return [row[0] for row in cursor.fetchall()]
+        except Exception as e:
+            print(f"Error al obtener los códigos: {e}")
+            return []
+        finally:
+            if con is not None:
+                con.close()
+
+
+    def obtener_id_por_codigo(self, codigo):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute('SELECT id FROM periodos_academicos WHERE codigo=?', (codigo,))
+            result = cursor.fetchone()
+            return result[0] if result else None
+        except Exception as e:
+            print(f"Error al obtener el ID por código: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
 
 # ModeloProAcademico = ModeloProAcademico()
 
-# pprint(ModeloProAcademico.obtener_periodo_academico_datos(1))
+# pprint(ModeloProAcademico.obtener_codigos())
 

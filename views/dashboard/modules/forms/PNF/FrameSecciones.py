@@ -7,17 +7,34 @@ from controllers.dashboard.PNF.controller_pnf import ControllerPNF
 from ..DatosPersonales import DatosPersonalesFrame
 
 class FremeSecciones(SectionFrameBase):
-    def __init__(self, master, controlador_docentes, controlador_pnf, controller_seccion, titulo="Datos de Secciones"):
+    def __init__(self, master, controlador_docentes, controlador_pnf, controller_seccion,controller_PA, controller_sede, titulo="Datos de Secciones"):
         super().__init__(master, titulo)
         self.controlador_Doc = controlador_docentes
         self.controller_pnf = controlador_pnf   
         self.controller_secciones = controller_seccion
-        
+        self.controller_PA = controller_PA
+        self.controller_sede = controller_sede
+
+        self.nombres_docentes = []
         #variables de control
-        
         self.var_turno = ctk.StringVar(value="Diurno")
         self.var_modalidad = ctk.StringVar(value="Presencial")
         self.var_estado = ctk.StringVar(value="Planificación")
+        
+        self.sedes = self.controller_sede.obtener_codigos()
+        if self.sedes:
+            self.var_sede = ctk.StringVar(value=self.sedes[0])
+        else:
+            self.var_sede = ctk.StringVar(value="No hay sedes")
+        
+
+        self.periodos_academicos = self.controller_PA.obtener_codigos()
+        if self.periodos_academicos:
+            self.var_periodo = ctk.StringVar(value=self.periodos_academicos[0])
+        else:
+            self.var_periodo = ctk.StringVar(value="No hay Perodos Academicos")
+        
+
 
         #Obterner datos pnf, trayecto y tramo
         self.nombres_pnf = self.controller_pnf.obtener_nombres_pnf()
@@ -26,8 +43,16 @@ class FremeSecciones(SectionFrameBase):
         self.tuple_pnf = self.controller_pnf.listado_pnf
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.tuple_pnf}  # nombre: id
 
-        self.nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(self.pnf_id_por_nombre[self.var1.get()])
-        self.var_docente = ctk.StringVar(value=self.nombres_docentes[0])
+        self.id_nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(self.pnf_id_por_nombre[self.var1.get()])
+        
+        for id_nombre in self.id_nombres_docentes:
+            self.nombres_docentes.append(id_nombre[1])
+
+
+        if self.nombres_docentes:
+            self.var_docente = ctk.StringVar(value=self.nombres_docentes[0])
+        else:
+            self.var_docente = ctk.StringVar(value="No hay Docentes Asignado")
 
         self.trayecto_id_por_nombre = {trayecto[1]: trayecto[0] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])}  # nombre: id
         self.valores_trayecto = [trayecto[1] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])]  # Obtener los trayectos para el PNF seleccionado
@@ -38,6 +63,11 @@ class FremeSecciones(SectionFrameBase):
         self.valores_tramos = [tramo[1] for tramo in self.tupla_tramos]
     
         self.var_tramo = ctk.StringVar(value=self.valores_tramos[0] if self.valores_tramos else "No seleccionado")  # Valor por defecto para el tramo
+
+        self._crear_fila_widgets([
+            ("Sede:", crear_option_menu, {"values":self.sedes, "variable":self.var_sede }, 1, self, 'sede_menu'),
+            ("Seleccione un Periodo Académico:", crear_option_menu, {"values":self.periodos_academicos, "variable":self.var_periodo }, 1, self, 'periodo_menu'),
+        ])
 
         self._crear_fila_widgets([
             ("Seleccione un P.N.F:", crear_option_menu, {"values":self.nombres_pnf, "variable":self.var1, "command": self.set_trayecto  }, 1, self, 'pnf_menu'),
@@ -63,7 +93,7 @@ class FremeSecciones(SectionFrameBase):
         self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")  # Valor por defecto para el trayecto
 
         self.nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(self.pnf_id_por_nombre[value])
-        self.var_docente.set(self.nombres_docentes[0] if self.nombres_docentes else "Docente")
+        self.var_docente.set(self.nombres_docentes[0] if self.nombres_docentes else "No hay Docentes Asignado")
         self.trayecto_menu.configure(values=self.valores_trayecto)
         print("Trayectos disponibles:", self.valores_trayecto)
 

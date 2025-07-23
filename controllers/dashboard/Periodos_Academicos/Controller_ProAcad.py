@@ -87,3 +87,9 @@ class PeriodoAcademicoController:
         except Exception as e:
             print(e)
             return False
+    
+    def obtener_codigos(self):
+        return self.modelo_pa.obtener_codigos()
+    
+    def obtener_id_por_codigo(self, codigo):
+        return self.modelo_pa.obtener_id_por_codigo(codigo)

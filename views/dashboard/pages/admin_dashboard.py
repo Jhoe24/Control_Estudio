@@ -149,7 +149,7 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
              widget.pack_forget()
 
-        secciones = SeccionView(self.cuerpo_principal,self.controller["Docentes"],self.controller["PNF"],self.controller["Secciones"])
+        secciones = SeccionView(self.cuerpo_principal,self.controller["Docentes"],self.controller["PNF"],self.controller["Secciones"],self.controller["Periodos"],self.controller["Sedes"])
         secciones.pack(fill="both", expand=True, padx=10, pady=10)
     
     def sedes(self):
@@ -166,11 +166,4 @@ class AdminDashboardView(BaseDashboardView):
         configuracion = Config_user(self.cuerpo_principal)
         configuracion.pack(fill="both", expand=True, padx=10, pady=10)
         
-    
-    # def sedes(self):
-    #     for widget in self.cuerpo_principal.winfo_children():
-    #         widget.pack_forget()
-        
-    #     sedes = ListSedesView(self.cuerpo_principal, None)
-    #     sedes.pack(fill="both", expand=True, padx=10, pady=10)
     

@@ -5,11 +5,15 @@ from views.dashboard.modules.forms.PNF.FrameSecciones import FremeSecciones
 
 
 class SeccionView(ctk.CTkScrollableFrame):
-    def __init__(self, master, controller_Doc, controller_pnf,controller_secciones):
+    def __init__(self, master, controller_Doc, controller_pnf,controller_secciones,controller_PA, controller_sede):
         super().__init__(master, fg_color="transparent")
         self.controller_Doc = controller_Doc
         self.controller_pnf = controller_pnf
-        self.form_seccion = FremeSecciones(self, self.controller_Doc, self.controller_pnf, controller_secciones)
+        self.controller_PA = controller_PA
+        self.controller_sede = controller_sede
+        self.controller_secciones = controller_secciones
+
+        self.form_seccion = FremeSecciones(self, self.controller_Doc, self.controller_pnf, self.controller_secciones,self.controller_PA,self.controller_sede)
 
         # Empacar los frames
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -25,4 +29,8 @@ class SeccionView(ctk.CTkScrollableFrame):
 
     def procesar_formulario(self):
         datos = self.form_seccion.obtener_datos_vista()
-        print(datos)
+        if self.controller_secciones.campos_obligatorios(self,datos):
+            if self.controller_secciones.registrar_seccion(datos, self):
+                self.controller_secciones.limpiar_formulario_completo(self)
+                
+        

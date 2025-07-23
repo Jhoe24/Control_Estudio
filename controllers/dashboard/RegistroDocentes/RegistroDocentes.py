@@ -112,7 +112,7 @@ class DocenteController:
         nombres = []
         
         for dic_doc in dic_nombres:
-            nombres.append(dic_doc["nombres"]+" "+dic_doc["apellidos"])
+            nombres.append((dic_doc["id"],dic_doc["nombres"]+" "+dic_doc["apellidos"]))
             
         return nombres
 

@@ -7,7 +7,9 @@ class ControladorSedes:
         self.modelo = ModeloSedes()
 
     def obtener_datos_vista(self, vista):
+
         dic_datos = {
+            
             "codigo": vista.codigo_entry.get(),
             "nombre": vista.nombre_entry.get(),
             "nombre_corto": vista.nombre_corto_entry.get(),
@@ -45,3 +47,9 @@ class ControladorSedes:
         else:
             messagebox.showerror("Error", "No se pudo actualizar los datos de la sede.", parent=ventana)
             return False
+        
+    def obtener_codigos(self):
+        return self.modelo.obtener_codigos()
+    
+    def obtener_id_por_codigo(self, codigo):
+        return self.modelo.obtener_id_por_codigo(codigo)
