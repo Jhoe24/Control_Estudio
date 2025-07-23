@@ -7,7 +7,7 @@ from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.Sedes.formSedes import FormSedes
 
-class ListSedesView(ctk.CTkScrollableFrame):
+class ListSedesView(ctk.CTkFrame):
     def __init__(self, master, controlador):
         super().__init__(master, fg_color="white")
         self.master = master
@@ -35,7 +35,7 @@ class ListSedesView(ctk.CTkScrollableFrame):
 
         self.sedes = self.controlador.listar_sedes()
         self.cantidad_sedes = len(self.sedes)
-        self.sedes_por_pagina = 10  # Número de sedes por página
+        self.sedes_por_pagina = 17  # Número de sedes por página
         self.pagina_actual = 1      # Página actual
         self.total_paginas = 1      # Total de páginas
         self.lista_sedes = self.sedes  # Lista de sedes para paginación

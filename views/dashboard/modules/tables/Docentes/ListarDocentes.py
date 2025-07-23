@@ -6,7 +6,7 @@ from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame
 from views.dashboard.modules.RegistrarDocentes import FormularioDocenteView
 from views.dashboard.modules.forms.Docentes.listaAsignacion import ListaAsignacionPNF
 
-class ListDocenteView(ctk.CTkScrollableFrame):
+class ListDocenteView(ctk.CTkFrame):
     def __init__(self, master, controlador, controller_pnf):
         super().__init__(master, fg_color="white")
         self.formulario_docente = FormularioDocenteView(master, controlador)
@@ -19,7 +19,7 @@ class ListDocenteView(ctk.CTkScrollableFrame):
         self.primer_id_table = self.controlador.modelo_docente.obtener_primer_id()
 
         self.docente = self.controlador.obtener_lista_docentes(0)
-        self.registros_por_pagina = 10
+        self.registros_por_pagina = 17
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_docente // self.registros_por_pagina) + (1 if self.cantidad_docente % self.registros_por_pagina > 0 else 0)
        
@@ -219,9 +219,7 @@ class ListDocenteView(ctk.CTkScrollableFrame):
         # Si ya hay un formulario abierto, lo destruye 
         top = ctk.CTkToplevel(self, fg_color="White")
         top.title("Asignar PNF")
-        icon_path = cargar_icono("pnf.png")
-        if icon_path:
-            top.iconbitmap(icon_path)
+        
         ancho = 900
         alto = 500
 

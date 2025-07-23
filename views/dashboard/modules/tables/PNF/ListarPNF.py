@@ -5,7 +5,7 @@ from views.dashboard.modules.forms.PNF.FormPNF import DatosPNFPensumFrame
 from views.dashboard.modules.forms.PNF.frameTrayecto import FrameTrayecto
 from pprint import pprint
 
-class ListarPNF(ctk.CTkScrollableFrame):
+class ListarPNF(ctk.CTkFrame):
     """
     Frame principal para listar, visualizar y editar los PNF y sus trayectos.
     Incluye paginación, visualización modal y edición de datos.
@@ -24,7 +24,7 @@ class ListarPNF(ctk.CTkScrollableFrame):
         self.botones_frame = None
 
         self.pagina_actual = 1
-        self.cantidad_mostrar = 5
+        self.cantidad_mostrar = 10
         self.cantidad_paginas = (len(self.lista_pnf) // self.cantidad_mostrar) + (1 if len(self.lista_pnf) % self.cantidad_mostrar > 0 else 0)
         self.filas_datos = []
 

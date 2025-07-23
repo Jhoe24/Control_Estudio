@@ -6,7 +6,7 @@ from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.Periodos_academico.formPeriodoAcademico import FormPeriodoAcademico
 
-class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
+class ListPeriodoAcademicoView(ctk.CTkFrame):
     def __init__(self, master, controlador):
         super().__init__(master, fg_color="white")
         self.master = master
@@ -20,7 +20,7 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
 
         # Paginación
         self.pagina_actual = 1
-        self.periodos_por_pagina = 10
+        self.periodos_por_pagina = 17
         self.total_paginas = (len(self.periodos) + self.periodos_por_pagina - 1) // self.periodos_por_pagina
 
         self.paginas_mostrar = self.periodos[:self.periodos_por_pagina]
@@ -351,6 +351,17 @@ class ListPeriodoAcademicoView(ctk.CTkScrollableFrame):
 
             exito = self.controlador.actualizar_periodo_academico(periodo_id, datos_actualizados, ventana)
             if exito:
-                ventana.destroy()
-                self.periodos = self.controlador.obtener_periodo_academico_datos(periodo_id)
+                self.periodos = self.controlador.obtener_periodos_academicos()
+                self.actualizar_listado()
                 self.mostrar_periodos()
+                
+                ventana.destroy()
+                
+
+    def actualizar_listado(self):
+        #self.lista_sedes = self.periodos
+        self.calcular_pagina(self.periodos)
+        #self.mostrar_periodos()
+        self.frame_paginacion.grid()
+        self.frame_paginacion.grid_remove()
+        self.frame_paginacion.grid()

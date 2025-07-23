@@ -55,7 +55,6 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         for entry in self.datos_pnf.entries_a_validar:
             entry.bind("<KeyRelease>", lambda event: self.validar_campos_trayecto())
         
-        print(self.datos_pnf.get_trayecto())
         self.button_siguiente = ctk.CTkButton(
             self,
             text="Grabar trayecto",
@@ -81,9 +80,9 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Limpiar Campos", width=140, #command=self.limpiar_formulario_completo,
                                         font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT,
                                         state="disabled")
-        #self.btn_cancelar.pack(side="left", padx=10)
+        self.btn_cancelar.pack(side="left", padx=10)
         self.btn_guardar.configure(state="disabled")  # Deshabilitar el botón de guardar al inicio
-        
+       
         
     def evento_mouse(self):
         # Accede al canvas interno de CTkScrollableFrame
@@ -198,5 +197,7 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
             self.btn_guardar.configure(state="normal")
         else:
             self.btn_guardar.configure(state="disabled")
+
+    
 
     

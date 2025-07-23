@@ -5,7 +5,7 @@ from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
 
 
-class ListarUC(ctk.CTkScrollableFrame):
+class ListarUC(ctk.CTkFrame):
 
     def __init__(self, master, controller,tupla_datos = None):
         super().__init__(master, fg_color="white")
@@ -24,7 +24,7 @@ class ListarUC(ctk.CTkScrollableFrame):
             self.lista_UC = self.controller.obtener_UC()
 
         self.pagina_actual = 1
-        self.uc_por_pagina = 10
+        self.uc_por_pagina = 17
         self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
 
         self.paginas_mostrar = self.lista_UC[:self.uc_por_pagina]
