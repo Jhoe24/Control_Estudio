@@ -1,8 +1,6 @@
-# archivo cargar_periodos.py – Carga masiva de periodos académicos
 import sqlite3
 import os
 
-# --- DATOS DE EJEMPLO PARA VARIOS PERIODOS ACADÉMICOS ---
 periodos_data = [
     {
         "codigo": "2025-1",
