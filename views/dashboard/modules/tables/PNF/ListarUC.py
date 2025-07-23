@@ -24,7 +24,7 @@ class ListarUC(ctk.CTkFrame):
             self.lista_UC = self.controller.obtener_UC()
 
         self.pagina_actual = 1
-        self.uc_por_pagina = 17
+        self.uc_por_pagina = 13
         self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
 
         self.paginas_mostrar = self.lista_UC[:self.uc_por_pagina]

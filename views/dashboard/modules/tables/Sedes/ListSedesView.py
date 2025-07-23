@@ -35,7 +35,7 @@ class ListSedesView(ctk.CTkFrame):
 
         self.sedes = self.controlador.listar_sedes()
         self.cantidad_sedes = len(self.sedes)
-        self.sedes_por_pagina = 17  # Número de sedes por página
+        self.sedes_por_pagina = 13  # Número de sedes por página
         self.pagina_actual = 1      # Página actual
         self.total_paginas = 1      # Total de páginas
         self.lista_sedes = self.sedes  # Lista de sedes para paginación
@@ -207,7 +207,7 @@ class ListSedesView(ctk.CTkFrame):
         """
         top = ctk.CTkToplevel(self, fg_color="white")
         top.title("Agregar Sede")
-        ancho, alto = 700, 700
+        ancho, alto = 700, 600
 
         # Centrar ventana
         top.update_idletasks()
@@ -221,7 +221,7 @@ class ListSedesView(ctk.CTkFrame):
         top.grab_set()
 
         # Crear frame con scroll dentro del modal
-        scrollable_frame = ctk.CTkScrollableFrame(top, width=ancho-40, height=alto-120, fg_color="white")
+        scrollable_frame = ctk.CTkFrame(top, width=ancho-40, height=alto-120, fg_color="white")
         scrollable_frame.pack(padx=20, pady=20, fill="both", expand=True)
 
         form = FormSedes(scrollable_frame, self.controlador)
@@ -229,27 +229,39 @@ class ListSedesView(ctk.CTkFrame):
         
         frame_btn = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
         frame_btn.pack(pady=10)
-        # Botón guardar
-        btn_guardar = ctk.CTkButton(
-            frame_btn, text="Guardar",
-            fg_color=COLOR_BOTON_PRIMARIO_FG,
-            font=FUENTE_BOTON,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-            text_color=COLOR_BOTON_PRIMARIO_TEXT,
-            command=lambda: self.guardar_sede(form, top)
-        )
-        btn_guardar.pack(side="left", pady=10)
+        # # Botón guardar
+        # btn_guardar = ctk.CTkButton(
+        #     frame_btn, text="Guardar",
+        #     fg_color=COLOR_BOTON_PRIMARIO_FG,
+        #     font=FUENTE_BOTON,
+        #     hover_color=COLOR_BOTON_PRIMARIO_HOVER,
+        #     text_color=COLOR_BOTON_PRIMARIO_TEXT,
+        #     command=lambda: self.guardar_sede(form, top)
+        # )
+        # btn_guardar.pack(side="left", pady=10)
 
-        btn_cerrar = ctk.CTkButton(
-            frame_btn, text="Cerrar",
-            fg_color=COLOR_BOTON_SECUNDARIO_FG,
-            font=FUENTE_BOTON,
-            hover_color=COLOR_BOTON_SECUNDARIO_HOVER,
-            text_color=COLOR_BOTON_SECUNDARIO_TEXT,
-            command=top.destroy
-        )
-        btn_cerrar.pack(side="left",pady=10)
+        # btn_cerrar = ctk.CTkButton(
+        #     frame_btn, text="Cerrar",
+        #     fg_color=COLOR_BOTON_SECUNDARIO_FG,
+        #     font=FUENTE_BOTON,
+        #     hover_color=COLOR_BOTON_SECUNDARIO_HOVER,
+        #     text_color=COLOR_BOTON_SECUNDARIO_TEXT,
+        #     command=top.destroy
+        # )
+        # btn_cerrar.pack(side="left",pady=10)
+         # Empacar los frames
+        self.button_frame = ctk.CTkFrame(frame_btn, fg_color="transparent")
+        self.button_frame.pack(pady=(25, 20))
 
+        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Guardar", width=140, command=lambda: self.guardar_sede(form, top),
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT
+                                        )
+        self.btn_guardar.pack(side="left", padx=10)
+
+        self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Cerrar", width=140, command=top.destroy,
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT
+                                        )
+        self.btn_cancelar.pack(side="left", padx=10)
 
     def guardar_sede(self, form, ventana):
         """

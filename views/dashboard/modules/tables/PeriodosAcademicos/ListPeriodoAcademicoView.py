@@ -20,7 +20,7 @@ class ListPeriodoAcademicoView(ctk.CTkFrame):
 
         # Paginación
         self.pagina_actual = 1
-        self.periodos_por_pagina = 17
+        self.periodos_por_pagina = 13
         self.total_paginas = (len(self.periodos) + self.periodos_por_pagina - 1) // self.periodos_por_pagina
 
         self.paginas_mostrar = self.periodos[:self.periodos_por_pagina]
@@ -223,25 +223,38 @@ class ListPeriodoAcademicoView(ctk.CTkFrame):
         form.pack(fill="both", expand=True)
 
         # Botón guardar
-        btn_guardar = ctk.CTkButton(
-            top, text="Guardar",
-            fg_color=COLOR_BOTON_PRIMARIO_FG,
-            font=FUENTE_BOTON,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-            text_color=COLOR_BOTON_PRIMARIO_TEXT,
-            command=lambda: self.guardar_periodo(form, top)
-        )
-        btn_guardar.pack(pady=10)
+        # btn_guardar = ctk.CTkButton(
+        #     top, text="Guardar",
+        #     fg_color=COLOR_BOTON_PRIMARIO_FG,
+        #     font=FUENTE_BOTON,
+        #     hover_color=COLOR_BOTON_PRIMARIO_HOVER,
+        #     text_color=COLOR_BOTON_PRIMARIO_TEXT,
+        #     command=lambda: self.guardar_periodo(form, top)
+        # )
+        # btn_guardar.pack(pady=10)
 
-        btn_cerrar_ventana = ctk.CTkButton(
-            top, text="Cerrar",
-            fg_color=COLOR_BOTON_SECUNDARIO_FG,
-            font=FUENTE_BOTON,
-            hover_color=COLOR_BOTON_SECUNDARIO_HOVER,
-            text_color=COLOR_BOTON_SECUNDARIO_TEXT,
-            command=top.destroy
-        )
-        btn_cerrar_ventana.pack(pady=10)
+        # btn_cerrar_ventana = ctk.CTkButton(
+        #     top, text="Cerrar",
+        #     fg_color=COLOR_BOTON_SECUNDARIO_FG,
+        #     font=FUENTE_BOTON,
+        #     hover_color=COLOR_BOTON_SECUNDARIO_HOVER,
+        #     text_color=COLOR_BOTON_SECUNDARIO_TEXT,
+        #     command=top.destroy
+        # )
+        # btn_cerrar_ventana.pack(pady=10)
+        # Empacar los frames
+        self.button_frame = ctk.CTkFrame(top, fg_color="transparent")
+        self.button_frame.pack(pady=(25, 20))
+
+        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Guardar", width=140, command=lambda: self.guardar_periodo(form, top),
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT
+                                        )
+        self.btn_guardar.pack(side="left", padx=10)
+
+        self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Cerrar", width=140, command=top.destroy,
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT
+                                        )
+        self.btn_cancelar.pack(side="left", padx=10)
 
     def guardar_periodo(self, form, ventana):
         datos = self.controlador.obtener_datos_vista(form)

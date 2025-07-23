@@ -20,7 +20,7 @@ class ListEstudiantesView(ctk.CTkFrame):
         self.pagina_actual = 1
         self.primer_id_table = self.controlador.modelo.obtener_primer_id()
         self.estudiantes =  self.controlador.obtener_lista_estudiantes(0)
-        self.registros_por_pagina = 17
+        self.registros_por_pagina = 13
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_estudiantes // self.registros_por_pagina) + (1 if self.cantidad_estudiantes % self.registros_por_pagina > 0 else 0)
        

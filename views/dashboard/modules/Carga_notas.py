@@ -21,11 +21,15 @@ class CargaNotasView(ctk.CTkFrame):
         self.master = master
         self.controller_estudiantes = controlador_estudiante
         self.controller_pnf = controlador_pnf
+
+        ctk.CTkLabel(self, text="Gestión de Carga de Notas", font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).pack(pady=(10, 20), padx=20, anchor="w")
+
         self.frame_contenedor_carga_notas = ctk.CTkFrame(self,
                                         fg_color="transparent",
-                                        width=self.winfo_width(), # O un valor fijo, o fill="x"
+                                        width=self.winfo_width(), 
                                         height=350)
         self.frame_contenedor_carga_notas.pack(fill="x", pady=10)
+        
 
         self.datos_carga_notas = CargaNotasFrame(self.frame_contenedor_carga_notas,controlador_estudiante,controlador_pnf)
         self.datos_carga_notas.pack(fill="both", expand=True, padx=10, pady=10)

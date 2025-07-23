@@ -77,11 +77,11 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
                                         state="disabled")
         self.btn_guardar.pack(side="left", padx=10)
 
-        self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Limpiar Campos", width=140, #command=self.limpiar_formulario_completo,
+        self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Limpiar Campos", width=140, command=self.limpiar_formulario_completo,
                                         font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT,
-                                        state="disabled")
+                                        state="normal")
         self.btn_cancelar.pack(side="left", padx=10)
-        self.btn_guardar.configure(state="disabled")  # Deshabilitar el botón de guardar al inicio
+      
        
         
     def evento_mouse(self):
@@ -189,7 +189,7 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         trayectos_ok = True
         if self.listado_trayectos:
             for frame in self.listado_trayectos:
-                if not frame.todos_campos_llenos():  # Debes implementar este método en FrameTrayecto
+                if not frame.todos_campos_llenos():  
                     trayectos_ok = False
                     break
         # Habilita o deshabilita el botón
@@ -200,4 +200,18 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
 
     
 
-    
+    def limpiar_formulario_completo(self):
+        """
+        Limpia todos los campos del formulario.
+        """
+        if self.listado_trayectos:
+            self.datos_pnf.limpiar_fomulario()
+            for trayecto in self.listado_trayectos:
+                trayecto.destroy()
+            self.listado_trayectos = []
+            self.datos_cantidad_trayecto = 0
+            self.button_siguiente.configure(state="disabled")
+            self.btn_guardar.configure(state="disabled")
+        self.datos_pnf.limpiar_fomulario()
+        self._parent_canvas.yview_moveto("0.0")
+           

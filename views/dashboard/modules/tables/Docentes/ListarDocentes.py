@@ -19,7 +19,7 @@ class ListDocenteView(ctk.CTkFrame):
         self.primer_id_table = self.controlador.modelo_docente.obtener_primer_id()
 
         self.docente = self.controlador.obtener_lista_docentes(0)
-        self.registros_por_pagina = 17
+        self.registros_por_pagina = 13
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_docente // self.registros_por_pagina) + (1 if self.cantidad_docente % self.registros_por_pagina > 0 else 0)
        
