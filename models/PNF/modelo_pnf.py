@@ -808,3 +808,24 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
+
+    def obtener_nombres_por_id(self, tabla, id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                f"""
+                SELECT nombre FROM {tabla} WHERE id = ?
+                """, (id,)
+            )
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error al obtener el nombre por ID: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
+
+bd = ModeloPNF()
+print(bd.obtener_nombres_por_id("trayectos",1))

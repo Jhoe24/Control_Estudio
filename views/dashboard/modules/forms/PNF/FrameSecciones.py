@@ -7,8 +7,8 @@ from controllers.dashboard.PNF.controller_pnf import ControllerPNF
 from ..DatosPersonales import DatosPersonalesFrame
 
 class FremeSecciones(SectionFrameBase):
-    def __init__(self, master, controlador_docentes, controlador_pnf, controller_seccion, controller_PA, controller_sede, titulo="Datos de Secciones"):
-        super().__init__(master, titulo)
+    def __init__(self, master, controlador_docentes, controlador_pnf, controller_seccion, controller_PA, controller_sede, titulo="Datos de Secciones", fgcolor=COLOR_HEADER_SECCION_BG):
+        super().__init__(master, titulo,fgcolor)
         self.controlador_Doc = controlador_docentes
         self.controller_pnf = controlador_pnf   
         self.controller_secciones = controller_seccion
@@ -103,8 +103,8 @@ class FremeSecciones(SectionFrameBase):
         print("Trayectos disponibles:", self.valores_trayecto)
 
     def set_tramo(self, value):
-        tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[value])
-        self.valores_tramos = [tramo[1] for tramo in tupla_tramos]
+        self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[value])
+        self.valores_tramos = [tramo[1] for tramo in self.tupla_tramos]
         self.tramo_id_por_nombre = {tupla[1]: tupla[0] for tupla in self.tupla_tramos}  # nombre: id
         self.var_tramo.set(self.valores_tramos[0] if self.valores_tramos else "Tramo")
         self.tramo_menu.configure(values=self.valores_tramos)

@@ -4,7 +4,7 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.PNF.FrameSecciones import FremeSecciones
 
 
-class SeccionView(ctk.CTkScrollableFrame):
+class SeccionView(ctk.CTkFrame):
     def __init__(self, master, controller_Doc, controller_pnf,controller_secciones,controller_PA, controller_sede):
         super().__init__(master, fg_color="transparent")
         self.controller_Doc = controller_Doc
@@ -13,7 +13,8 @@ class SeccionView(ctk.CTkScrollableFrame):
         self.controller_sede = controller_sede
         self.controller_secciones = controller_secciones
 
-        self.form_seccion = FremeSecciones(self, self.controller_Doc, self.controller_pnf, self.controller_secciones,self.controller_PA,self.controller_sede)
+        ctk.CTkLabel(self, text="Registrar Sección", font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).pack(pady=10, padx=10, anchor="w")
+        self.form_seccion = FremeSecciones(self, self.controller_Doc, self.controller_pnf, self.controller_secciones,self.controller_PA,self.controller_sede).pack(fill="both", expand=True, padx=10, pady=10)
 
         # Empacar los frames
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")

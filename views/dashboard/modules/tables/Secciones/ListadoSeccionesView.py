@@ -94,7 +94,6 @@ class ListSeccionesView(ctk.CTkFrame):
 
         for idx, seccion in enumerate(secciones_mostrar, start=2):
             sede = self.cambiar_id_por_nombre(seccion)
-            print(sede)
             fila_widgets = [
                 self._crear_celda(idx, 0, sede["codigo_seccion"]),
                 self._crear_celda(idx, 1, sede["pnf_id"]),
@@ -228,18 +227,31 @@ class ListSeccionesView(ctk.CTkFrame):
         """
         ventana = ctk.CTkToplevel(self)
         ventana.title(f"Detalles de la Sección: {sede.get('nombre', '')}")
-        ventana.geometry("850x750")
+        ancho = 700
+        alto = 650
+
+        # Centramos la ventana
+        ventana.update_idletasks()
+        screen_width = ventana.winfo_screenwidth()
+        screen_height = ventana.winfo_screenheight()
+        x = (screen_width // 2) - (ancho // 2)
+        y = (screen_height // 2) - (alto // 2)
+        ventana.geometry(f"{ancho}x{alto}+{x}+{y}")
+
+        ventana.lift()
+        ventana.focus_force()
         ventana.grab_set()
 
-        contenedor_scroll = ctk.CTkScrollableFrame(ventana, fg_color=COLOR_FONDO_FORMULARIO)
+        contenedor_scroll = ctk.CTkFrame(ventana, fg_color=COLOR_FONDO_FORMULARIO)
         contenedor_scroll.pack(fill="both", expand=True, padx=10, pady=10)
 
         form = FremeSecciones(contenedor_scroll,
             self.controlador_docentes,
             self.controlador_pnf,
             self.controlador_secciones,
+            self.controlador_sede,
             self.controlador_PA,
-            self.controlador_sede
+            fgcolor=COLOR_HEADER_SECCION_BG_2
         )
 
         form.cargar_datos(sede)
