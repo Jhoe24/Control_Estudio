@@ -59,7 +59,7 @@ class ModeloSecciones:
             if con is not None:
                 con.close()
     
-    def actualizar_seccion(self, seccion_id, datos_actualizados,fecha_actualizacion):
+    def actualizar_seccion(self, seccion_id, datos_actualizados,fecha_cambio_estado):
         con = None
         try:
             con = sql.connect(self.db_ruta)
@@ -67,34 +67,34 @@ class ModeloSecciones:
             cursor.execute("""
                 UPDATE secciones
                 SET 
-                    codigo = ?, 
-                    docente_nombre = ?, 
+                    codigo_seccion = ?, 
+                    docente_titular_id = ?, 
                     cupo_maximo = ?, 
                     turno = ?, 
                     modalidad = ?, 
                     aula = ?, 
                     estado = ?, 
-                    sede = ?, 
-                    periodo_academico = ?, 
-                    pnf = ?, 
-                    trayecto = ?, 
-                    tramo = ?, 
-                    fecha_actualizacion = ?
+                    sede_id = ?, 
+                    periodo_academico_id = ?, 
+                    pnf_id = ?, 
+                    trayecto_id = ?, 
+                    tramo_id = ?, 
+                    fecha_cambio_estado = ?
                 WHERE id = ?
             """, (
-                datos_actualizados["codigo"],
-                datos_actualizados["docente_nombre"],
+                datos_actualizados["codigo_seccion"],
+                datos_actualizados["docente_titular_id"],
                 datos_actualizados["cupo_maximo"],
                 datos_actualizados["turno"],
                 datos_actualizados["modalidad"],
                 datos_actualizados["aula"],
                 datos_actualizados["estado"],
-                datos_actualizados["sede"],
-                datos_actualizados["periodo_academico"],
-                datos_actualizados["pnf"],
-                datos_actualizados["trayecto"],
-                datos_actualizados["tramo"],
-                fecha_actualizacion,
+                datos_actualizados["sede_id"],
+                datos_actualizados["periodo_academico_id"],
+                datos_actualizados["pnf_id"],
+                datos_actualizados["trayecto_id"],
+                datos_actualizados["tramo_id"],
+                fecha_cambio_estado,
                 seccion_id
             ))
 

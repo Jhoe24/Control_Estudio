@@ -264,26 +264,37 @@ class ListSeccionesView(ctk.CTkFrame):
         ctk.CTkButton(botones_frame, text="Cerrar", command=ventana.destroy).pack(side="left", padx=10)
 
         def actualizar_seccion():
-            datos_actualizados = self.controlador.obtener_datos_vista(form)
+            datos_actualizados = self.controlador_secciones.obtener_datos_vista(form)
             seccion_id = sede.get("id") or sede.get("seccion_id")
             if not seccion_id:
                 print("Error: No se pudo identificar el ID de la sede para actualizar.")
                 messagebox.showerror("Error", "No se pudo identificar el ID de la sede para actualizar.", parent=ventana)
                 return
-            exito = self.controlador.actualizar_seccion(seccion_id, datos_actualizados, ventana)
+            exito = self.controlador_secciones.actualizar_seccion(seccion_id, datos_actualizados, ventana)
             if exito:
                 self.actualizar_listado()
                 ventana.destroy()
                 
     def actualizar_listado(self):
-        self.sedes = self.controlador.listar_sedes()
-        self.lista_sedes = self.sedes
-        self.calcular_pagina(self.sedes)
+        #self.secciones = self.controlador_secciones.listar_secciones()
+        # sin un atributo o método que proporcione el pnf
+        id_pnf = None
+        try:
+            nombre_pnf = self.filtrado.var_pnf.get()
+            id_pnf = self.controlador_pnf.obtener_id_por_nombre(nombre_pnf) 
+        except Exception as e:
+            print(f"No se pudo obtener id_pnf para listar secciones: {e}")
+
+        if id_pnf:
+            self.secciones = self.controlador_secciones.listar_secciones(id_pnf)
+        else:
+            self.secciones = []  
+
+        self.calcular_pagina()
         self.mostrar_secciones()
         self.frame_paginacion.grid()
         self.frame_paginacion.grid_remove()
         self.frame_paginacion.grid()
-    
 
     def cambiar_id_por_nombre(self,secciones):
         listado = self.controlador_docentes.obtener_solo_nombres_docentes_por_pnf(secciones["pnf_id"])
@@ -294,3 +305,19 @@ class ListSeccionesView(ctk.CTkFrame):
                 break
         return secciones
 
+    def obtener_nombre_docente_titular(self, docente_id, pnf_id):
+        """
+        Retorna el nombre completo del docente titular dado su id y pnf_id.
+        """
+        if docente_id is None:
+            return "No hay docente asignado"
+
+        try:
+            listado = self.controlador_docentes.obtener_solo_nombres_docentes_por_pnf(pnf_id)
+            for id_docente, nombre_apellido in listado:
+                if id_docente == docente_id:
+                    return nombre_apellido
+            return "Docente no encontrado"
+        except Exception as e:
+            print(f"Error al obtener el nombre del docente titular: {e}")
+            return "Error obteniendo docente"

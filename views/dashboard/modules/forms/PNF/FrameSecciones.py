@@ -82,7 +82,7 @@ class FremeSecciones(SectionFrameBase):
             ("Turno", crear_option_menu, {"values": ["Diurno", "Nocturno", "Fin de Semana"], "variable": self.var_turno, "width": 300}, 1, self, "turno_menu"),
             ("Modalidad", crear_option_menu, {"values": ["Presencial","Semipresencial","Virtual"],"variable": self.var_modalidad,"width": 300}, 1, self, "modalidad_menu"),
             ("Aula", crear_entry, {"width": 300, "placeholder_text": "Ingrese el aula"}, 1, self, "aula_entry"),
-            ("Estado", crear_option_menu, {"values": ["Planificación","Abierta","En Curso","Finalizado","Cancelada","Suspendida"],"variable": self.var_estado, "width": 200},1,self,"estado_menu")
+            ("Estado", crear_option_menu, {"values": ["Planificada","Abierta","En curso","Finalizada","Cancelada","Suspendida"],"variable": self.var_estado, "width": 200},1,self,"estado_menu")
         ])
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
@@ -156,12 +156,15 @@ class FremeSecciones(SectionFrameBase):
             self.codigo_entry.configure(state="disabled")
 
             # Docente
-            docente_val = datos.get("docente_titular_id", "")
-            if docente_val and docente_val in self.nombres_docentes:
-                self.var_docente.set(docente_val)
+            docente_nombre = datos.get("docente_titular_id", "")
+
+            if docente_nombre and docente_nombre in self.nombres_docentes:
+                self.var_docente.set(docente_nombre)
             else:
                 self.var_docente.set("No hay Docentes Asignado")
+
             self.docente_menu.configure(state="disabled")
+
 
             # Cupo Máximo
             self.cupo_maximo_entry.delete(0, "end")
@@ -195,7 +198,7 @@ class FremeSecciones(SectionFrameBase):
 
             # Estado
             estado_val = datos.get("estado", "Planificación")
-            if estado_val in ["Planificación", "Abierta", "En Curso", "Finalizado", "Cancelada", "Suspendida"]:
+            if estado_val in ["Planificada", "Abierta", "En curso", "Finalizada", "Cancelada", "Suspendida"]:
                 self.var_estado.set(estado_val)
             else:
                 self.var_estado.set("Planificación")
@@ -223,7 +226,9 @@ class FremeSecciones(SectionFrameBase):
                 self.var1.set(pnf_val)
             else:
                 self.var1.set(self.nombres_pnf[0] if self.nombres_pnf else "")
+            self.set_trayecto(self.var1.get())
             self.pnf_menu.configure(state="disabled")
+            
 
             # Trayecto
             trayecto_val = datos.get("trayecto", "")
@@ -231,6 +236,7 @@ class FremeSecciones(SectionFrameBase):
                 self.var_trayecto.set(trayecto_val)
             else:
                 self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")
+            self.set_tramo(self.var_trayecto.get())
             self.trayecto_menu.configure(state="disabled")
 
             # Tramo

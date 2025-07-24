@@ -1,6 +1,6 @@
 import tkinter.messagebox as messagebox
 from models.Secciones.models_secciones import ModeloSecciones
-
+from datetime import datetime
 
 import os
 import sqlite3
@@ -84,6 +84,9 @@ class ControllerSecciones:
 
         self._seccion_id_por_nombre = {nombre: id for id, nombre in resultados}
         return list(self._seccion_id_por_nombre.keys())
+    
+    def obtener_fecha_actual(self):
+        return datetime.now().strftime("%Y-%m-%d")
 
     def obtener_id_por_nombre(self, nombre_seccion):
         return self._seccion_id_por_nombre.get(nombre_seccion)
@@ -91,8 +94,15 @@ class ControllerSecciones:
     def actualizar_seccion(self, seccion_id, datos_actualizados, ventana):
         exito = self.modelo.actualizar_seccion(seccion_id, datos_actualizados,self.obtener_fecha_actual())
         if exito:
-            messagebox.showinfo("Éxito", "Datos de la sede actualizados correctamente.", parent=ventana)
+            messagebox.showinfo("Éxito", "Datos de la sección actualizados correctamente.", parent=ventana)
             return True
         else:
-            messagebox.showerror("Error", "No se pudo actualizar los datos de la sede.", parent=ventana)
+            messagebox.showerror("Error", "No se pudo actualizar los datos de la sección.", parent=ventana)
             return False
+        
+    def obtener_nombre_docente_por_id(self, docente_id, pnf_id):
+        listado = self.controlador_docentes.obtener_solo_nombres_docentes_por_pnf(pnf_id)
+        for id, nombre in listado:
+            if id == docente_id:
+                return nombre
+        return ""
