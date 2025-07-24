@@ -6,54 +6,31 @@ import tkinter.messagebox as messagebox
 from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.Sedes.formSedes import FormSedes
+from views.dashboard.modules.forms.PNF.FrameSecciones import FremeSecciones
+from views.dashboard.modules.forms.PNF.FrameFiltradoSecciones import FiltradoSecciones
 
-class ListSedesView(ctk.CTkFrame):
-    def __init__(self, master, controlador):
+class ListSeccionesView(ctk.CTkFrame):
+    def __init__(self, master, controlador_pnf, controlador_secciones, controlador_docentes, controller_sede, controller_PA):
         super().__init__(master, fg_color="white")
         self.master = master
-        self.controlador = controlador
+        self.controlador_pnf = controlador_pnf
+        self.controlador_secciones = controlador_secciones
+        self.controlador_docentes = controlador_docentes
+        self.controlador_sede = controller_sede
+        self.controlador_PA = controller_PA
         self.filas_datos = []
-        # self.sedes = [{
-        #     "codigo": "S001",
-        #     "nombre": "Sede Central",
-        #     "tipo": "Universidad",
-        #     "direccion": "Calle Principal, Ciudad",
-        #     "estado": "Planificación",
-        # }, {
-        #     "codigo": "S002",
-        #     "nombre": "Sede Norte",
-        #     "tipo": "Instituto",
-        #     "direccion": "Avenida Norte, Ciudad",
-        #     "estado": "Planificación",
-        # }, {
-        #     "codigo": "S003",
-        #     "nombre": "Sede Sur",
-        #     "tipo": "Escuela",
-        #     "direccion": "Calle Sur, Ciudad",
-        #     "estado": "Planificación",
-        # }]
+       
+        self.secciones = []
+        self.cantidad_secciones = len(self.secciones)
+        self.secciones_por_pagina = 13  # Número de sedes por página
+        self.pagina_actual = 1          # Página actual
+        self.total_paginas = 1          # Total de páginas
 
-        self.sedes = self.controlador.listar_sedes()
-        self.cantidad_sedes = len(self.sedes)
-        self.sedes_por_pagina = 13  # Número de sedes por página
-        self.pagina_actual = 1      # Página actual
-        self.total_paginas = 1      # Total de páginas
-        self.lista_sedes = self.sedes  # Lista de sedes para paginación
-
-        # Botón "Agregar Sede"
-        self.boton_agregar = ctk.CTkButton(
-            self,
-            text="Agregar Sede",
-            font=FUENTE_BOTON,
-            fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-            text_color=COLOR_BOTON_PRIMARIO_TEXT,
-            command=self.abrir_modal_formulario
-        )
-        self.boton_agregar.grid(row=0, column=0, padx=15, pady=15, sticky="w")
-
+        self.filtrado = FiltradoSecciones(self, self.controlador_pnf, self.controlador_secciones)
+        self.filtrado.grid(row=0, column=0, columnspan=6, padx=15, pady=(10, 0), sticky="ew")
+    
         # --- ENCABEZADOS ---
-        headers = ["Código", "Nombre", "Tipo", "Dirección", "Estado", "Acción"]
+        headers = ["Código", "PNF", "Trayecto", "Docente Titular", "Estado", "Acción"]
         for col, header in enumerate(headers):
             celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)
             celda.grid(row=1, column=col, padx=1, pady=1, sticky="nsew")
@@ -71,7 +48,7 @@ class ListSedesView(ctk.CTkFrame):
         self.frame_paginacion.grid_columnconfigure(3, weight=0)
         self.frame_paginacion.grid_columnconfigure(4, weight=1)
 
-        if len(self.sedes) <= self.sedes_por_pagina:
+        if len(self.secciones) <= self.secciones_por_pagina:
             self.frame_paginacion.grid_remove()
         else:
             self.frame_paginacion.grid()
@@ -85,18 +62,18 @@ class ListSedesView(ctk.CTkFrame):
         self.boton_siguiente.grid(row=0, column=3, padx=(5, 0))
 
         # Coloca el frame de paginación al final de la tabla
-        fila_paginacion = len(self.sedes) + 2 if len(self.sedes) <= self.sedes_por_pagina else self.sedes_por_pagina + 2
+        fila_paginacion = len(self.secciones) + 2 if len(self.secciones) <= self.secciones_por_pagina else self.secciones_por_pagina + 2
         self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=6, pady=15, sticky="ew")
 
-        if len(self.sedes) <= self.sedes_por_pagina:
+        if len(self.secciones) <= self.secciones_por_pagina:
             self.frame_paginacion.grid_remove()
         else:
             self.frame_paginacion.grid()
 
         # Mostrar registros existentes
-        self.mostrar_sedes()
+        self.mostrar_secciones()
 
-    def mostrar_sedes(self):
+    def mostrar_secciones(self):
         """
         Muestra las sedes de la página actual.
         """
@@ -107,22 +84,25 @@ class ListSedesView(ctk.CTkFrame):
         self.filas_datos.clear()
 
         # Calcular paginación
-        self.total_paginas = (len(self.sedes) + self.sedes_por_pagina - 1) // self.sedes_por_pagina if len(self.sedes) > 0 else 0
+        self.total_paginas = (len(self.secciones) + self.secciones_por_pagina - 1) // self.secciones_por_pagina if len(self.secciones) > 0 else 0
         if self.pagina_actual > self.total_paginas:
             self.pagina_actual = self.total_paginas if self.total_paginas > 0 else 1
 
-        inicio = (self.pagina_actual - 1) * self.sedes_por_pagina
-        fin = inicio + self.sedes_por_pagina
-        sedes_mostrar = self.sedes[inicio:fin]
+        inicio = (self.pagina_actual - 1) * self.secciones_por_pagina
+        fin = inicio + self.secciones_por_pagina
+        secciones_mostrar = self.secciones[inicio:fin]
 
-        for idx, sede in enumerate(sedes_mostrar, start=2):
+        for idx, seccion in enumerate(secciones_mostrar, start=2):
+            sede = self.cambiar_id_por_nombre(seccion)
+            print(sede)
             fila_widgets = [
-                self._crear_celda(idx, 0, sede["codigo"]),
-                self._crear_celda(idx, 1, sede["nombre"]),
-                self._crear_celda(idx, 2, sede["tipo"]),
-                self._crear_celda(idx, 3, sede["direccion"]),
+                self._crear_celda(idx, 0, sede["codigo_seccion"]),
+                self._crear_celda(idx, 1, sede["pnf_id"]),
+                self._crear_celda(idx, 2, sede["trayecto_id"]),
+                self._crear_celda(idx, 3, sede["docente_titular_id"]),
                 self._crear_celda(idx, 4, sede["estado"]),
             ]
+
             celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
             celda_btn.grid(row=idx, column=5, padx=1, pady=1, sticky="nsew")
             btn_ver = ctk.CTkButton(
@@ -138,7 +118,7 @@ class ListSedesView(ctk.CTkFrame):
             self.filas_datos.append(fila_widgets)
 
         # Actualizar el frame de paginación al final de la tabla
-        fila_paginacion = len(sedes_mostrar) + 2
+        fila_paginacion = len(secciones_mostrar) + 2
         self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=6, pady=15, sticky="ew")
 
         # Actualizar label de página
@@ -158,21 +138,19 @@ class ListSedesView(ctk.CTkFrame):
     def anterior_pagina(self):
         if self.pagina_actual > 1:
             self.pagina_actual -= 1
-            self.mostrar_sedes()
+            self.mostrar_secciones()
 
     def siguiente_pagina(self):
         if self.pagina_actual < self.total_paginas:
             self.pagina_actual += 1
-            self.mostrar_sedes()
+            self.mostrar_secciones()
 
-    def calcular_pagina(self, lista_sedes=None):
+    def calcular_pagina(self):
         """
         Calcula la paginación para las sedes.
         """
-        if lista_sedes is not None:
-            self.lista_sedes = lista_sedes
-        total_registros = len(self.lista_sedes)
-        self.total_paginas = (total_registros + self.sedes_por_pagina - 1) // self.sedes_por_pagina if total_registros > 0 else 0
+        total_registros = len(self.secciones)
+        self.total_paginas = (total_registros + self.secciones_por_pagina - 1) // self.secciones_por_pagina if total_registros > 0 else 0
 
         # Ajustar página actual
         if self.total_paginas == 0:
@@ -182,9 +160,9 @@ class ListSedesView(ctk.CTkFrame):
         elif self.pagina_actual < 1:
             self.pagina_actual = 1
 
-        inicio = (self.pagina_actual - 1) * self.sedes_por_pagina if self.pagina_actual > 0 else 0
-        fin = inicio + self.sedes_por_pagina
-        self.sedes_mostrar = self.lista_sedes[inicio:fin] if self.total_paginas > 0 else []
+        inicio = (self.pagina_actual - 1) * self.secciones_por_pagina if self.pagina_actual > 0 else 0
+        fin = inicio + self.secciones_por_pagina
+        self.secciones_mostrar = self.secciones[inicio:fin] if self.total_paginas > 0 else []
 
         # Actualizar label de paginación
         self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
@@ -199,7 +177,7 @@ class ListSedesView(ctk.CTkFrame):
         self.boton_anterior.configure(state="disabled" if self.pagina_actual <= 1 else "normal")
         self.boton_siguiente.configure(state="disabled" if self.pagina_actual >= self.total_paginas else "normal")
 
-        self.mostrar_sedes()
+        self.mostrar_secciones()
 
     def abrir_modal_formulario(self):
         """
@@ -229,27 +207,7 @@ class ListSedesView(ctk.CTkFrame):
         
         frame_btn = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
         frame_btn.pack(pady=10)
-        # # Botón guardar
-        # btn_guardar = ctk.CTkButton(
-        #     frame_btn, text="Guardar",
-        #     fg_color=COLOR_BOTON_PRIMARIO_FG,
-        #     font=FUENTE_BOTON,
-        #     hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-        #     text_color=COLOR_BOTON_PRIMARIO_TEXT,
-        #     command=lambda: self.guardar_sede(form, top)
-        # )
-        # btn_guardar.pack(side="left", pady=10)
-
-        # btn_cerrar = ctk.CTkButton(
-        #     frame_btn, text="Cerrar",
-        #     fg_color=COLOR_BOTON_SECUNDARIO_FG,
-        #     font=FUENTE_BOTON,
-        #     hover_color=COLOR_BOTON_SECUNDARIO_HOVER,
-        #     text_color=COLOR_BOTON_SECUNDARIO_TEXT,
-        #     command=top.destroy
-        # )
-        # btn_cerrar.pack(side="left",pady=10)
-         # Empacar los frames
+    
         self.button_frame = ctk.CTkFrame(frame_btn, fg_color="transparent")
         self.button_frame.pack(pady=(25, 20))
 
@@ -263,30 +221,27 @@ class ListSedesView(ctk.CTkFrame):
                                         )
         self.btn_cancelar.pack(side="left", padx=10)
 
-    def guardar_sede(self, form, ventana):
-        """
-        Guarda una nueva sede.
-        """
-        datos = self.controlador.obtener_datos_vista(form)
-        exito = self.controlador.registrar_sede(datos, ventana)
-        if exito:
-            ventana.destroy()
-            self.sedes = self.controlador.obtener_sedes()
-            self.mostrar_sedes()
-
+    
     def ver_datos_completos_sede(self, sede):
         """
         Muestra los datos completos de una sede en un modal.
         """
         ventana = ctk.CTkToplevel(self)
-        ventana.title(f"Detalles de la Sede: {sede.get('nombre', '')}")
+        ventana.title(f"Detalles de la Sección: {sede.get('nombre', '')}")
         ventana.geometry("850x750")
         ventana.grab_set()
 
         contenedor_scroll = ctk.CTkScrollableFrame(ventana, fg_color=COLOR_FONDO_FORMULARIO)
         contenedor_scroll.pack(fill="both", expand=True, padx=10, pady=10)
 
-        form = FormSedes(contenedor_scroll, self.controlador)
+        form = FremeSecciones(contenedor_scroll,
+            self.controlador_docentes,
+            self.controlador_pnf,
+            self.controlador_secciones,
+            self.controlador_PA,
+            self.controlador_sede
+        )
+
         form.cargar_datos(sede)
         form.pack(fill="both", expand=True, padx=10, pady=10)
 
@@ -297,7 +252,7 @@ class ListSedesView(ctk.CTkFrame):
             botones_frame,
             text="Actualizar Datos",
             state="disabled",
-            command=lambda: actualizar_sede()
+            command=lambda: actualizar_seccion()
         )
         btn_actualizar.pack(side="left", padx=10)
 
@@ -308,25 +263,34 @@ class ListSedesView(ctk.CTkFrame):
         ctk.CTkButton(botones_frame, text="Editar Campos", command=habilitar_edicion).pack(side="left", padx=10)
         ctk.CTkButton(botones_frame, text="Cerrar", command=ventana.destroy).pack(side="left", padx=10)
 
-        def actualizar_sede():
+        def actualizar_seccion():
             datos_actualizados = self.controlador.obtener_datos_vista(form)
-            sede_id = sede.get("id") or sede.get("sede_id")
-            if not sede_id:
+            seccion_id = sede.get("id") or sede.get("seccion_id")
+            if not seccion_id:
                 print("Error: No se pudo identificar el ID de la sede para actualizar.")
                 messagebox.showerror("Error", "No se pudo identificar el ID de la sede para actualizar.", parent=ventana)
                 return
-            exito = self.controlador.actualizar_sede(sede_id, datos_actualizados, ventana)
+            exito = self.controlador.actualizar_seccion(seccion_id, datos_actualizados, ventana)
             if exito:
                 self.actualizar_listado()
                 ventana.destroy()
                 
-    
     def actualizar_listado(self):
         self.sedes = self.controlador.listar_sedes()
         self.lista_sedes = self.sedes
         self.calcular_pagina(self.sedes)
-        self.mostrar_sedes()
+        self.mostrar_secciones()
         self.frame_paginacion.grid()
         self.frame_paginacion.grid_remove()
         self.frame_paginacion.grid()
+    
+
+    def cambiar_id_por_nombre(self,secciones):
+        listado = self.controlador_docentes.obtener_solo_nombres_docentes_por_pnf(secciones["pnf_id"])
         
+        for id, nombre_apellido in listado:
+            if id == secciones["docente_titular_id"]:
+                secciones["docente_titular_id"] = nombre_apellido
+                break
+        return secciones
+

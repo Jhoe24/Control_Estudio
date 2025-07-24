@@ -30,6 +30,9 @@ from views.dashboard.modules.tables.Sedes.ListSedesView import ListSedesView
 
 from views.dashboard.modules.configuracion import Config_user
 
+from views.dashboard.modules.tables.Secciones.ListadoSeccionesView import ListSeccionesView
+
+
 
 
 class AdminDashboardView(BaseDashboardView):
@@ -135,7 +138,7 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
                 
-        carga_notas = CargaNotasView(self.cuerpo_principal,self.controller["Periodos"], self.controller['PNF'])
+        carga_notas = CargaNotasView(self.cuerpo_principal,self.controller["Period"], self.controller['PNF'], self.controller['Secciones'])
         carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
     
     def periodo(self):
@@ -158,6 +161,13 @@ class AdminDashboardView(BaseDashboardView):
 
         sedes = ListSedesView(self.cuerpo_principal, self.controller["Sedes"])
         sedes.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def list_secciones(self):
+        for widget in self.cuerpo_principal.winfo_children():
+             widget.pack_forget()
+
+        list_secciones = ListSeccionesView(self.cuerpo_principal,self.controller["PNF"],self.controller["Secciones"], self.controller["Docentes"], self.controller["Periodos"],self.controller["Sedes"])
+        list_secciones.pack(fill="both", expand=True, padx=10, pady=10)
 
     def configuracion_usuarios(self):
         for widget in self.cuerpo_principal.winfo_children():

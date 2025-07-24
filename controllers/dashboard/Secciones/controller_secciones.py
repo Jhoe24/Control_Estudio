@@ -2,10 +2,14 @@ import tkinter.messagebox as messagebox
 from models.Secciones.models_secciones import ModeloSecciones
 
 
+import os
+import sqlite3
+
 class ControllerSecciones:
 
     def __init__(self):
         self.modelo = ModeloSecciones()
+        self._seccion_id_por_nombre = {}
     
     def obtener_datos_vista(self, vista):
         
@@ -57,6 +61,38 @@ class ControllerSecciones:
             messagebox.showerror(title="Error",message="No se pudo registrar la seccion", parent=vista)
             return False
         
-
+    def listar_secciones(self, id_pnf):
+        return self.modelo.listar_secciones(id_pnf)
+    
     def limpiar_formulario_completo(self, vista):
         pass
+
+    def obtener_nombres_secciones_por_pnf(self, pnf_id):
+        db_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'db', 'Sistema_academico.db')
+        conn = sqlite3.connect(db_path)
+        conn.execute("PRAGMA foreign_keys = ON;")
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT s.id, s.codigo_seccion || ' - ' || s.turno AS nombre
+            FROM secciones s
+            WHERE s.pnf_id = ?
+            ORDER BY s.codigo_seccion
+        ''', (pnf_id,))
+        resultados = cursor.fetchall()
+        conn.close()
+
+        self._seccion_id_por_nombre = {nombre: id for id, nombre in resultados}
+        return list(self._seccion_id_por_nombre.keys())
+
+    def obtener_id_por_nombre(self, nombre_seccion):
+        return self._seccion_id_por_nombre.get(nombre_seccion)
+
+    def actualizar_seccion(self, seccion_id, datos_actualizados, ventana):
+        exito = self.modelo.actualizar_seccion(seccion_id, datos_actualizados,self.obtener_fecha_actual())
+        if exito:
+            messagebox.showinfo("Éxito", "Datos de la sede actualizados correctamente.", parent=ventana)
+            return True
+        else:
+            messagebox.showerror("Error", "No se pudo actualizar los datos de la sede.", parent=ventana)
+            return False

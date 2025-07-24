@@ -93,3 +93,19 @@ class PeriodoAcademicoController:
     
     def obtener_id_por_codigo(self, codigo):
         return self.modelo_pa.obtener_id_por_codigo(codigo)
+    
+    def obtener_id_por_nombre(self, nombre_periodo):
+        import sqlite3
+        import os 
+        
+        db_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'db', 'Sistema_academico.db')
+        conn = sqlite3.connect(db_path)
+        conn.execute("PRAGMA foreign_keys = ON;")
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT id FROM periodos_academicos WHERE nombre = ?", (nombre_periodo,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        else:
+            raise ValueError(f"No se encontró un período académico con nombre '{nombre_periodo}'")

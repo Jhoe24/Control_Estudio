@@ -67,7 +67,7 @@ class AsignarPNFFrame(SectionFrameBase):
                 ("Estado:", crear_option_menu, {"values": ["Activo", "Inactivo","Graduado","Retirado","Suspendido","Transferido"], "variable": self.var_estado}, 1, self, 'estado_menu'),
                 ("Observaciones:", crear_entry, {"width":300,"placeholder_text":"Ingrese observaciones"}, 1, self, 'observaciones_entry'),
             ])
-
+            
             self.instancias_widgets = [
                 self.pnf_menu,
                 self.trayecto_menu,
@@ -108,7 +108,25 @@ class AsignarPNFFrame(SectionFrameBase):
                                             text_color=COLOR_BOTON_SECUNDARIO_TEXT)
             self.btn_cancelar.pack(side="left", padx=10)
 
+            self.btn_secciones = ctk.CTkButton(
+                self.button_frame,
+                text="Inscribir Secciones",width=140,
+                font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, 
+                hover_color=COLOR_BOTON_PRIMARIO_HOVER,
+                text_color=COLOR_BOTON_PRIMARIO_TEXT,
+                command=self.mostrar_form_seccion
+            )
+            self.btn_secciones.pack(side="left", padx=10)
+
+
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
+
+    def mostrar_form_seccion(self):
+        self._crear_fila_widgets([
+            ("Secciones Disponibles:",crear_option_menu,{"values":["Seccion I", "Seccion II", "Seccion III"]},1,self,"secciones_menu")
+        ])
+        self.button_frame.pack_forget()
+        self.button_frame.pack(pady=(25, 20))
 
     def registrar_fecha(self,callback,titulo_btn="Seleccionar Fecha",attr_name=None):
        

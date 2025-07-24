@@ -7,7 +7,7 @@ from controllers.dashboard.PNF.controller_pnf import ControllerPNF
 from ..DatosPersonales import DatosPersonalesFrame
 
 class FremeSecciones(SectionFrameBase):
-    def __init__(self, master, controlador_docentes, controlador_pnf, controller_seccion,controller_PA, controller_sede, titulo="Datos de Secciones"):
+    def __init__(self, master, controlador_docentes, controlador_pnf, controller_seccion, controller_PA, controller_sede, titulo="Datos de Secciones"):
         super().__init__(master, titulo)
         self.controlador_Doc = controlador_docentes
         self.controller_pnf = controlador_pnf   
@@ -92,7 +92,12 @@ class FremeSecciones(SectionFrameBase):
         self.valores_trayecto = [trayecto[1] for trayecto in tupla_trayectos]  # Obtener solo los nombres de los trayectos
         self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")  # Valor por defecto para el trayecto
 
-        self.nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(self.pnf_id_por_nombre[value])
+        self.id_nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(self.pnf_id_por_nombre[value])
+
+        self.nombres_docentes = []
+        for id_nombre in self.id_nombres_docentes:
+            self.nombres_docentes.append(id_nombre[1])
+
         self.var_docente.set(self.nombres_docentes[0] if self.nombres_docentes else "No hay Docentes Asignado")
         self.trayecto_menu.configure(values=self.valores_trayecto)
         print("Trayectos disponibles:", self.valores_trayecto)
@@ -112,3 +117,129 @@ class FremeSecciones(SectionFrameBase):
     
     def obtener_datos_vista(self):
         return self.controller_secciones.obtener_datos_vista(self)
+
+    def habilitar_campos(self):
+        self.codigo_entry.configure(state="normal")
+        self.docente_menu.configure(state="normal")
+        self.cupo_maximo_entry.configure(state="normal")
+        self.turno_menu.configure(state="normal")
+        self.modalidad_menu.configure(state="normal")
+        self.aula_entry.configure(state="normal")
+        self.estado_menu.configure(state="normal")
+        self.sede_menu.configure(state="normal")
+        self.periodo_menu.configure(state="normal")
+        self.pnf_menu.configure(state="normal")
+        self.trayecto_menu.configure(state="normal")
+        self.tramo_menu.configure(state="normal")
+        
+    def deshabilitar_campos(self):
+        self.codigo_entry.configure(state="disabled")
+        self.docente_menu.configure(state="disabled")
+        self.cupo_maximo_entry.configure(state="disabled")
+        self.turno_menu.configure(state="disabled")
+        self.modalidad_menu.configure(state="disabled")
+        self.aula_entry.configure(state="disabled")
+        self.estado_menu.configure(state="disabled")
+        self.sede_menu.configure(state="disabled")
+        self.periodo_menu.configure(state="disabled")
+        self.pnf_menu.configure(state="disabled")
+        self.trayecto_menu.configure(state="disabled")
+        self.tramo_menu.configure(state="disabled")
+
+    def cargar_datos(self, datos):
+        try:
+            # Código
+            self.codigo_entry.delete(0, "end")
+            codigo_val = datos.get("codigo_seccion", "")
+            if codigo_val:
+                self.codigo_entry.insert(0, codigo_val)
+            self.codigo_entry.configure(state="disabled")
+
+            # Docente
+            docente_val = datos.get("docente_titular_id", "")
+            if docente_val and docente_val in self.nombres_docentes:
+                self.var_docente.set(docente_val)
+            else:
+                self.var_docente.set("No hay Docentes Asignado")
+            self.docente_menu.configure(state="disabled")
+
+            # Cupo Máximo
+            self.cupo_maximo_entry.delete(0, "end")
+            cupo_val = datos.get("cupo_maximo", "")
+            if cupo_val:
+                self.cupo_maximo_entry.insert(0, str(cupo_val))
+            self.cupo_maximo_entry.configure(state="disabled")
+
+            # Turno
+            turno_val = datos.get("turno", "Diurno")
+            if turno_val in ["Diurno", "Nocturno", "Fin de Semana"]:
+                self.var_turno.set(turno_val)
+            else:
+                self.var_turno.set("Diurno")
+            self.turno_menu.configure(state="disabled")
+
+            # Modalidad
+            modalidad_val = datos.get("modalidad", "Presencial")
+            if modalidad_val in ["Presencial", "Semipresencial", "Virtual"]:
+                self.var_modalidad.set(modalidad_val)
+            else:
+                self.var_modalidad.set("Presencial")
+            self.modalidad_menu.configure(state="disabled")
+
+            # Aula
+            self.aula_entry.delete(0, "end")
+            aula_val = datos.get("aula", "")
+            if aula_val:
+                self.aula_entry.insert(0, aula_val)
+            self.aula_entry.configure(state="disabled")
+
+            # Estado
+            estado_val = datos.get("estado", "Planificación")
+            if estado_val in ["Planificación", "Abierta", "En Curso", "Finalizado", "Cancelada", "Suspendida"]:
+                self.var_estado.set(estado_val)
+            else:
+                self.var_estado.set("Planificación")
+            self.estado_menu.configure(state="disabled")
+
+            # Sede
+            sede_val = datos.get("sede", "")
+            if sede_val in self.sedes:
+                self.var_sede.set(sede_val)
+            else:
+                self.var_sede.set(self.sedes[0] if self.sedes else "No hay sedes")
+            self.sede_menu.configure(state="disabled")
+
+            # Periodo Académico
+            periodo_val = datos.get("periodo_academico", "")
+            if periodo_val in self.periodos_academicos:
+                self.var_periodo.set(periodo_val)
+            else:
+                self.var_periodo.set(self.periodos_academicos[0] if self.periodos_academicos else "No hay Periodos Academicos")
+            self.periodo_menu.configure(state="disabled")
+
+            # PNF
+            pnf_val = datos.get("pnf", "")
+            if pnf_val in self.nombres_pnf:
+                self.var1.set(pnf_val)
+            else:
+                self.var1.set(self.nombres_pnf[0] if self.nombres_pnf else "")
+            self.pnf_menu.configure(state="disabled")
+
+            # Trayecto
+            trayecto_val = datos.get("trayecto", "")
+            if trayecto_val in self.valores_trayecto:
+                self.var_trayecto.set(trayecto_val)
+            else:
+                self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")
+            self.trayecto_menu.configure(state="disabled")
+
+            # Tramo
+            tramo_val = datos.get("tramo", "")
+            if tramo_val in self.valores_tramos:
+                self.var_tramo.set(tramo_val)
+            else:
+                self.var_tramo.set(self.valores_tramos[0] if self.valores_tramos else "No seleccionado")
+            self.tramo_menu.configure(state="disabled")
+
+        except Exception as e:
+            print(f"Error al cargar datos en el formulario de secciones: {e}")

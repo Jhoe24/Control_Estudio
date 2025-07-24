@@ -4,17 +4,17 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
 from views.dashboard.modules.forms.Carga_notas.form_nota_estudiante import FrameNotaEstudiante
 
-
 class ListadosEstudiantesPNF(ListarUC):
-    def __init__(self, master,controller_estudinates, controller_pnf,tuplas_datos):
+    def __init__(self, master,controller_estudinates, controller_pnf, tuplas_datos):
         super().__init__(master=master,controller=controller_pnf,tupla_datos=tuplas_datos)
         self.controller_estudiante = controller_estudinates
         
-
+        print(f'estos son datos de la tupla {tuplas_datos}')
+        
     def mostrar_listado(self):
         """
-        Muestra la lista de UC en la tabla sin tener nada que ver con el filtrado 
-        y recibiendo los datos de un diccionario
+            Muestra la lista de UC en la tabla sin tener nada que ver con el filtrado 
+            y recibiendo los datos de un diccionario
         """
         # Se limpia la tabla
         for fila in self.fila_datos:
@@ -47,7 +47,7 @@ class ListadosEstudiantesPNF(ListarUC):
     
     def anterior_pagina(self):
         """
-        Retrocede a la página anterior de la tabla.
+            Retrocede a la página anterior de la tabla.
         """
         if self.pagina_actual > 1:
             self.pagina_actual -= 1
@@ -59,7 +59,7 @@ class ListadosEstudiantesPNF(ListarUC):
         
     def siguiente_pagina(self):
         """
-        Avanza a la siguiente página de la tabla.
+            Avanza a la siguiente página de la tabla.
         """
         nuevo_inicio = self.pagina_actual * self.uc_por_pagina
         nuevo_fin = nuevo_inicio + self.uc_por_pagina
@@ -73,7 +73,7 @@ class ListadosEstudiantesPNF(ListarUC):
 
     def cargar_nota_uc(self, dic_uc):
         """
-        Crear una ventana modal para mostrar los datos.
+            Crear una ventana modal para mostrar los datos.
         """
         top = ctk.CTkToplevel(self, fg_color="White")
         top.title("Datos Completos del PNF")

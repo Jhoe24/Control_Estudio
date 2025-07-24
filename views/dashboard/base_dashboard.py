@@ -173,6 +173,7 @@ class BaseDashboardView(BaseView):
                             ("Registrar P.N.F", "uc_icon", self.pnf),
                             ("Listas de P.N.F", "uc_icon", self.list_pnf),
                             ("Secciones", "uc_icon", self.secciones),
+                            ("Listar Secciones", "uc_icon", self.list_secciones),
                             ("Unidades Curriculares", "uc_icon", self.unid_Curr),
                             ("Listar U.C","uc_icon",self.listar_uc)
                         ] 
@@ -322,6 +323,7 @@ class BaseDashboardView(BaseView):
     def pnf(self): pass
     def list_pnf(self):pass
     def secciones(self): pass
+    def list_secciones(self): pass
     def unid_Curr(self): pass
     def listar_uc(self): pass
     def sedes(self): pass

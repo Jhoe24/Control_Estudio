@@ -6,8 +6,6 @@ from views.dashboard.modules.forms.Carga_notas.cargar_notas import CargaNotasFra
 from views.dashboard.modules.tables.Carga_notas.Lis_estudiantes_pnf import ListadosEstudiantesPNF
 from time import sleep 
 
-
-
 from views.dashboard.components.widget_utils import *
 
 
@@ -16,7 +14,7 @@ from config.app_config import AppConfig
 
 class CargaNotasView(ctk.CTkFrame):
 
-    def __init__(self, master, controlador_estudiante, controlador_pnf):
+    def __init__(self, master, controlador_estudiante, controlador_pnf, controller_secciones):
         super().__init__(master, fg_color=COLOR_FONDO_FORMULARIO)
         self.master = master
         self.controller_estudiantes = controlador_estudiante
@@ -31,10 +29,10 @@ class CargaNotasView(ctk.CTkFrame):
         self.frame_contenedor_carga_notas.pack(fill="x", pady=10)
         
 
-        self.datos_carga_notas = CargaNotasFrame(self.frame_contenedor_carga_notas,controlador_estudiante,controlador_pnf)
+        self.datos_carga_notas = CargaNotasFrame(self.frame_contenedor_carga_notas, controlador_estudiante, controlador_pnf, controller_secciones)
         self.datos_carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
 
-        #Frame para los botones
+        # Frame para los botones
         self.btn_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.btn_frame.pack(fill="x", pady=10)
 
@@ -60,11 +58,11 @@ class CargaNotasView(ctk.CTkFrame):
 
     def mostrar_listado(self):
         self.btn_siguiente.grid_remove()
-        tuplas_datos = self.datos_carga_notas.obtener_tupla_pnf()
+        tuplas_datos = self.datos_carga_notas.obtener_filtros_seleccionados()
         self.frame_contenedor_carga_notas.destroy()
         self.btn_siguiente.destroy()
-    
-        listado_instancia = ListadosEstudiantesPNF(self,self.controller_estudiantes,self.controller_pnf,tuplas_datos)
+        
+        listado_instancia = ListadosEstudiantesPNF(self,self.controller_estudiantes,self.controller_pnf, tuplas_datos)
         listado_instancia.pack(fill="both", expand=True, padx=10, pady=10)
 
         

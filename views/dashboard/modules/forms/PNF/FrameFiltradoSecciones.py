@@ -1,16 +1,14 @@
 import customtkinter as ctk
 import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
-from views.dashboard.components.SectionFrameBase import SectionFrameBase
-from controllers.dashboard.PNF.controller_pnf import ControllerPNF
 
-from ..DatosPersonales import DatosPersonalesFrame
-
-class FremeSecciones(SectionFrameBase):
-    def __init__(self, master, controlador_pnf):
-        super().__init__(master, "")
+class FiltradoSecciones(ctk.CTkFrame):
+    def __init__(self, master, controlador_pnf, controlador_secciones):
+        super().__init__(master,fg_color="white")
         self.controller_pnf = controlador_pnf   
-      
+        self.controller_secciones = controlador_secciones
+        self.master = master
+        
         #Obterner datos pnf, trayecto y tramo
         self.nombres_pnf = self.controller_pnf.obtener_nombres_pnf()
         self.var1 = ctk.StringVar(value=self.nombres_pnf[0] if self.nombres_pnf else "") # Valor por defecto para el PNF
@@ -18,10 +16,36 @@ class FremeSecciones(SectionFrameBase):
         self.tuple_pnf = self.controller_pnf.listado_pnf
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.tuple_pnf}  # nombre: id
 
-      
-        self._crear_fila_widgets([
-            ("Seleccione un P.N.F:", crear_option_menu, {"values":self.nombres_pnf, "variable":self.var1, "command": self.set_trayecto  }, 1, self, 'pnf_menu'),
-        ])
+        frame = ctk.CTkFrame(self,fg_color="transparent")
+        frame.pack(pady=PADY_FILA, padx=15, side = "left")
 
-      #terminar el filtrado alinear bien el opion menu y colocar el boton
-      
+        self.pnf_menu = crear_option_menu(
+            frame,
+            values=self.nombres_pnf,
+            variable=self.var1,
+            #command=self.set_trayecto
+        )
+
+        self.btn_buscar = ctk.CTkButton(
+            frame,
+            text="Buscar",
+            font=FUENTE_BOTON, 
+            hover_color=COLOR_BOTON_PRIMARIO_HOVER, 
+            text_color=COLOR_BOTON_PRIMARIO_TEXT,
+            command=self.realizar_busquedad
+        )
+
+        self.pnf_menu.pack(side="left", padx=(0, 15))
+        self.btn_buscar.pack(side="left", padx=(20, 15))
+        
+    def obtener_pnf_id(self):
+        nombre_seleccionado = self.var1.get()
+        if nombre_seleccionado in self.pnf_id_por_nombre:
+            return self.pnf_id_por_nombre[nombre_seleccionado]
+        else:
+            return None
+    
+    def realizar_busquedad(self):
+        pnf_id = self.obtener_pnf_id()
+        self.master.secciones = self.controller_secciones.listar_secciones(pnf_id)
+        self.master.calcular_pagina()
