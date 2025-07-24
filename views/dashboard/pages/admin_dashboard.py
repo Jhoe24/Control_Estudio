@@ -87,7 +87,7 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
         
-        list_estudiante = ListEstudiantesView(self.cuerpo_principal, self.controller['Estudiantes'], self.controller['PNF'])
+        list_estudiante = ListEstudiantesView(self.cuerpo_principal, self.controller['Estudiantes'],self.controller["Secciones"], self.controller['PNF'])
         list_estudiante.pack(fill="both", expand=True, padx=10, pady=10)
     
     def docentes(self):

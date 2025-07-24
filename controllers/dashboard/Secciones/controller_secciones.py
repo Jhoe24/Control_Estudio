@@ -106,3 +106,48 @@ class ControllerSecciones:
             if id == docente_id:
                 return nombre
         return ""
+    
+    def obtener_datos_vista_seccionAsignada(self, vista):
+        name_seccion = vista.var_seccion.get()
+        seccion_id = self.obtener_id_por_nombre(name_seccion)
+        return {
+            "seccion_id":seccion_id,
+            "condicion":vista.var_condicion.get(),
+            "estado":vista.var_estado.get()
+        }
+    
+    def registrar_estudiante_seccion(self,datos):
+        """Verificar si ya existe dicha asignacion para armar la consulta"""
+        sql = """SELECT * FROM inscripciones WHERE estudiante_id = ?"""
+
+        resultado = self.modelo.ejecutar_consulta_armada(sql,(datos["estudiante_id"],),True)
+        """Si la asignacion ya existe actualizarla y si no insertar una nueva"""
+        if resultado:
+            sql="""UPDATE inscripciones SET condicion = ?, estado = ?, seccion_id = ? WHERE estudiante_id = ?"""
+            return self.modelo.ejecutar_consulta_armada(sql,(datos["condicion"],
+                                                             datos["estado"],
+                                                             datos["seccion_id"],
+                                                             datos["estudiante_id"]))
+        else:
+            sql = """INSERT INTO inscripciones (estudiante_id, seccion_id, condicion, estado) VALUES (?,?,?,?)"""
+            return self.modelo.ejecutar_consulta_armada(sql,(datos["estudiante_id"],
+                                                             datos["seccion_id"],
+                                                             datos["condicion"],
+                                                             datos["estado"]))
+    
+    def obtener_nombre_por_id(self, id_seccion):
+        sql = """SELECT codigo_seccion FROM secciones WHERE id = ?"""
+        resultado = self.modelo.ejecutar_consulta_armada(sql,(id_seccion,),True)
+        if resultado:
+            return resultado
+        else:
+            return None
+        
+    def obtener_seccion_estudiante(self, estudiante_id):
+        sql = """SELECT * FROM inscripciones WHERE estudiante_id = ?"""
+        resultado = self.modelo.ejecutar_consulta_armada(sql,(estudiante_id,),True)
+        if resultado:
+            return resultado
+        else:
+            return None
+        

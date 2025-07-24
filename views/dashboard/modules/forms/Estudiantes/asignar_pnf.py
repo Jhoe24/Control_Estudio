@@ -2,11 +2,13 @@ import tkinter.messagebox as messagebox
 import tkinter as tk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
+from views.dashboard.modules.forms.Estudiantes.Ingreso_seccion import AsignarSeccionFrame
 from ..DatosPersonales import DatosPersonalesFrame
+from pprint import pprint
 
 class AsignarPNFFrame(SectionFrameBase):
-    def __init__(self, master, controller, controller_pnf, estudiante,para_edicion):
-        super().__init__(master,"Asignar PNF a Estudiante")
+    def __init__(self, master, controller, controller_pnf,controller_secciones, estudiante,para_edicion,callbak):
+        super().__init__(master,"Asignar PNF a Estudiante",COLOR_HEADER_SECCION_BG_2)
 
         self.controller = controller
         self.controller_pnf = controller_pnf
@@ -14,6 +16,10 @@ class AsignarPNFFrame(SectionFrameBase):
         self.fecha_inicio = ""
         self.fecha_fin = ""
         self.btn_fecha = None
+        self.controller_secciones = controller_secciones
+        self.callbak = callbak
+
+        self.asignacion_seccion = None
 
         self.para_edicion = para_edicion  # Variable para indicar si es para edición
 
@@ -110,7 +116,7 @@ class AsignarPNFFrame(SectionFrameBase):
 
             self.btn_secciones = ctk.CTkButton(
                 self.button_frame,
-                text="Inscribir Secciones",width=140,
+                text="Inscribir Sección",width=140,
                 font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, 
                 hover_color=COLOR_BOTON_PRIMARIO_HOVER,
                 text_color=COLOR_BOTON_PRIMARIO_TEXT,
@@ -121,12 +127,26 @@ class AsignarPNFFrame(SectionFrameBase):
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
-    def mostrar_form_seccion(self):
-        self._crear_fila_widgets([
-            ("Secciones Disponibles:",crear_option_menu,{"values":["Seccion I", "Seccion II", "Seccion III"]},1,self,"secciones_menu")
-        ])
+    def mostrar_form_seccion(self,datos = None):
+        self.btn_secciones.configure(text="Cancelar Seccion", command=self.cancelar_asignacion_seccion)
+
+        self.asignacion_seccion = AsignarSeccionFrame(self,self.controller_secciones,self.pnf_id_por_nombre[self.var1.get()])
+        self.asignacion_seccion.pack(pady = 10, padx = 10, fill="both", expand=True)
+        if datos:
+            self.asignacion_seccion.cargar_datos_secciones(datos)
+    
         self.button_frame.pack_forget()
         self.button_frame.pack(pady=(25, 20))
+    
+    def no_secciones_disponibles(self):
+        ctk.CTkLabel(self, text="No hay secciones disponibles", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL).pack(pady=(10, 0), padx=10, anchor="w")
+        self.btn_secciones.configure(state="disabled")
+ 
+    def cancelar_asignacion_seccion(self):
+        self.asignacion_seccion.destroy()
+        self.asignacion_seccion = None
+        self.button_frame.pack(pady=(25, 20))
+        self.btn_secciones.configure(text="Inscribir Sección", command=self.mostrar_form_seccion)
 
     def registrar_fecha(self,callback,titulo_btn="Seleccionar Fecha",attr_name=None):
        
@@ -203,7 +223,9 @@ class AsignarPNFFrame(SectionFrameBase):
         self.valores_trayecto = [trayecto[1] for trayecto in tupla_trayectos]  # Obtener solo los nombres de los trayectos
         self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")  # Valor por defecto para el trayecto
         self.trayecto_menu.configure(values=self.valores_trayecto)
-        print("Trayectos disponibles:", self.valores_trayecto)
+        if self.asignacion_seccion:
+            self.asignacion_seccion.actualizar_datos_secciones(self.pnf_id_por_nombre[value])
+
 
     def set_tramo(self, value):
         tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[value])
@@ -213,6 +235,7 @@ class AsignarPNFFrame(SectionFrameBase):
 
     def guardar_datos(self):
         datos = self.controller_pnf.obtener_asignacion_pnf(self)
+       
         if not datos:
             print("Error: No se pudieron obtener los datos de la asignación del PNF.")
             return
@@ -222,10 +245,26 @@ class AsignarPNFFrame(SectionFrameBase):
             return
         if self.controller_pnf.modelo.registrar_asignacion_estudiante_pnf(datos):
             messagebox.showinfo("Éxito", "La asignación se realizo exitosamente.", parent=self)
+            """
+            Registro de asignacion del estudiante a una Seccion
+            """   
+            if self.asignacion_seccion:
+                datos_secciones = self.controller_secciones.obtener_datos_vista_seccionAsignada(self.asignacion_seccion)
+                datos_secciones["estudiante_id"] = self.id_estudiante
+                print(datos_secciones)
+                exito = self.controller_secciones.registrar_estudiante_seccion(datos_secciones)
+                if exito:
+                    print("La inscripcion se realizo exitosamente")
+                else:
+                    print("No se pudo realizar la inscripcion")
+
+            self.callbak()
             self.winfo_toplevel().destroy()    # Cierra el formulario después de guardar
         else:
             messagebox.showerror("Error", "No se pudo realizar la asignación, intente nuevamente.", parent=self)
-    
+
+        
+
     def cargar_datos_pnf(self, estudiante_id):
         datos_pnf = self.controller_pnf.modelo.obtener_pnf_asignado(estudiante_id)
         if datos_pnf:
@@ -280,6 +319,11 @@ class AsignarPNFFrame(SectionFrameBase):
             self.btn_fecha_inicio.configure(state="disabled")
             self.btn_fecha_fin.configure(state="disabled")
             self.btn_guardar.configure(state="disabled")
+
+            resultado = self.controller_secciones.obtener_seccion_estudiante(estudiante_id)
+            if resultado:
+                self.mostrar_form_seccion(resultado)
+                self.btn_secciones.configure(state="disabled")
             
         else:
             print("Error: No se pudieron cargar los datos del PNF.")
@@ -295,9 +339,22 @@ class AsignarPNFFrame(SectionFrameBase):
             return
         if self.controller_pnf.modelo.update_pnf_asignado(self.estudiante["id"],datos):
             messagebox.showinfo("Exito", "La actualización se realizo exitosamente.", parent=self)
+
+            if self.asignacion_seccion:
+                datos_secciones = self.controller_secciones.obtener_datos_vista_seccionAsignada(self.asignacion_seccion)
+                datos_secciones["estudiante_id"] = self.id_estudiante
+                exito = self.controller_secciones.registrar_estudiante_seccion(datos_secciones)
+                if exito:
+                    print("La inscripcion se realizo exitosamente")
+                else:
+                    print("No se pudo realizar la inscripcion")
+
+            self.callbak()
             self.winfo_toplevel().destroy()  # Cierra el formulario después de guardar
         else:
             messagebox.showerror("Error", "No se pudo actualizar.", parent=self)
+
+       
 
     def habilitar_edicion_pnf(self):
         for widget in self.instancias_widgets:
@@ -305,6 +362,9 @@ class AsignarPNFFrame(SectionFrameBase):
         self.btn_fecha_inicio.configure(state="normal")
         self.btn_fecha_fin.configure(state="normal")
         self.btn_guardar.configure(state="normal")
+
+        if self.asignacion_seccion:
+            self.asignacion_seccion.habilitar_campos()
 
     def limpiar_campos(self):
         for widget in self.instancias_widgets:
@@ -317,3 +377,5 @@ class AsignarPNFFrame(SectionFrameBase):
         self.fecha_fin_label.configure(text="Fecha de Fin: No seleccionada")
         self.btn_fecha_inicio.configure(state="normal")
         self.btn_fecha_fin.configure(state="normal")
+
+    

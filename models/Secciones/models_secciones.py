@@ -108,3 +108,26 @@ class ModeloSecciones:
         finally:
             if con is not None:
                 con.close()
+                    
+    def ejecutar_consulta_armada(self, sentencia, params=None,es_select=False):
+            con = None
+            try:
+                con = sql.connect(self.db_ruta)
+                con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+                cursor = con.cursor()
+                if params:
+                    cursor.execute(sentencia, params)
+                    con.commit()# si la sentencias es un insert o un update hacer modificacion en la base de datos
+                    if es_select:
+                        return cursor.fetchone()
+                    else:
+                        return True 
+                else:
+                    cursor.execute(sentencia)#si la sentencia es un select retornar resultado
+                    return cursor.fetchone()
+            except Exception as e:
+                print(f"Error al ejecutar la consulta: {e}")
+                return False
+            finally:
+                if con is not None:
+                    con.close()
