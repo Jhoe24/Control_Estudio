@@ -11,6 +11,9 @@ class ListadosEstudiantesPNF(ListarUC):
         
         print(f'estos son datos de la tupla {tuplas_datos}')
         
+        label_titulo = ctk.CTkLabel(self, text=f"{tuplas_datos[3]}  {tuplas_datos[4]}", font=("Arial", 16, "bold"), text_color="black")
+        label_titulo.grid(row=0, column=0, columnspan=5, pady=(10, 10))
+        
     def mostrar_listado(self):
         """
             Muestra la lista de UC en la tabla sin tener nada que ver con el filtrado 

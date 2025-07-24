@@ -42,9 +42,36 @@ class CargaNotasFrame(SectionFrameBase):
         self.seccion_menu.configure(values=self.secciones_disponibles)
 
     def obtener_filtros_seleccionados(self):
-
         periodo_id = self.controller_periodos_academicos.obtener_id_por_nombre(self.var_periodo.get())
         pnf_id = self.pnf_id_por_nombre[self.var_pnf.get()]
         seccion_id = self.controller_secciones.obtener_id_por_nombre(self.var_seccion.get())
-        return (periodo_id, pnf_id, seccion_id)
+
+        sql = """
+            SELECT trayecto_id, tramo_id FROM secciones WHERE id = ?
+        """
+        datos = self.controller_secciones.modelo.ejecutar_consulta_armada(sql, (seccion_id,), True)
+        if datos:
+            trayecto_id = datos.get('trayecto_id')
+            tramo_id = datos.get('tramo_id')
+        else:
+            trayecto_id = None
+            tramo_id = None
+
+        # Obtener los nombres seleccionados
+        trayecto_nombre = None
+        tramo_nombre = None
+        if trayecto_id:
+            # Buscar nombre trayecto
+            trayectos = self.controller_pnf.obtener_trayectos_por_pnf(pnf_id)
+            trayecto_id_por_nombre = {t[1]: t[0] for t in trayectos}
+            trayecto_nombre = next((nombre for nombre, tid in trayecto_id_por_nombre.items() if tid == trayecto_id), None)
+        if tramo_id:
+            # Buscar nombre tramo
+            tramos = self.controller_pnf.obtener_tramos_por_trayecto(trayecto_id)
+            tramo_id_por_nombre = {t[1]: t[0] for t in tramos}
+            tramo_nombre = next((nombre for nombre, tid in tramo_id_por_nombre.items() if tid == tramo_id), None)
+
+        return (pnf_id, trayecto_id, tramo_id, trayecto_nombre, tramo_nombre)
     
+    
+   

@@ -64,7 +64,6 @@ class CargaNotasView(ctk.CTkFrame):
         
         listado_instancia = ListadosEstudiantesPNF(self,self.controller_estudiantes,self.controller_pnf, tuplas_datos)
         listado_instancia.pack(fill="both", expand=True, padx=10, pady=10)
-
         
         self.btn_siguiente = ctk.CTkButton(
             self, text="Siguiente", 
