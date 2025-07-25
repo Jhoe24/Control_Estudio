@@ -112,3 +112,6 @@ class PeriodoAcademicoController:
         
     def obtener_nombres_por_id(self, tabla, id):
         return self.modelo_pa.obtener_nombres_por_id(tabla, id)
+    
+    def obtener_codigo_por_id(self, id):
+        return self.modelo_pa.obtener_codigo_por_id(id)

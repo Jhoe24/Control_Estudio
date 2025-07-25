@@ -143,6 +143,21 @@ class ModeloSedes:
                 if con is not None:
                     con.close()
 
+    def obtener_codigo_por_id(self, id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute('SELECT codigo FROM sedes WHERE id=?', (id,))
+            result = cursor.fetchone()
+            return result[0] if result else None
+        except Exception as e:
+            print(f"Error al obtener el código por id: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
+
 # bd = ModeloSedes()
-# print(bd.obtener_nombres_por_id("sedes", 1))
+# print(bd.obtener_codigo_por_id(1))
 

@@ -37,6 +37,7 @@ class UnidadCurricular(SectionFrameBase):
 
         self.scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
         self.scroll.pack(fill="both", expand=True, padx=10, pady=10)
+        self.canvas_ref = self.scroll._parent_canvas # Guardar la referencia al canvas
         self.evento_mouse()
 
         # Fila para los datos de la Unidad Curricular
@@ -198,8 +199,21 @@ class UnidadCurricular(SectionFrameBase):
         self.pnfmenu.configure(command=lambda _: [self.actualizar_trayectos_por_pnf(self.pnfmenu.get()), self.validar_estado_boton_guardar()])
         self.trayectomenu.configure(command=lambda _: [self.actualizar_tramos_por_trayecto(self.trayectomenu.get()), self.validar_estado_boton_guardar()])
         self.tramomenu.configure(command=lambda _: self.validar_estado_boton_guardar())
+        
+        self.bind("<Destroy>", self.on_destroy_unidad_curricular)
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
+
+    def on_destroy_unidad_curricular(self, event):
+        """
+        Callback que se ejecuta cuando la instancia de UnidadCurricular es destruida.
+        Desvincula los eventos globales del mouse para evitar errores.
+        """
+        # Es importante asegurarse de que el evento es para esta instancia específica
+        # y no para un widget hijo que se destruye primero.
+        if event.widget == self:
+            #print("UnidadCurricular está siendo destruida. Desvinculando eventos de mouse.")
+            self.desvincular_eventos_mouse()
 
     def procesar_formulario(self):
         """
@@ -266,18 +280,26 @@ class UnidadCurricular(SectionFrameBase):
         """
         Habilita el scroll con la rueda del mouse en el CTkScrollableFrame para Windows, Mac y Linux.
         """
-        canvas = self.scroll._parent_canvas  # Accede al canvas del scroll
-        # Windows y Mac
-        canvas.bind_all("<MouseWheel>", self.movimiento_mouse)
-        # Linux
-        canvas.bind_all("<Button-4>", self.movimiento_mouse)
-        canvas.bind_all("<Button-5>", self.movimiento_mouse)
+        if self.canvas_ref.winfo_exists():
+            # Windows y Mac
+            self.canvas_ref.bind_all("<MouseWheel>", self.movimiento_mouse, add="+")
+            # Linux
+            self.canvas_ref.bind_all("<Button-4>", self.movimiento_mouse, add="+")
+            self.canvas_ref.bind_all("<Button-5>", self.movimiento_mouse, add="+")
+        else:
+            print("Advertencia: El canvas no existe al intentar bindear eventos de mouse.")
+
 
     def movimiento_mouse(self, event):
         """
         Controla el movimiento del scroll con el mouse en distintas plataformas.
         """
-        canvas = self.scroll._parent_canvas
+        canvas = self.canvas_ref # Usar la referencia guardada
+        if not canvas.winfo_exists():
+            #print("Info: El canvas ya no existe. Desvinculando eventos.")
+            self.desvincular_eventos_mouse() # Llama a un nuevo método para desvincular
+            return
+
         if event.num == 4:  # Linux scroll up
             canvas.yview_scroll(-1, "units")
         elif event.num == 5:  # Linux scroll down
@@ -285,6 +307,16 @@ class UnidadCurricular(SectionFrameBase):
         else:  # Windows/Mac
             velocidad = 16
             canvas.yview_scroll(int(-1*(event.delta/60)* velocidad), "units")
+
+    def desvincular_eventos_mouse(self):
+        """
+        Desvincula los eventos del mouse.
+        """
+        # Asegurarse de que el canvas aún existe antes de desvincular
+        if self.canvas_ref and self.canvas_ref.winfo_exists():
+            self.canvas_ref.unbind_all("<MouseWheel>")
+            self.canvas_ref.unbind_all("<Button-4>")
+            self.canvas_ref.unbind_all("<Button-5>")
 
     def obtener_nombre_pnf(self):
         nombre_pnf = []

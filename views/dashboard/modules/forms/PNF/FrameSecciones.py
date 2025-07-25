@@ -21,6 +21,9 @@ class FremeSecciones(SectionFrameBase):
         self.var_modalidad = ctk.StringVar(value="Presencial")
         self.var_estado = ctk.StringVar(value="Planificada")
         
+        # Obtener lista completa de sedes 
+        self.listado_sedes_completo = self.controller_sede.listar_sedes()
+
         self.sedes = self.controller_sede.obtener_codigos()
         if self.sedes:
             self.var_sede = ctk.StringVar(value=self.sedes[0])
@@ -32,7 +35,8 @@ class FremeSecciones(SectionFrameBase):
         if self.periodos_academicos:
             self.var_periodo = ctk.StringVar(value=self.periodos_academicos[0])
         else:
-            self.var_periodo = ctk.StringVar(value="No hay Perodos Academicos")
+            self.var_periodo = ctk.StringVar(value="No hay Periodos Academicos")
+        
         
 
 
@@ -44,10 +48,10 @@ class FremeSecciones(SectionFrameBase):
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.tuple_pnf}  # nombre: id
 
         self.id_nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(self.pnf_id_por_nombre[self.var1.get()])
-        
-        for id_nombre in self.id_nombres_docentes:
-            self.nombres_docentes.append(id_nombre[1])
 
+        if self.id_nombres_docentes:
+            for id_nombre in self.id_nombres_docentes:
+                self.nombres_docentes.append(id_nombre[1])
 
         if self.nombres_docentes:
             self.var_docente = ctk.StringVar(value=self.nombres_docentes[0])
@@ -55,10 +59,10 @@ class FremeSecciones(SectionFrameBase):
             self.var_docente = ctk.StringVar(value="No hay Docentes Asignado")
 
         self.trayecto_id_por_nombre = {trayecto[1]: trayecto[0] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])}  # nombre: id
-        self.valores_trayecto = [trayecto[1] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])]  # Obtener los trayectos para el PNF seleccionado
+        self.valores_trayecto = [trayecto[1] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])]  # Obtener los trayectos para el PNF 
         
         self.var_trayecto = ctk.StringVar(value=self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")  # Valor por defecto para el trayecto
-        self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[self.var_trayecto.get()])  # Obtener los tramos para el trayecto seleccionado
+        self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[self.var_trayecto.get()])  # Obtener los tramos para el trayecto 
         self.tramo_id_por_nombre = {tupla[1]: tupla[0] for tupla in self.tupla_tramos}  # nombre: id
         self.valores_tramos = [tramo[1] for tramo in self.tupla_tramos]
     
@@ -148,9 +152,16 @@ class FremeSecciones(SectionFrameBase):
 
     def cargar_datos(self, datos):
         try:
-            # Primero actualizamos todas las listas de valores posibles
-            self.sedes = self.controller_sede.obtener_codigos()
-            self.periodos_academicos = self.controller_PA.obtener_codigos()
+            # Recargar Mapeos
+            self.listado_sedes_completo = self.controller_sede.listar_sedes()
+            self.sedes_nombres = [s['nombre'] for s in self.listado_sedes_completo]
+            self.sede_id_to_nombre = {s['id']: s['nombre'] for s in self.listado_sedes_completo}
+            self.sede_codigo_to_nombre = {s['codigo']: s['nombre'] for s in self.listado_sedes_completo}
+
+            self.listado_pa_completo = self.controller_PA.obtener_periodos_academicos()
+            self.periodos_academicos_nombres = self.controller_PA.obtener_nombres_periodos()
+            self.pa_id_to_nombre = {pa['id']: pa['nombre'] for pa in self.listado_pa_completo}
+            
             # Código
             self.codigo_entry.delete(0, "end")
             codigo_val = datos.get("codigo_seccion", "")
@@ -162,7 +173,6 @@ class FremeSecciones(SectionFrameBase):
             docente_nombre = datos.get("docente_titular_id", "")
             pnf_nombre = datos.get("pnf_id", "")
             if pnf_nombre:
-                # Obtenemos el ID del PNF basado en el nombre
                 pnf_id = self.pnf_id_por_nombre.get(pnf_nombre)
                 if pnf_id:
                     self.id_nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(pnf_id)
@@ -175,7 +185,6 @@ class FremeSecciones(SectionFrameBase):
                         self.var_docente.set("No hay Docentes Asignado")
 
             self.docente_menu.configure(state="disabled")
-
 
             # Cupo Máximo
             self.cupo_maximo_entry.delete(0, "end")
@@ -216,31 +225,35 @@ class FremeSecciones(SectionFrameBase):
             self.estado_menu.configure(state="disabled")
 
             # Sede
-            sede_val = datos.get("sede", "")
-            self.sede_menu.configure(values=self.sedes)
+            sede_val = datos.get("sede_id", "")
+            resultado = self.controller_sede.obtener_codigo_por_id(sede_val)
+            if resultado:
+                sede_val = resultado
             if sede_val in self.sedes:
                 self.var_sede.set(sede_val)
             else:
-                self.var_sede.set(self.sedes[0] if self.sedes else "No hay sedes")
+                self.var_sede.set("Sede no seleccionada")
             self.sede_menu.configure(state="disabled")
 
             # Periodo Académico
-            periodo_val = datos.get("periodo_academico", "")
-            self.periodo_menu.configure(values=self.periodos_academicos)
+            periodo_val = datos.get("periodo_academico_id", "")
+            resultado = self.controller_PA.obtener_codigo_por_id(periodo_val)
+            if resultado:
+                periodo_val = resultado
             if periodo_val in self.periodos_academicos:
                 self.var_periodo.set(periodo_val)
             else:
-                self.var_periodo.set(self.periodos_academicos[0] if self.periodos_academicos else "No hay Periodos Academicos")
+                self.var_periodo.set("Periodo académico no seleccionado")
             self.periodo_menu.configure(state="disabled")
 
             # PNF
             pnf_val = datos.get("pnf_id", "")
             if pnf_val in self.nombres_pnf:
                 self.var1.set(pnf_val)
-                # Actualizar trayectos y tramos para este PNF
+                # Actualizar trayectos y tramos 
                 self.set_trayecto(pnf_val)
                 
-                # Actualizar docentes para este PNF
+                # Actualizar docentes
                 pnf_id = self.pnf_id_por_nombre.get(pnf_val)
                 if pnf_id:
                     self.id_nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(pnf_id)
@@ -255,19 +268,17 @@ class FremeSecciones(SectionFrameBase):
                 self.set_trayecto(self.var1.get())
             self.pnf_menu.configure(state="disabled")
 
-            
-
             # Trayecto
             trayecto_val = datos.get("trayecto_id", "")
             if trayecto_val in self.valores_trayecto:
                 self.var_trayecto.set(trayecto_val)
-                # Actualizar tramos para este trayecto
+                # Actualizar tramos 
                 self.set_tramo(trayecto_val)
             else:
                 self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")
                 self.set_tramo(self.var_trayecto.get())
             self.trayecto_menu.configure(state="disabled")
-
+            
             # Tramo
             tramo_val = datos.get("tramo_id", "")
             if tramo_val in self.valores_tramos:
