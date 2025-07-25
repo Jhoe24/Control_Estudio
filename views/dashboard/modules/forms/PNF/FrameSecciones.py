@@ -148,6 +148,9 @@ class FremeSecciones(SectionFrameBase):
 
     def cargar_datos(self, datos):
         try:
+            # Primero actualizamos todas las listas de valores posibles
+            self.sedes = self.controller_sede.obtener_codigos()
+            self.periodos_academicos = self.controller_PA.obtener_codigos()
             # Código
             self.codigo_entry.delete(0, "end")
             codigo_val = datos.get("codigo_seccion", "")
@@ -157,11 +160,19 @@ class FremeSecciones(SectionFrameBase):
 
             # Docente
             docente_nombre = datos.get("docente_titular_id", "")
+            pnf_nombre = datos.get("pnf_id", "")
+            if pnf_nombre:
+                # Obtenemos el ID del PNF basado en el nombre
+                pnf_id = self.pnf_id_por_nombre.get(pnf_nombre)
+                if pnf_id:
+                    self.id_nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(pnf_id)
+                    self.nombres_docentes = [doc[1] for doc in self.id_nombres_docentes]
+                    self.docente_menu.configure(values=self.nombres_docentes)
 
-            if docente_nombre and docente_nombre in self.nombres_docentes:
-                self.var_docente.set(docente_nombre)
-            else:
-                self.var_docente.set("No hay Docentes Asignado")
+                    if docente_nombre and docente_nombre in self.nombres_docentes:
+                        self.var_docente.set(docente_nombre)
+                    else:
+                        self.var_docente.set("No hay Docentes Asignado")
 
             self.docente_menu.configure(state="disabled")
 
@@ -206,6 +217,7 @@ class FremeSecciones(SectionFrameBase):
 
             # Sede
             sede_val = datos.get("sede", "")
+            self.sede_menu.configure(values=self.sedes)
             if sede_val in self.sedes:
                 self.var_sede.set(sede_val)
             else:
@@ -214,6 +226,7 @@ class FremeSecciones(SectionFrameBase):
 
             # Periodo Académico
             periodo_val = datos.get("periodo_academico", "")
+            self.periodo_menu.configure(values=self.periodos_academicos)
             if periodo_val in self.periodos_academicos:
                 self.var_periodo.set(periodo_val)
             else:
@@ -221,26 +234,42 @@ class FremeSecciones(SectionFrameBase):
             self.periodo_menu.configure(state="disabled")
 
             # PNF
-            pnf_val = datos.get("pnf", "")
+            pnf_val = datos.get("pnf_id", "")
             if pnf_val in self.nombres_pnf:
                 self.var1.set(pnf_val)
+                # Actualizar trayectos y tramos para este PNF
+                self.set_trayecto(pnf_val)
+                
+                # Actualizar docentes para este PNF
+                pnf_id = self.pnf_id_por_nombre.get(pnf_val)
+                if pnf_id:
+                    self.id_nombres_docentes = self.controlador_Doc.obtener_solo_nombres_docentes_por_pnf(pnf_id)
+                    self.nombres_docentes = [doc[1] for doc in self.id_nombres_docentes]
+                    self.docente_menu.configure(values=self.nombres_docentes)
+                    
+                    docente_nombre = datos.get("docente_titular_id", "")
+                    if docente_nombre in self.nombres_docentes:
+                        self.var_docente.set(docente_nombre)
             else:
                 self.var1.set(self.nombres_pnf[0] if self.nombres_pnf else "")
-            self.set_trayecto(self.var1.get())
+                self.set_trayecto(self.var1.get())
             self.pnf_menu.configure(state="disabled")
+
             
 
             # Trayecto
-            trayecto_val = datos.get("trayecto", "")
+            trayecto_val = datos.get("trayecto_id", "")
             if trayecto_val in self.valores_trayecto:
                 self.var_trayecto.set(trayecto_val)
+                # Actualizar tramos para este trayecto
+                self.set_tramo(trayecto_val)
             else:
                 self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")
-            self.set_tramo(self.var_trayecto.get())
+                self.set_tramo(self.var_trayecto.get())
             self.trayecto_menu.configure(state="disabled")
 
             # Tramo
-            tramo_val = datos.get("tramo", "")
+            tramo_val = datos.get("tramo_id", "")
             if tramo_val in self.valores_tramos:
                 self.var_tramo.set(tramo_val)
             else:
