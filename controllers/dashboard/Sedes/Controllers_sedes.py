@@ -53,3 +53,6 @@ class ControladorSedes:
     
     def obtener_id_por_codigo(self, codigo):
         return self.modelo.obtener_id_por_codigo(codigo)
+    
+    def obtener_nombres_por_id(self, tabla, id):
+        return self.modelo.obtener_nombres_por_id(tabla, id)

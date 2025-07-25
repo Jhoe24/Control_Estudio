@@ -109,3 +109,6 @@ class PeriodoAcademicoController:
             return row[0]
         else:
             raise ValueError(f"No se encontró un período académico con nombre '{nombre_periodo}'")
+        
+    def obtener_nombres_por_id(self, tabla, id):
+        return self.modelo_pa.obtener_nombres_por_id(tabla, id)

@@ -537,3 +537,6 @@ class ControllerPNF:
         except Exception as e:
             print(f"Error al validar los campos de la asignación del PNF: {e}")
             return False
+        
+    def obtener_nombres_por_id(self, tabla, id):
+        return self.modelo.obtener_nombres_por_id(tabla, id)

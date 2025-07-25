@@ -131,3 +131,5 @@ class ModeloSecciones:
             finally:
                 if con is not None:
                     con.close()
+
+

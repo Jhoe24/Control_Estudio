@@ -19,7 +19,7 @@ class FremeSecciones(SectionFrameBase):
         #variables de control
         self.var_turno = ctk.StringVar(value="Diurno")
         self.var_modalidad = ctk.StringVar(value="Presencial")
-        self.var_estado = ctk.StringVar(value="Planificación")
+        self.var_estado = ctk.StringVar(value="Planificada")
         
         self.sedes = self.controller_sede.obtener_codigos()
         if self.sedes:
@@ -79,7 +79,7 @@ class FremeSecciones(SectionFrameBase):
             ("Codigo", crear_entry, {"width": 300, "placeholder_text": "Ingrese el codigo"}, 1, self, "codigo_entry"),
             ("Docente", crear_option_menu,{"values": self.nombres_docentes,"variable": self.var_docente,"width": 300}, 1, self, "docente_menu"),
             ("Cupo Máximo", crear_entry, {"width": 300, "placeholder_text":"Cupo Máximo"},1, self, "cupo_maximo_entry"),
-            ("Turno", crear_option_menu, {"values": ["Diurno", "Nocturno", "Fin de Semana"], "variable": self.var_turno, "width": 300}, 1, self, "turno_menu"),
+            ("Turno", crear_option_menu, {"values": ["Diurno", "Nocturno", "Fin de semana"], "variable": self.var_turno, "width": 300}, 1, self, "turno_menu"),
             ("Modalidad", crear_option_menu, {"values": ["Presencial","Semipresencial","Virtual"],"variable": self.var_modalidad,"width": 300}, 1, self, "modalidad_menu"),
             ("Aula", crear_entry, {"width": 300, "placeholder_text": "Ingrese el aula"}, 1, self, "aula_entry"),
             ("Estado", crear_option_menu, {"values": ["Planificada","Abierta","En curso","Finalizada","Cancelada","Suspendida"],"variable": self.var_estado, "width": 200},1,self,"estado_menu")
@@ -175,7 +175,7 @@ class FremeSecciones(SectionFrameBase):
 
             # Turno
             turno_val = datos.get("turno", "Diurno")
-            if turno_val in ["Diurno", "Nocturno", "Fin de Semana"]:
+            if turno_val in ["Diurno", "Nocturno", "Fin de semana"]:
                 self.var_turno.set(turno_val)
             else:
                 self.var_turno.set("Diurno")
@@ -197,7 +197,7 @@ class FremeSecciones(SectionFrameBase):
             self.aula_entry.configure(state="disabled")
 
             # Estado
-            estado_val = datos.get("estado", "Planificación")
+            estado_val = datos.get("estado", "Planificada")
             if estado_val in ["Planificada", "Abierta", "En curso", "Finalizada", "Cancelada", "Suspendida"]:
                 self.var_estado.set(estado_val)
             else:

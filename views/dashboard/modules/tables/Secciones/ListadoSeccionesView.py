@@ -308,14 +308,14 @@ class ListSeccionesView(ctk.CTkFrame):
         self.frame_paginacion.grid_remove()
         self.frame_paginacion.grid()
 
-    def cambiar_id_por_nombre(self,secciones):
-        listado = self.controlador_docentes.obtener_solo_nombres_docentes_por_pnf(secciones["pnf_id"])
+    # def cambiar_id_por_nombre(self,secciones):
+    #     listado = self.controlador_docentes.obtener_solo_nombres_docentes_por_pnf(secciones["pnf_id"])
         
-        for id, nombre_apellido in listado:
-            if id == secciones["docente_titular_id"]:
-                secciones["docente_titular_id"] = nombre_apellido
-                break
-        return secciones
+    #     for id, nombre_apellido in listado:
+    #         if id == secciones["docente_titular_id"]:
+    #             secciones["docente_titular_id"] = nombre_apellido
+    #             break
+    #     return secciones
 
     def obtener_nombre_docente_titular(self, docente_id, pnf_id):
         """
@@ -333,3 +333,59 @@ class ListSeccionesView(ctk.CTkFrame):
         except Exception as e:
             print(f"Error al obtener el nombre del docente titular: {e}")
             return "Error obteniendo docente"
+
+    def cambiar_id_por_nombre(self, seccion):
+        # Docente Titular
+        listado_docentes = self.controlador_docentes.obtener_solo_nombres_docentes_por_pnf(seccion["pnf_id"])
+        for id_docente, nombre_apellido in listado_docentes:
+            if id_docente == seccion["docente_titular_id"]:
+                seccion["docente_titular_id"] = nombre_apellido
+                break
+        else:
+            seccion["docente_titular_id"] = "Docente no asignado" # O un valor por defecto adecuado
+
+        # Convertir PNF_ID a nombre
+        pnf_nombre_tuple = self.controlador_pnf.obtener_nombres_por_id("pnf", seccion["pnf_id"])
+        if pnf_nombre_tuple:
+            seccion["pnf_id"] = pnf_nombre_tuple[0]
+        else:
+            seccion["pnf_id"] = "PNF Desconocido"
+
+        # Convertir TRAYECTO_ID a nombre
+        trayecto_nombre_tuple = self.controlador_pnf.obtener_nombres_por_id("trayectos", seccion["trayecto_id"])
+        if trayecto_nombre_tuple:
+            seccion["trayecto_id"] = trayecto_nombre_tuple[0]
+        else:
+            seccion["trayecto_id"] = "Trayecto Desconocido"
+
+        # Convertir TRAMO_ID a nombre 
+        if "tramo_id" in seccion and seccion["tramo_id"] is not None:
+            tramo_nombre_tuple = self.controlador_pnf.obtener_nombres_por_id("tramos", seccion["tramo_id"])
+            if tramo_nombre_tuple:
+                seccion["tramo_id"] = tramo_nombre_tuple[0]
+            else:
+                seccion["tramo_id"] = "Tramo Desconocido"
+        else:
+            seccion["tramo_id"] = "No asignado" # O un valor por defecto adecuado
+
+        # Convertir SEDE_ID a nombre
+        if "sede" in seccion and seccion["sede"] is not None:
+            sede_nombre_tuple = self.controlador_sede.obtener_nombres_por_id("sedes", seccion["sede"])
+            if sede_nombre_tuple:
+                seccion["sede"] = sede_nombre_tuple[0]
+            else:
+                seccion["sede"] = "Sede Desconocida"
+        else:
+            seccion["sede"] = "No asignada" # O un valor por defecto adecuado
+
+        # Convertir PERIODO_ACADEMICO_ID a nombre
+        if "periodo_academico" in seccion and seccion["periodo_academico"] is not None:
+            periodo_academico_nombre_tuple = self.controlador_PA.obtener_nombres_por_id("periodos_academicos", seccion["periodo_academico"])
+            if periodo_academico_nombre_tuple:
+                seccion["periodo_academico"] = periodo_academico_nombre_tuple[0]
+            else:
+                seccion["periodo_academico"] = "Periodo Desconocido"
+        else:
+            seccion["periodo_academico"] = "No asignado" # O un valor por defecto adecuado
+
+        return seccion
