@@ -71,7 +71,7 @@ class CargaNotasFrame(SectionFrameBase):
             tramo_id_por_nombre = {t[1]: t[0] for t in tramos}
             tramo_nombre = next((nombre for nombre, tid in tramo_id_por_nombre.items() if tid == tramo_id), None)
 
-        return (pnf_id, trayecto_id, tramo_id, trayecto_nombre, tramo_nombre)
+        return (pnf_id, trayecto_id, tramo_id, trayecto_nombre, tramo_nombre, seccion_id)
     
     
    

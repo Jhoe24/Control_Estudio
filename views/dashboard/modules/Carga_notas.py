@@ -14,11 +14,12 @@ from config.app_config import AppConfig
 
 class CargaNotasView(ctk.CTkFrame):
 
-    def __init__(self, master, controlador_estudiante, controlador_pnf, controller_secciones):
+    def __init__(self, master, controlador_estudiante, controlador_pnf, controller_secciones, controller_estudiantes_inscritos):
         super().__init__(master, fg_color=COLOR_FONDO_FORMULARIO)
         self.master = master
         self.controller_estudiantes = controlador_estudiante
         self.controller_pnf = controlador_pnf
+        self.controller_estudiantes_inscritos = controller_estudiantes_inscritos
 
         ctk.CTkLabel(self, text="Gestión de Carga de Notas", font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).pack(pady=(10, 20), padx=20, anchor="w")
 
@@ -29,7 +30,8 @@ class CargaNotasView(ctk.CTkFrame):
         self.frame_contenedor_carga_notas.pack(fill="x", pady=10)
         
 
-        self.datos_carga_notas = CargaNotasFrame(self.frame_contenedor_carga_notas, controlador_estudiante, controlador_pnf, controller_secciones)
+        # El orden correcto es: master, controller_periodos_academicos, controller_pnf, controller_secciones
+        self.datos_carga_notas = CargaNotasFrame(self.frame_contenedor_carga_notas, self.controller_estudiantes, self.controller_pnf, controller_secciones)
         self.datos_carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Frame para los botones
@@ -62,7 +64,7 @@ class CargaNotasView(ctk.CTkFrame):
         self.frame_contenedor_carga_notas.destroy()
         self.btn_siguiente.destroy()
         
-        listado_instancia = ListadosEstudiantesPNF(self,self.controller_estudiantes,self.controller_pnf, tuplas_datos)
+        listado_instancia = ListadosEstudiantesPNF(self,self.controller_estudiantes,self.controller_pnf, tuplas_datos, self.controller_estudiantes_inscritos)
         listado_instancia.pack(fill="both", expand=True, padx=10, pady=10)
         
         self.btn_siguiente = ctk.CTkButton(
@@ -80,4 +82,3 @@ class CargaNotasView(ctk.CTkFrame):
 
     def next(self):pass
 
-        

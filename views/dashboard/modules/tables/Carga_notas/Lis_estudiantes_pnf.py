@@ -5,11 +5,11 @@ from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
 from views.dashboard.modules.forms.Carga_notas.form_nota_estudiante import FrameNotaEstudiante
 
 class ListadosEstudiantesPNF(ListarUC):
-    def __init__(self, master,controller_estudinates, controller_pnf, tuplas_datos):
+    def __init__(self, master,controller_estudinates, controller_pnf, tuplas_datos, controller_estudiantes_inscritos):
         super().__init__(master=master,controller=controller_pnf,tupla_datos=tuplas_datos)
         self.controller_estudiante = controller_estudinates
-        
-        print(f'estos son datos de la tupla {tuplas_datos}')
+        self.controller_estudiantes_inscritos = controller_estudiantes_inscritos
+        self.tuplas_datos = tuplas_datos
         
         label_titulo = ctk.CTkLabel(self, text=f"{tuplas_datos[3]}  {tuplas_datos[4]}", font=("Arial", 16, "bold"), text_color="black")
         label_titulo.grid(row=0, column=0, columnspan=5, pady=(10, 10))
@@ -46,6 +46,9 @@ class ListadosEstudiantesPNF(ListarUC):
             button.pack(padx=10, pady=5)
             fila_widgets.append(celda_btn)
             self.fila_datos.append(fila_widgets)
+
+        print(f'la tupla es {self.tuplas_nombre}')
+
             
     
     def anterior_pagina(self):
@@ -97,7 +100,12 @@ class ListadosEstudiantesPNF(ListarUC):
         # Scroll principal del modal
         scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
         scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        
-        carga_noras_estudiantes = FrameNotaEstudiante(scroll_frame,self.controller_estudiante,self.tuplas_nombre)
-        carga_noras_estudiantes.pack(fill = "x", padx = 10, pady = 10)
-        
+        unidad_curricular_id = dic_uc['id']  
+        carga_noras_estudiantes = FrameNotaEstudiante(
+            scroll_frame,
+            self.controller_estudiantes_inscritos,
+            self.tuplas_datos,
+            unidad_curricular_id  
+        )
+        carga_noras_estudiantes.pack(fill="x", padx=10, pady=10)
+
