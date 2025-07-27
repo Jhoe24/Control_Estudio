@@ -3,6 +3,31 @@ import os
 from pprint import pprint
 
 class ModelRegistroEstudiantes:
+    def guardar_nota(self, inscripcion_id, unidad_curricular_id, valor):
+        """
+        Guarda o actualiza la nota de un estudiante para una unidad curricular específica.
+        """
+        db_ruta = self.db_ruta
+        con = sql.connect(db_ruta)
+        cursor = con.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;")
+        try:
+            # Verificar si ya existe una nota para esta inscripcion y unidad curricular
+            cursor.execute("SELECT id FROM notas WHERE inscripcion_id = ? AND unidad_curricular_id = ?", (inscripcion_id, unidad_curricular_id))
+            existe = cursor.fetchone()
+            if existe:
+                # Actualizar nota existente
+                cursor.execute("UPDATE notas SET valor = ? WHERE id = ?", (valor, existe[0]))
+            else:
+                # Insertar nueva nota
+                cursor.execute("INSERT INTO notas (inscripcion_id, unidad_curricular_id, valor) VALUES (?, ?, ?)", (inscripcion_id, unidad_curricular_id, valor))
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al guardar la nota: {e}")
+            raise
+        finally:
+            con.close()
     
     def __init__(self):
         self.db_ruta = os.path.join('db', 'sistema_academico.db')
@@ -486,7 +511,30 @@ class ModelRegistroEstudiantes:
         finally:
             if con is not None:
                 con.close()
-                           
+    
+
+    #==========Asignacion del pnf a estudiantes=======================
+
+    # def obtener_estudiantes_pnf(self,tupla_datos):
+    #     con = None
+    #     try:
+    #         con = sql.connect(self.db_ruta)
+    #         con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+    #         cursor = con.cursor()
+    #         cursor.execute(
+    #             """
+    #             SELECT * FROM estudiante_pnf WHERE pnf_id = ? AND trayecto_actual = ? AND tramo_actual = ?
+    #             """, tupla_datos
+    #         )
+    #         return cursor.fetchall()  # Retorna un diccionario o None
+    #     except Exception as e:
+    #         print(f"Error al obtener el PNF asignado: {e}")
+    #         return None
+    #     finally:
+    #         if con is not None:
+    #             con.close()
+
+
                            
     # def obtener_campo(self, table, columna, value):
     #     try:
@@ -506,3 +554,91 @@ class ModelRegistroEstudiantes:
     #         print(f"Error en la consulta {table}: {e}") 
     #         return False
 
+    def obtener_estudiantes_pnf(self, pnf_id, trayecto_actual, tramo_actual):
+        """
+        Obtiene información detallada de estudiantes inscritos en un PNF, trayecto y tramo específicos.
+        Los resultados se devuelven como una lista de diccionarios.
+        """
+        instruccion = '''
+        SELECT
+            epnf.id, epnf.estudiante_id, epnf.pnf_id, epnf.sede_id, epnf.fecha_inicio,
+            epnf.fecha_fin, epnf.cohorte, epnf.turno, epnf.trayecto_actual,
+            epnf.tramo_actual, epnf.creditos_aprobados, epnf.promedio_general,
+            epnf.estado,
+            est.codigo_unico, est.codigo_estudiantil, est.tipo_ingreso,
+            est.fecha_ingreso, est.situacion_academica,
+            ip.documento_identidad, ip.nombres, ip.apellidos, ip.fecha_nacimiento,
+            ip.correo_electronico, ip.correo_institucional, ip.sexo, ip.nacionalidad
+        FROM
+            estudiante_pnf AS epnf
+        JOIN
+            estudiantes AS est ON epnf.estudiante_id = est.id
+        JOIN
+            informacion_personal AS ip ON est.persona_id = ip.id
+        WHERE
+            epnf.pnf_id = ? AND epnf.trayecto_actual = ? AND epnf.tramo_actual = ?;
+        '''
+        parametros = (pnf_id, trayecto_actual, tramo_actual)
+        
+        db_ruta = os.path.join('db', 'sistema_academico.db')
+        con = sql.connect(db_ruta)
+        cursor = con.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;")
+        
+        try:
+            cursor.execute(instruccion, parametros)
+            
+            # Obtener los nombres de las columnas para usarlos como claves del diccionario
+            column_names = [description[0] for description in cursor.description]
+            
+            resultados_diccionarios = []
+            for fila in cursor.fetchall():
+                resultados_diccionarios.append(dict(zip(column_names, fila)))
+            
+            return resultados_diccionarios
+        except Exception as e:
+            print(f"Error al obtener estudiantes con detalle: {e}")
+            raise
+        finally:
+            con.close()
+
+    def obtener_estudiantes_por_seccion(self, seccion_id):
+        """
+        Devuelve una lista de estudiantes inscritos en una sección específica.
+        """
+        instruccion = '''
+        SELECT e.id, ip.documento_identidad, ip.nombres, ip.apellidos
+        FROM inscripciones i
+        JOIN estudiantes e ON i.estudiante_id = e.id
+        JOIN informacion_personal ip ON e.persona_id = ip.id
+        WHERE i.seccion_id = ?
+        '''
+        db_ruta = self.db_ruta
+        con = sql.connect(db_ruta)
+        con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+        cursor = con.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;")
+        try:
+            cursor.execute(instruccion, (seccion_id,))
+            resultados = cursor.fetchall()
+            return resultados
+        except Exception as e:
+            print(f"Error al obtener estudiantes por sección: {e}")
+            return []
+        finally:
+            con.close()
+    
+    def obtener_inscripcion_id(self, estudiante_id, seccion_id):
+        instruccion = "SELECT id FROM inscripciones WHERE estudiante_id = ? AND seccion_id = ?"
+        db_ruta = self.db_ruta
+        con = sql.connect(db_ruta)
+        cursor = con.cursor()
+        try:
+            cursor.execute(instruccion, (estudiante_id, seccion_id))
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else None
+        except Exception as e:
+            print(f"Error al obtener inscripcion_id: {e}")
+            return None
+        finally:
+            con.close()

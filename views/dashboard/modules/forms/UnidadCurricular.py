@@ -37,6 +37,7 @@ class UnidadCurricular(SectionFrameBase):
 
         self.scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
         self.scroll.pack(fill="both", expand=True, padx=10, pady=10)
+        self.canvas_ref = self.scroll._parent_canvas # Guardar la referencia al canvas
         self.evento_mouse()
 
         # Fila para los datos de la Unidad Curricular
@@ -198,8 +199,21 @@ class UnidadCurricular(SectionFrameBase):
         self.pnfmenu.configure(command=lambda _: [self.actualizar_trayectos_por_pnf(self.pnfmenu.get()), self.validar_estado_boton_guardar()])
         self.trayectomenu.configure(command=lambda _: [self.actualizar_tramos_por_trayecto(self.trayectomenu.get()), self.validar_estado_boton_guardar()])
         self.tramomenu.configure(command=lambda _: self.validar_estado_boton_guardar())
+        
+        self.bind("<Destroy>", self.on_destroy_unidad_curricular)
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
+
+    def on_destroy_unidad_curricular(self, event):
+        """
+        Callback que se ejecuta cuando la instancia de UnidadCurricular es destruida.
+        Desvincula los eventos globales del mouse para evitar errores.
+        """
+        # Es importante asegurarse de que el evento es para esta instancia específica
+        # y no para un widget hijo que se destruye primero.
+        if event.widget == self:
+            #print("UnidadCurricular está siendo destruida. Desvinculando eventos de mouse.")
+            self.desvincular_eventos_mouse()
 
     def procesar_formulario(self):
         """
@@ -266,18 +280,26 @@ class UnidadCurricular(SectionFrameBase):
         """
         Habilita el scroll con la rueda del mouse en el CTkScrollableFrame para Windows, Mac y Linux.
         """
-        canvas = self.scroll._parent_canvas  # Accede al canvas del scroll
-        # Windows y Mac
-        canvas.bind_all("<MouseWheel>", self.movimiento_mouse)
-        # Linux
-        canvas.bind_all("<Button-4>", self.movimiento_mouse)
-        canvas.bind_all("<Button-5>", self.movimiento_mouse)
+        if self.canvas_ref.winfo_exists():
+            # Windows y Mac
+            self.canvas_ref.bind_all("<MouseWheel>", self.movimiento_mouse, add="+")
+            # Linux
+            self.canvas_ref.bind_all("<Button-4>", self.movimiento_mouse, add="+")
+            self.canvas_ref.bind_all("<Button-5>", self.movimiento_mouse, add="+")
+        else:
+            print("Advertencia: El canvas no existe al intentar bindear eventos de mouse.")
+
 
     def movimiento_mouse(self, event):
         """
         Controla el movimiento del scroll con el mouse en distintas plataformas.
         """
-        canvas = self.scroll._parent_canvas
+        canvas = self.canvas_ref # Usar la referencia guardada
+        if not canvas.winfo_exists():
+            #print("Info: El canvas ya no existe. Desvinculando eventos.")
+            self.desvincular_eventos_mouse() # Llama a un nuevo método para desvincular
+            return
+
         if event.num == 4:  # Linux scroll up
             canvas.yview_scroll(-1, "units")
         elif event.num == 5:  # Linux scroll down
@@ -285,6 +307,16 @@ class UnidadCurricular(SectionFrameBase):
         else:  # Windows/Mac
             velocidad = 16
             canvas.yview_scroll(int(-1*(event.delta/60)* velocidad), "units")
+
+    def desvincular_eventos_mouse(self):
+        """
+        Desvincula los eventos del mouse.
+        """
+        # Asegurarse de que el canvas aún existe antes de desvincular
+        if self.canvas_ref and self.canvas_ref.winfo_exists():
+            self.canvas_ref.unbind_all("<MouseWheel>")
+            self.canvas_ref.unbind_all("<Button-4>")
+            self.canvas_ref.unbind_all("<Button-5>")
 
     def obtener_nombre_pnf(self):
         nombre_pnf = []
@@ -373,68 +405,161 @@ class UnidadCurricular(SectionFrameBase):
     def set_datos(self, datos):
         """
         Establece los datos del formulario con un diccionario de datos.
+        Maneja valores None y opciones no válidas en OptionMenus.
         """
+        def valor_seguro(valor, default=''):
+            """Convierte None a string vacío o valor por defecto"""
+            return str(valor) if valor is not None else default
+        
+        def obtener_valor_option_menu(valor, opciones_validas, default):
+            """Obtiene un valor válido para OptionMenu o retorna el valor actual si no está en las opciones"""
+            if valor is None:
+                return default
+            if valor in opciones_validas:
+                return valor
+            # Si el valor no está en las opciones válidas, lo retorna tal como está
+            return str(valor)
+        
+        # Crear mapeos inversos para PNF, Trayecto y Tramo
         pnf_nombre_por_id = {v: k for k, v in self.pnf_id_por_nombre.items()}
         trayecto_nombre_por_id = {v: k for k, v in self.trayecto_id_por_nombre.items()}
         tramo_nombre_por_id = {v: k for k, v in self.tramo_id_por_nombre.items()}
-        #print(f"[INFO] Estableciendo datos en Unidad Curricular: {datos}")
+        
+        # Rellenar campos de texto básicos
         self.codigo_entry.delete(0, 'end')
-        self.codigo_entry.insert(0, datos.get('codigo', ''))
+        self.codigo_entry.insert(0, valor_seguro(datos.get('codigo')))
+        
         self.nombre_entry.delete(0, 'end')
-        self.nombre_entry.insert(0, datos.get('nombre', ''))
+        self.nombre_entry.insert(0, valor_seguro(datos.get('nombre')))
+        
         self.nombre_corto_entry.delete(0, 'end')
-        self.nombre_corto_entry.insert(0, datos.get('nombre_corto', ''))
+        self.nombre_corto_entry.insert(0, valor_seguro(datos.get('nombre_corto')))
+        
         self.area_entry.delete(0, 'end')
-        self.area_entry.insert(0, datos.get('area', ''))
+        self.area_entry.insert(0, valor_seguro(datos.get('area')))
+        
         self.subarea_entry.delete(0, 'end')
-        self.subarea_entry.insert(0, datos.get('subarea', ''))
+        self.subarea_entry.insert(0, valor_seguro(datos.get('subarea')))
 
-        # Rellenar horas
+        # Rellenar campos numéricos (horas)
         self.horas_teoricas_entry.delete(0, 'end')
-        self.horas_teoricas_entry.insert(0, str(datos.get('horas_teoricas', 0)))
+        self.horas_teoricas_entry.insert(0, valor_seguro(datos.get('horas_teoricas'), '0'))
+        
         self.horas_practicas_entry.delete(0, 'end')
-        self.horas_practicas_entry.insert(0, str(datos.get('horas_practicas', 0)))
+        self.horas_practicas_entry.insert(0, valor_seguro(datos.get('horas_practicas'), '0'))
+        
         self.horas_laboratorio_entry.delete(0, 'end')
-        self.horas_laboratorio_entry.insert(0, str(datos.get('horas_laboratorio', 0)))
+        self.horas_laboratorio_entry.insert(0, valor_seguro(datos.get('horas_laboratorio'), '0'))
+        
         self.horas_trabajo_independiente_entry.delete(0, 'end')
-        self.horas_trabajo_independiente_entry.insert(0, str(datos.get('horas_trabajo_independiente', 0)))
+        self.horas_trabajo_independiente_entry.insert(0, valor_seguro(datos.get('horas_trabajo_independiente'), '0'))
+        
         self.horas_totales_entry.delete(0, 'end')
-        self.horas_totales_entry.insert(0, str(datos.get('horas_totales', 0)))
+        self.horas_totales_entry.insert(0, valor_seguro(datos.get('horas_totales'), '0'))
 
         # Rellenar unidades de crédito
         self.unidades_credito_entry.delete(0, 'end')
-        self.unidades_credito_entry.insert(0, str(datos.get('unidades_credito', 1)))
+        self.unidades_credito_entry.insert(0, valor_seguro(datos.get('unidades_credito'), '1'))
 
+        # Rellenar clave especial
         self.clave_especial_entry.delete(0, 'end')
-        self.clave_especial_entry.insert(0, datos.get('clave_especial', ''))
-        # Rellenar fechas
-        # self.fecha_creacion_entry.delete(0, 'end')
-        # self.fecha_creacion_entry.insert(0, datos.get('fecha_creacion', ''))
-        # self.fecha_actualizacion_entry.delete(0, 'end')
-        # self.fecha_actualizacion_entry.insert(0, datos.get('fecha_actualizacion', ''))
-        # Rellenar OptionMenus
-        self.tipo_menu.set(datos.get('tipo', 'Obligatoria'))
-        self.caracter_menu.set(datos.get('caracter', 'Teórica'))
-        self.modalidad_menu.set(datos.get('modalidad', 'Presencial'))
-        self.complejidad_menu.set(datos.get('complejidad', 'Básica'))
-        self.estado_menu.set(datos.get('estado', 'activa'))
+        self.clave_especial_entry.insert(0, valor_seguro(datos.get('clave_especial')))
+
+        # Rellenar OptionMenus con validación
+        opciones_tipo = ["Obligatoria", "Electiva"]
+        valor_tipo = obtener_valor_option_menu(datos.get('tipo'), opciones_tipo, 'Obligatoria')
+        if valor_tipo not in opciones_tipo:
+            # Si el valor no está en las opciones, agregarlo temporalmente
+            self.tipo_menu.configure(values=opciones_tipo + [valor_tipo])
+        self.tipo_menu.set(valor_tipo)
+
+        opciones_caracter = ["Teórica", "Práctica", "Teórico-Práctica", "Laboratorio"]
+        valor_caracter = obtener_valor_option_menu(datos.get('caracter'), opciones_caracter, 'Teórica')
+        if valor_caracter not in opciones_caracter:
+            self.caracter_menu.configure(values=opciones_caracter + [valor_caracter])
+        self.caracter_menu.set(valor_caracter)
+
+        opciones_modalidad = ["Presencial", "Semipresencial", "Virtual"]
+        valor_modalidad = obtener_valor_option_menu(datos.get('modalidad'), opciones_modalidad, 'Presencial')
+        if valor_modalidad not in opciones_modalidad:
+            self.modalidad_menu.configure(values=opciones_modalidad + [valor_modalidad])
+        self.modalidad_menu.set(valor_modalidad)
+
+        opciones_complejidad = ["Básica", "Intermedia", "Avanzada"]
+        valor_complejidad = obtener_valor_option_menu(datos.get('complejidad'), opciones_complejidad, 'Básica')
+        if valor_complejidad not in opciones_complejidad:
+            self.complejidad_menu.configure(values=opciones_complejidad + [valor_complejidad])
+        self.complejidad_menu.set(valor_complejidad)
+
+        opciones_estado = ["activa", "inactiva", "revision"]
+        valor_estado = obtener_valor_option_menu(datos.get('estado'), opciones_estado, 'activa')
+        if valor_estado not in opciones_estado:
+            self.estado_menu.configure(values=opciones_estado + [valor_estado])
+        self.estado_menu.set(valor_estado)
 
         # Rellenar PNF, Trayecto y Tramo
-        pnf_nombre = pnf_nombre_por_id.get(datos.get("pnf_id"), "Sin opciones disponibles")
-        trayecto_nombre = trayecto_nombre_por_id.get(datos.get("trayecto_id"), "Sin opciones disponibles")
+        pnf_id = datos.get("pnf_id")
+        if pnf_id is not None:
+            pnf_nombre = pnf_nombre_por_id.get(pnf_id)
+            if pnf_nombre:
+                self.pnfmenu.set(pnf_nombre)
+                # Actualizar trayectos basado en el PNF seleccionado
+                self.actualizar_trayectos_por_pnf(pnf_nombre)
+            else:
+                # Si no encuentra el PNF, mostrar el ID
+                valores_pnf_actuales = list(self.pnfmenu.cget("values"))
+                valor_pnf_display = f"ID: {pnf_id}"
+                if valor_pnf_display not in valores_pnf_actuales:
+                    self.pnfmenu.configure(values=valores_pnf_actuales + [valor_pnf_display])
+                self.pnfmenu.set(valor_pnf_display)
+        else:
+            # Si no hay PNF seleccionado, usar el primero disponible
+            valores_pnf = list(self.pnfmenu.cget("values"))
+            if valores_pnf:
+                self.pnfmenu.set(valores_pnf[0])
 
-        self.pnfmenu.set(pnf_nombre)
-        self.trayectomenu.set(trayecto_nombre)
+        trayecto_id = datos.get("trayecto_id")
+        if trayecto_id is not None:
+            trayecto_nombre = trayecto_nombre_por_id.get(trayecto_id)
+            if trayecto_nombre:
+                self.trayectomenu.set(trayecto_nombre)
+                # Actualizar tramos basado en el trayecto seleccionado
+                self.actualizar_tramos_por_trayecto(trayecto_nombre)
+            else:
+                # Si no encuentra el trayecto, mostrar el ID
+                valores_trayecto_actuales = list(self.trayectomenu.cget("values"))
+                valor_trayecto_display = f"ID: {trayecto_id}"
+                if valor_trayecto_display not in valores_trayecto_actuales:
+                    self.trayectomenu.configure(values=valores_trayecto_actuales + [valor_trayecto_display])
+                self.trayectomenu.set(valor_trayecto_display)
+        else:
+            # Si no hay trayecto seleccionado, usar el primero disponible
+            valores_trayecto = list(self.trayectomenu.cget("values"))
+            if valores_trayecto:
+                self.trayectomenu.set(valores_trayecto[0])
 
-        # --- ACTUALIZA LOS TRAMOS SEGÚN EL TRAYECTO ---
-        # Esto asegura que el OptionMenu de tramo tenga los valores correctos
-        self.actualizar_tramos_por_trayecto(trayecto_nombre)
+        tramo_id = datos.get("tramo_id")
+        if tramo_id is not None:
+            # Actualizar el mapeo de tramos después de actualizar por trayecto
+            tramo_nombre_por_id = {v: k for k, v in self.tramo_id_por_nombre.items()}
+            tramo_nombre = tramo_nombre_por_id.get(tramo_id)
+            if tramo_nombre:
+                self.tramomenu.set(tramo_nombre)
+            else:
+                # Si no encuentra el tramo, mostrar el ID
+                valores_tramo_actuales = list(self.tramomenu.cget("values"))
+                valor_tramo_display = f"ID: {tramo_id}"
+                if valor_tramo_display not in valores_tramo_actuales:
+                    self.tramomenu.configure(values=valores_tramo_actuales + [valor_tramo_display])
+                self.tramomenu.set(valor_tramo_display)
+        else:
+            # Si no hay tramo seleccionado, usar el primero disponible
+            valores_tramo = list(self.tramomenu.cget("values"))
+            if valores_tramo:
+                self.tramomenu.set(valores_tramo[0])
 
-        # Ahora puedes crear el mapeo inverso de tramos actualizado
-        tramo_nombre_por_id = {v: k for k, v in self.tramo_id_por_nombre.items()}
-        tramo_nombre = tramo_nombre_por_id.get(datos.get("tramo_id"), "Sin opciones disponibles")
-        self.tramomenu.set(tramo_nombre)
-
+        # Validar estado del botón guardar al final
+        self.validar_estado_boton_guardar()
 
     def deshabilitar_campos(self):
         """

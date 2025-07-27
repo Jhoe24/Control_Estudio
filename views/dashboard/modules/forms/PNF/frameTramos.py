@@ -61,24 +61,56 @@ class FrameTramos(SectionFrameBase):
 
 
     def set_datos(self, datos):
-        self.numero_entry.insert(0, datos.get("numero", ""))
-        self.numero_entry.configure(state="disabled")
-        self.nombre_entry.insert(0, datos.get("nombre", ""))
-        self.nombre_entry.configure(state="disabled")
-        self.duracion_semanas_entry.insert(0, datos.get("duracion_semanas", ""))
-        self.duracion_semanas_entry.configure(state="disabled")
-        self.duracion_horas_entry.insert(0, datos.get("duracion_horas", ""))
-        self.duracion_horas_entry.configure(state="disabled")
-        self.creditos_entry.insert(0, datos.get("creditos", ""))
-        self.creditos_entry.configure(state="disabled")
-        self.objetivos_entry.insert(0, datos.get("objetivos", ""))
-        self.objetivos_entry.configure(state="disabled")
+        # Primero habilitar todos los campos
+        self.habilitar_campos()
+        
+        # Limpiar campos antes de insertar nuevos datos
+        self.limpiar_campos()
+        
+        # Insertar los nuevos datos de forma segura
+        self._insertar_dato_seguro(self.numero_entry, datos.get("numero", ""))
+        self._insertar_dato_seguro(self.nombre_entry, datos.get("nombre", ""))
+        self._insertar_dato_seguro(self.duracion_semanas_entry, datos.get("duracion_semanas", ""))
+        self._insertar_dato_seguro(self.duracion_horas_entry, datos.get("duracion_horas", ""))
+        self._insertar_dato_seguro(self.creditos_entry, datos.get("creditos", ""))
+        self._insertar_dato_seguro(self.objetivos_entry, datos.get("objetivos", ""))
+        self.estado_option_menu.set(datos.get("estado", "activo"))
+        
         # Si tienes un campo para competencias, agrégalo aquí
         if hasattr(self, "competencias_entry"):
-            self.competencias_entry.insert(0, datos.get("competencias", ""))
-            self.competencias_entry.configure(state="disabled")
-        self.estado_option_menu.set(datos.get("estado", "activo"))
-        self.estado_option_menu.configure(state="disabled")
+            self._insertar_dato_seguro(self.competencias_entry, datos.get("competencias", ""))
+        
+        # Después deshabilitar los campos (excepto el número que ya está deshabilitado)
+        for campo in self.entries_a_validar:
+            if campo != self.numero_entry:  # No deshabilitar el número si ya está deshabilitado
+                campo.configure(state="disabled")
+
+    def _insertar_dato_seguro(self, entry, valor):
+        """Inserta un valor en un entry de forma segura"""
+        try:
+            # Asegurarse de que el entry esté habilitado
+            if str(entry.cget("state")) == "disabled":
+                entry.configure(state="normal")
+            
+            # Insertar el valor
+            entry.insert(0, str(valor))
+            
+        except Exception as e:
+            print(f"Error al insertar dato en entry: {e}")
+            # Intentar habilitar y volver a insertar
+            try:
+                entry.configure(state="normal")
+                entry.insert(0, str(valor))
+            except Exception as e2:
+                print(f"Error crítico al insertar dato: {e2}")
+
+    def limpiar_campos(self):
+        """Limpia todos los campos de entrada"""
+        for entry in self.entries_a_validar:
+            if hasattr(entry, 'delete'):
+                entry.delete(0, 'end')
+            elif hasattr(entry, 'set'):
+                entry.set("")
     
     def habilitar_campos(self):
         for campo in self.entries_a_validar:

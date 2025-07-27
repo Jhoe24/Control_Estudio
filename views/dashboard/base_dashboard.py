@@ -87,13 +87,14 @@ class BaseDashboardView(BaseView):
         if self.user_role.lower() in ["admin", "administrador"]:
             menu_items = [
                 ("Inicio", "home_icon", self.inicio, False),
+                ("Periodos", "pnf_icon", self.periodo, False),
                 ("Estudiantes", "estudiantes_icon", None, True),  # Submenú
                 ("Docentes", "docentes_icon", self.docentes, True),
                 ("Carga de Notas", "carga_notas_icon", self.carga_notas, False),
                 ("P.N.F", "pnf_icon", self.pnf, True),
                 ("Sedes", "sedes_icon", self.sedes, False),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
-                ("Configuración", "configuracion_icon", self.configuracion, False),
+                ("Configuración", "configuracion_icon", self.configuracion, True),
                 ("Cerrar Sesión", "cerrar_sesion_icon", self._confirmar_logout, False),
             ]
         elif self.user_role.lower() == "student":
@@ -102,7 +103,7 @@ class BaseDashboardView(BaseView):
                 ("Mi Perfil", "perfil_icon", self.perfil, False),
                 ("Mis Notas", "notas_icon", self.notas, False),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
-                ("Configuración", "configuracion_icon", self.configuracion, False),
+                ("Configuración", "configuracion_icon", self.configuracion, True),
                 ("Cerrar Sesión", "cerrar_sesion_icon", self._confirmar_logout, False),
             ]
         else:  # teacher o otros roles
@@ -111,7 +112,7 @@ class BaseDashboardView(BaseView):
                 ("Estudiantes", "estudiantes_icon", None, True),  # Submenú
                 ("Mis Clases", "clases_icon", self.mis_clases, False),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
-                ("Configuración", "configuracion_icon", self.configuracion, False),
+                ("Configuración", "configuracion_icon", self.configuracion, True),
                 ("Cerrar Sesión", "cerrar_sesion_icon", self._confirmar_logout, False),
             ]
         
@@ -171,8 +172,16 @@ class BaseDashboardView(BaseView):
                         submenu_items= [
                             ("Registrar P.N.F", "uc_icon", self.pnf),
                             ("Listas de P.N.F", "uc_icon", self.list_pnf),
+                            ("Secciones", "uc_icon", self.secciones),
+                            ("Listar Secciones", "uc_icon", self.list_secciones),
                             ("Unidades Curriculares", "uc_icon", self.unid_Curr),
                             ("Listar U.C","uc_icon",self.listar_uc)
+                        ] 
+                elif texto == "Configuración":
+                    if self.user_role.lower() in ["admin", "administrador"]:
+                        submenu_items = [
+                            ("Usuarios", "configuracion_icon", self.configuracion_usuarios),
+                            ("Respaldos", "configuracion_icon", self.configuracion_respaldos)
                         ]
                 
                 # Crear botones del submenú
@@ -303,6 +312,7 @@ class BaseDashboardView(BaseView):
 
     
     def inicio(self): pass
+    def periodo(self): pass
     def docentes(self): pass
     def list_docente(self): pass
     def estudiantes(self): pass
@@ -312,6 +322,8 @@ class BaseDashboardView(BaseView):
     def carga_notas(self): pass
     def pnf(self): pass
     def list_pnf(self):pass
+    def secciones(self): pass
+    def list_secciones(self): pass
     def unid_Curr(self): pass
     def listar_uc(self): pass
     def sedes(self): pass
@@ -319,4 +331,6 @@ class BaseDashboardView(BaseView):
     def notas(self): pass
     def mis_clases(self): pass
     def configuracion(self): pass
+    def configuracion_usuarios(self): pass
+    def configuracion_respaldos(self): pass
     def _mostrar_ayuda(self): pass

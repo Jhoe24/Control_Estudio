@@ -7,20 +7,21 @@ from views.dashboard.modules.RegistrarEstudiantes import FormularioEstudianteVie
 from views.dashboard.modules.forms.Estudiantes.asignar_pnf import AsignarPNFFrame
 
 
-class ListEstudiantesView(ctk.CTkScrollableFrame):
-    def __init__(self, master, controlador,controller_pnf = None):
+class ListEstudiantesView(ctk.CTkFrame):
+    def __init__(self, master, controlador,controller_secciones,controller_pnf = None,):
         super().__init__(master, fg_color="white")
         self.furmulario_estudiante = FormularioEstudianteView(master, controlador)
         self.master = master
         self.controlador = controlador
         self.controller_pnf = controller_pnf
+        self.controller_secciones = controller_secciones
         
         self.filas_datos = []
         self.cantidad_estudiantes = self.controlador.modelo.obtener_cantidad_estudiantes()
         self.pagina_actual = 1
         self.primer_id_table = self.controlador.modelo.obtener_primer_id()
         self.estudiantes =  self.controlador.obtener_lista_estudiantes(0)
-        self.registros_por_pagina = 10
+        self.registros_por_pagina = 13
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_estudiantes // self.registros_por_pagina) + (1 if self.cantidad_estudiantes % self.registros_por_pagina > 0 else 0)
        
@@ -31,9 +32,7 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         # Validación de campos
         try:
             toplevel = self.winfo_toplevel()
-            
-            
-            
+
             self.vcmd_num_val = toplevel.register(self.controlador._solo_numeros)
             self.vcmd_fecha_val = toplevel.register(self.controlador._numeros_y_barras)
             self.vcmd_decimal_val = toplevel.register(self.controlador._solo_decimal)
@@ -230,9 +229,6 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         # Si ya hay un formulario abierto, lo destruye 
         top = ctk.CTkToplevel(self, fg_color="White")
         top.title("Asignar PNF")
-        icon_path = cargar_icono("pnf.png")
-        if icon_path:
-            top.iconbitmap(icon_path)
         ancho = 900
         alto = 700
 
@@ -261,9 +257,13 @@ class ListEstudiantesView(ctk.CTkScrollableFrame):
         # Crea el frame para asignar PNF
         
         if para_edicion:
-            asignar_pnf_frame = AsignarPNFFrame(scroll_frame, self.controlador,self.controller_pnf, estudiante,True)
+            asignar_pnf_frame = AsignarPNFFrame(scroll_frame, self.controlador,self.controller_pnf,self.controller_secciones,estudiante,True,self.actualizar_listado)
             # Si es para edición, carga los datos del PNF asignado
             asignar_pnf_frame.cargar_datos_pnf(estudiante['id'])
         else:
-            asignar_pnf_frame = AsignarPNFFrame(scroll_frame, self.controlador,self.controller_pnf, estudiante,False)
+            asignar_pnf_frame = AsignarPNFFrame(scroll_frame, self.controlador,self.controller_pnf,self.controller_secciones, estudiante,False,self.actualizar_listado)
         asignar_pnf_frame.pack(fill="both", expand=True)
+
+
+    def actualizar_listado(self):
+        self.mostrar_pagina(True)

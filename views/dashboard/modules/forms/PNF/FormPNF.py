@@ -8,7 +8,6 @@ from ..DatosPersonales import DatosPersonalesFrame
 class DatosPNFPensumFrame(SectionFrameBase):
     def __init__(self, master, vcmd_num, vcmd_fecha):
         super().__init__(master, header_text="Datos de PNF y Pensum")
-        self.tipo_documento_var = ctk.StringVar(value="cedula") # Valor por defecto: Cédula
         self.vcmd_num = self.register(self.solo_numeros) 
         self.vcmd_fecha = vcmd_fecha # Guardar para usar en fechas
        
@@ -166,6 +165,14 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.titulo_otorga_entry,
             self.perfil_egreso_entry,
             self.version_pensum_entry,
+        ]
+
+        self.optines_menus = [
+            self.tipo_pnf_menu,
+            self.estado_menu,
+            self.duracion_trayectos_entry,
+            self.duracion_semanas_entry,
+            self.duracion_tramos_entry
         ]
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
@@ -342,3 +349,33 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.duracion_tramos_entry.configure("normal")
            
         # Habilitar el botón de grabar Trayecto si existe
+
+    def limpiar_fomulario(self):
+        """
+        Limpia todos los campos del formulario.
+        """
+        try:
+            for campo in self.entries_a_validar:
+                if isinstance(campo, ctk.CTkEntry):
+                    campo.delete(0, "end")
+                    campo.configure(state="normal")
+            
+            
+            self.var_tipo_pnf.set("TSU")
+            self.duracion_trayectos_entry.set("I")
+            self.duracion_semanas_entry.set("12")
+            self.estado_menu.set("activo")  
+            self.duracion_tramos_entry.set("I")
+            
+            for menu in self.optines_menus:
+                menu.configure(state="normal")
+
+            
+
+            self.fecha_resolucion = None
+            self.fecha_resolucion_label.configure(text="Fecha de Resolución: No seleccionada")
+            self.btn_fecha.configure(state="normal")
+        except Exception as e:
+            print(f"Error al limpiar el formulario: {e}")
+        
+        

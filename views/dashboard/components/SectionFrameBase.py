@@ -3,13 +3,13 @@ from .widget_utils import *
 
 class SectionFrameBase(ctk.CTkFrame):
 
-    def __init__(self, master, header_text):
+    def __init__(self, master, header_text, fg_color_label=COLOR_HEADER_SECCION_BG):
         super().__init__(master, fg_color="transparent")
         self.pack(fill="x", pady=(0, 15), padx=10, expand="True")
 
         if header_text:
             header_label = ctk.CTkLabel(self, text=f" {header_text} ", text_color=COLOR_HEADER_SECCION_TEXT,
-                                        fg_color=COLOR_HEADER_SECCION_BG, font=FUENTE_HEADER_SECCION,
+                                        fg_color=fg_color_label, font=FUENTE_HEADER_SECCION,
                                         height=30, corner_radius=6)
             header_label.pack(fill="x", pady=(0, 10), padx=0)
 

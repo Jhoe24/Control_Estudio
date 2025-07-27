@@ -5,25 +5,38 @@ from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
 
 
-class ListarUC(ctk.CTkScrollableFrame):
+class ListarUC(ctk.CTkFrame):
 
-    def __init__(self, master, controller):
+    def __init__(self, master, controller,tupla_datos = None):
         super().__init__(master, fg_color="white")
         self.controller = controller
-        self.lista_UC = self.controller.obtener_UC()
+        tupla_id = ()
+        self.tuplas_nombre = ()
+        if tupla_datos:
+            for i in range(len(tupla_datos)):
+                if i == 0 or i == 1 or i == 2:
+                    tupla_id = tupla_id + (tupla_datos[i],)
+                if i == 0 or i == 3 or i == 4:
+                    self.tuplas_nombre = self.tuplas_nombre + (tupla_datos[i],)
+
+            print(f"Tuplas con ids = {tupla_id}, Tupas nombres = {self.tuplas_nombre}")
+            
+            self.lista_UC = self.controller.obtener_UC(tupla_id)
+        else:
+            self.lista_UC = self.controller.obtener_UC()
 
         self.pagina_actual = 1
-        self.uc_por_pagina = 10
+        self.uc_por_pagina = 13
         self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
-
 
         self.paginas_mostrar = self.lista_UC[:self.uc_por_pagina]
         self.posicion_actual = len(self.paginas_mostrar)
         self.button_uc = None
         self.frame_uc = None
 
-        self.busqueda_frame = FiltradoPNFFrame(self, self.controller)
-        self.busqueda_frame.grid(row=0, column=0, columnspan=5, padx=15, pady=(10, 0), sticky="ew")
+        if not tupla_datos:
+            self.busqueda_frame = FiltradoPNFFrame(self, self.controller)
+            self.busqueda_frame.grid(row=0, column=0, columnspan=5, padx=15, pady=(10, 0), sticky="ew")
 
         self.fila_datos = []
 

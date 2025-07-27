@@ -1,4 +1,3 @@
-
 import tkinter.messagebox as messagebox
 
 from models.Docentes.RegistroDocentes import ModeloDocente
@@ -16,6 +15,7 @@ class DocenteController:
         else:
             messagebox.showerror("Error de Registro", "No se pudo registrar el docente. Por favor, intente nuevamente.", parent=vista_formulario)
         print(dic_docentes)
+        
     def obtener_lista_docentes(self,desde=0):
         #Obtener 10 registro de docentes
         nmin = 0
@@ -106,6 +106,15 @@ class DocenteController:
         
         except Exception as e:
             print(e)
+
+    def obtener_solo_nombres_docentes_por_pnf(self, pnf_id):
+        dic_nombres = self.modelo_docente.obtener_nombres_docentes(pnf_id)
+        nombres = []
+        
+        for dic_doc in dic_nombres:
+            nombres.append((dic_doc["id"],dic_doc["nombres"]+" "+dic_doc["apellidos"]))
+            
+        return nombres
 
     def obtener_todos_los_datos(self, vista_formulario):
         # Extrae los teléfonos de la vista dinámica

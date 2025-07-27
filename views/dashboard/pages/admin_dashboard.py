@@ -1,3 +1,4 @@
+# archivo : views/dashboard/pages/admin_dashboard.py
 import customtkinter as ctk
 from views.dashboard.base_dashboard import BaseDashboardView
 from config.settings import Settings
@@ -19,6 +20,19 @@ from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
 
 from views.dashboard.modules.Carga_notas import CargaNotasView
+#from views.dashboard.modules.Sedes import ListSedesView
+
+from views.dashboard.modules.Freame_periodos_academicos import PeriodoAcademicoView
+from views.dashboard.modules.tables.PeriodosAcademicos.ListPeriodoAcademicoView import ListPeriodoAcademicoView
+
+from views.dashboard.modules.SeccionesView import SeccionView
+from views.dashboard.modules.tables.Sedes.ListSedesView import ListSedesView
+
+from views.dashboard.modules.configuracion import Config_user
+
+from views.dashboard.modules.tables.Secciones.ListadoSeccionesView import ListSeccionesView
+
+
 
 
 class AdminDashboardView(BaseDashboardView):
@@ -73,7 +87,7 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
         
-        list_estudiante = ListEstudiantesView(self.cuerpo_principal, self.controller['Estudiantes'], self.controller['PNF'])
+        list_estudiante = ListEstudiantesView(self.cuerpo_principal, self.controller['Estudiantes'],self.controller["Secciones"], self.controller['PNF'])
         list_estudiante.pack(fill="both", expand=True, padx=10, pady=10)
     
     def docentes(self):
@@ -122,8 +136,44 @@ class AdminDashboardView(BaseDashboardView):
     
     def carga_notas(self): 
         for widget in self.cuerpo_principal.winfo_children():
-                    widget.pack_forget()
+            widget.pack_forget()
                 
-        carga_notas = CargaNotasView(self.cuerpo_principal,self.controller["Estudiantes"], self.controller['PNF'])
+        carga_notas = CargaNotasView(self.cuerpo_principal, self.controller['Periodos'], self.controller['PNF'], self.controller['Secciones'], self.controller["Estudiantes"],)
         carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
+    
+    def periodo(self):
+        for widget in self.cuerpo_principal.winfo_children():
+             widget.pack_forget()
+
+        periodo_academico = ListPeriodoAcademicoView(self.cuerpo_principal,self.controller["Periodos"])
+        periodo_academico.pack(fill="both", expand=True, padx=10, pady=10)
+    
+    def secciones(self):
+        for widget in self.cuerpo_principal.winfo_children():
+             widget.pack_forget()
+
+        secciones = SeccionView(self.cuerpo_principal,self.controller["Docentes"],self.controller["PNF"],self.controller["Secciones"],self.controller["Periodos"],self.controller["Sedes"])
+        secciones.pack(fill="both", expand=True, padx=10, pady=10)
+    
+    def sedes(self):
+        for widget in self.cuerpo_principal.winfo_children():
+             widget.pack_forget()
+
+        sedes = ListSedesView(self.cuerpo_principal, self.controller["Sedes"])
+        sedes.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def list_secciones(self):
+        for widget in self.cuerpo_principal.winfo_children():
+             widget.pack_forget()
+
+        list_secciones = ListSeccionesView(self.cuerpo_principal,self.controller["PNF"],self.controller["Secciones"], self.controller["Docentes"], self.controller["Periodos"],self.controller["Sedes"])
+        list_secciones.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def configuracion_usuarios(self):
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+        
+        configuracion = Config_user(self.cuerpo_principal)
+        configuracion.pack(fill="both", expand=True, padx=10, pady=10)
+        
     

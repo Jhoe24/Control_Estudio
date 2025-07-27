@@ -1,9 +1,13 @@
-
 import tkinter.messagebox as messagebox
 
 from models.Estudiantes.RegistroEstudiantes import ModelRegistroEstudiantes
 
 class EstudianteController:
+    def guardar_nota(self, inscripcion_id, unidad_curricular_id, valor):
+        """
+        Guarda o actualiza la nota de un estudiante para una unidad curricular específica.
+        """
+        return self.modelo.guardar_nota(inscripcion_id, unidad_curricular_id, valor)
     def __init__(self):
         self.modelo = ModelRegistroEstudiantes()
 
@@ -232,3 +236,15 @@ class EstudianteController:
         vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
         vista_formulario.datos_personales_frame.nro_documento_entry.configure(state="normal")
 
+    def obtener_estudiantes_pnf(self,tupla_datos):
+        resultado = self.modelo.obtener_estudiantes_pnf(pnf_id=tupla_datos[0],trayecto_actual=tupla_datos[1],tramo_actual=tupla_datos[2])
+        if resultado:
+            return resultado
+        else: 
+            return []
+
+    def obtener_estudiantes_por_seccion(self, seccion_id):
+        return self.modelo.obtener_estudiantes_por_seccion(seccion_id)
+
+    def obtener_inscripcion_id(self, estudiante_id, seccion_id):
+        return self.modelo.obtener_inscripcion_id(estudiante_id, seccion_id)

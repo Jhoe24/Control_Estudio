@@ -564,14 +564,17 @@ class ModeloPNF:
             if con is not None:
                 con.close()
     
-    def buscar_uc_por_pnf(self, sentencia_sql, tuple_id):
+    def buscar_uc_por_pnf(self, sentencia_sql, tuple_id,es_dic = False):
         """
         Busca las Unidades Curriculares asociadas a un PNF específico.
         """
         con = None
         try:
             con = sql.connect(self.db_ruta)
+            if es_dic:
+                con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
             cursor = con.cursor()
+            
             cursor.execute(sentencia_sql, tuple_id)
             return cursor.fetchall()  # Retorna una lista de diccionarios
         except Exception as e:
@@ -654,6 +657,7 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
+
     def tiene_pnf_asignado(self, id_estudiante,tabla="estudiante_pnf"):
         con = None
         try:
@@ -676,7 +680,8 @@ class ModeloPNF:
         finally:
             if con is not None:
                 con.close()
-    
+
+
     def obtener_pnf_asignado(self, id_estudiante):
         con = None
         try:
@@ -707,7 +712,7 @@ class ModeloPNF:
                 SELECT * FROM docente_sede_pnf WHERE docente_id = ?
                 """, (docente_id,)
             )
-            return cursor.fetchone()  # Retorna un diccionario o None
+            return cursor.fetchall()  # Retorna un diccionario o None
         except Exception as e:
             print(f"Error al obtener el PNF asignado: {e}")
             return None
@@ -802,3 +807,25 @@ class ModeloPNF:
         finally:
             if con is not None:
                 con.close()
+
+
+    def obtener_nombres_por_id(self, tabla, id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                f"""
+                SELECT nombre FROM {tabla} WHERE id = ?
+                """, (id,)
+            )
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error al obtener el nombre por ID: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
+
+bd = ModeloPNF()
+print(bd.obtener_nombres_por_id("trayectos",1))

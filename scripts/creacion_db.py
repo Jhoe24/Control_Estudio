@@ -237,7 +237,7 @@ class SistemaAcademicoDB:
             duracion_trayectos INTEGER,
             duracion_semanas INTEGER,
             total_creditos INTEGER,
-            total_horas INTEGER,
+            total_horas INTEGER DEFAULT 0,
             modalidad TEXT DEFAULT 'Presencial' 
                 CHECK (modalidad IN ('Presencial', 'Semipresencial', 'Virtual', 'Mixta')),
             titulo_otorga TEXT,
@@ -282,11 +282,11 @@ class SistemaAcademicoDB:
             numero INTEGER,
             nombre TEXT,
             tipo TEXT CHECK (tipo IN ('Inicial', 'Profesional', 'Especialización', 'Investigación')),
-            duracion_semanas INTEGER,
-            duracion_horas INTEGER,
-            creditos_minimos INTEGER,
-            creditos_maximos INTEGER,
-            numero_tramos INTEGER,
+            duracion_semanas INTEGER DEFAULT 0,
+            duracion_horas INTEGER DEFAULT 0,
+            creditos_minimos INTEGER DEFAULT 0,
+            creditos_maximos INTEGER DEFAULT 0,
+            numero_tramos INTEGER DEFAULT 0,
             objetivos TEXT,
             competencias TEXT,
             perfil_egreso TEXT,
@@ -305,9 +305,9 @@ class SistemaAcademicoDB:
             trayecto_id INTEGER,
             numero INTEGER,
             nombre TEXT,
-            duracion_semanas INTEGER,
-            duracion_horas INTEGER,
-            creditos INTEGER,
+            duracion_semanas INTEGER DEFAULT 0,
+            duracion_horas INTEGER DEFAULT 0,
+            creditos INTEGER DEFAULT 0,
             objetivos TEXT,
             competencias TEXT,
             estado TEXT DEFAULT 'activo' CHECK (estado IN ('activo', 'inactivo')),
@@ -329,18 +329,20 @@ class SistemaAcademicoDB:
             area TEXT,
             subarea TEXT,
             eje_formativo TEXT,
-            horas_teoricas INTEGER DEFAULT 0,
-            horas_practicas INTEGER DEFAULT 0,
-            horas_laboratorio INTEGER DEFAULT 0,
-            horas_trabajo_independiente INTEGER DEFAULT 0,
-            horas_totales INTEGER,
+            horas_teoricas REAL DEFAULT 0,
+            horas_practicas REAL DEFAULT 0,
+            horas_laboratorio REAL DEFAULT 0,
+            horas_trabajo_independiente REAL DEFAULT 0,
+            horas_totales REAL DEFAULT 0,
             unidades_credito INTEGER,
             tipo TEXT DEFAULT 'Obligatoria' 
                 CHECK (tipo IN ('Obligatoria', 'Electiva', 'Proyecto', 'Pasantía', 'Trabajo Especial')),
-            caracter TEXT CHECK (caracter IN ('Teórica', 'Práctica', 'Teórico-Práctica', 'Laboratorio')),
+            caracter TEXT DEFAULT 'Teórica'
+                CHECK (caracter IN ('Teórica', 'Práctica', 'Teórico-Práctica', 'Laboratorio')),
             modalidad TEXT DEFAULT 'Presencial' 
                 CHECK (modalidad IN ('Presencial', 'Semipresencial', 'Virtual')),
-            complejidad TEXT CHECK (complejidad IN ('Básica', 'Intermedia', 'Avanzada')),
+            complejidad TEXT DEFAULT 'Básica'
+                CHECK (complejidad IN ('Básica', 'Intermedia', 'Avanzada')),
             prelaciones TEXT,
             competencias_genericas TEXT,
             competencias_especificas TEXT,
@@ -359,7 +361,7 @@ class SistemaAcademicoDB:
             FOREIGN KEY (pnf_id) REFERENCES pnf(id),
             FOREIGN KEY (trayecto_id) REFERENCES trayectos(id),
             FOREIGN KEY (tramo_id) REFERENCES tramos(id),
-            UNIQUE(codigo, pnf_id)
+            UNIQUE(codigo, pnf_id, tramo_id)
         );'''
         self.ejecutar_consulta(instruccion6)
 
@@ -506,9 +508,11 @@ class SistemaAcademicoDB:
         instruccion1 = '''
         CREATE TABLE IF NOT EXISTS secciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            unidad_curricular_id INTEGER,
-            periodo_academico_id INTEGER,
             sede_id INTEGER,
+            periodo_academico_id INTEGER,
+            pnf_id INTEGER,
+            trayecto_id INTEGER,
+            tramo_id INTEGER,
             codigo_seccion TEXT,
             docente_titular_id INTEGER,
             docente_auxiliar_id INTEGER,
@@ -533,12 +537,13 @@ class SistemaAcademicoDB:
                 CHECK (estado IN ('Planificada', 'Abierta', 'En curso', 'Finalizada', 'Cancelada', 'Suspendida')),
             fecha_cambio_estado DATE,
             observaciones TEXT,
-            FOREIGN KEY (unidad_curricular_id) REFERENCES unidades_curriculares(id),
+            FOREIGN KEY (pnf_id) REFERENCES pnf(id),
+            FOREIGN KEY (trayecto_id) REFERENCES trayectos(id),
+            FOREIGN KEY (tramo_id) REFERENCES tramos(id),
             FOREIGN KEY (periodo_academico_id) REFERENCES periodos_academicos(id),
             FOREIGN KEY (sede_id) REFERENCES sedes(id),
             FOREIGN KEY (docente_titular_id) REFERENCES docentes(id),
-            FOREIGN KEY (docente_auxiliar_id) REFERENCES docentes(id),
-            UNIQUE(unidad_curricular_id, periodo_academico_id, sede_id, codigo_seccion)
+            FOREIGN KEY (docente_auxiliar_id) REFERENCES docentes(id)
         );'''
         self.ejecutar_consulta(instruccion1)
 
@@ -575,6 +580,7 @@ class SistemaAcademicoDB:
         CREATE TABLE IF NOT EXISTS evaluaciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             inscripcion_id INTEGER,
+            unidad_curricular_id INTEGER,
             tipo_evaluacion TEXT 
                 CHECK (tipo_evaluacion IN ('Parcial', 'Final', 'Recuperativa', 'Extraordinaria', 'Proyecto', 'Práctica', 'Laboratorio')),
             numero_evaluacion INTEGER,
@@ -591,7 +597,9 @@ class SistemaAcademicoDB:
             docente_califica INTEGER,
             fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (inscripcion_id) REFERENCES inscripciones(id),
-            FOREIGN KEY (docente_califica) REFERENCES docentes(id)
+            FOREIGN KEY (unidad_curricular_id) REFERENCES unidades_curriculares(id),
+            FOREIGN KEY (docente_califica) REFERENCES docentes(id),
+            UNIQUE(inscripcion_id, unidad_curricular_id, tipo_evaluacion)
         );'''
         self.ejecutar_consulta(instruccion3)
         
@@ -645,6 +653,20 @@ class SistemaAcademicoDB:
             UNIQUE(inscripcion_id, fecha)
         );'''
         self.ejecutar_consulta(instruccion5)
+        
+        # notas finales por unidad curricular
+        instruccion_notas = '''
+        CREATE TABLE IF NOT EXISTS notas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            inscripcion_id INTEGER NOT NULL,
+            unidad_curricular_id INTEGER NOT NULL,
+            valor REAL NOT NULL CHECK(valor BETWEEN 0 AND 20),
+            fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (inscripcion_id)       REFERENCES inscripciones(id) ON DELETE CASCADE,
+            FOREIGN KEY (unidad_curricular_id) REFERENCES unidades_curriculares(id),
+            UNIQUE(inscripcion_id, unidad_curricular_id)
+        );'''
+        self.ejecutar_consulta(instruccion_notas)
 
     def crear_tablas_auditoria(self):
         """Tablas para auditoría y logs del sistema"""
