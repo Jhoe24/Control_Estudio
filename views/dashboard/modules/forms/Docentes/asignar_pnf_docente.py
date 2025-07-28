@@ -8,6 +8,7 @@ class AsignarDocentePNFFrame(SectionFrameBase):
     def __init__(self, master, controller, controller_pnf, docente, para_edicion):
         super().__init__(master, "Asignar PNF a Docente",COLOR_HEADER_SECCION_BG_2)
 
+        self.master = master
         self.controller = controller
         self.controller_pnf = controller_pnf
         self.docente = docente
@@ -17,6 +18,8 @@ class AsignarDocentePNFFrame(SectionFrameBase):
         self.btn_fecha_desasignacion = None
 
         self.para_edicion = para_edicion
+        self.id_asignacion = None
+
 
         if not self.controller_pnf:
             print("Error: El controlador de PNF no está definido.")
@@ -150,11 +153,11 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             "activo": self.var_activo.get(),
             "observaciones": self.var_observaciones.get(),
         }
+       
         if self.controller_pnf.modelo.registrar_asignacion_docente_pnf(datos):
-            messagebox.showinfo("Éxito", "La asignación se realizó exitosamente.", parent=self)
-            self.winfo_toplevel().destroy()
+            messagebox.showinfo("Éxito", "La asignación se realizó exitosamente.")
         else:
-            messagebox.showerror("Error", "No se pudo realizar la asignación, intente nuevamente.", parent=self)
+            messagebox.showerror("Error", "No se pudo realizar la asignación, intente nuevamente.")
 
     def actualizar_datos_pnf(self):
         datos = {
@@ -166,11 +169,12 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             "activo": self.var_activo.get(),
             "observaciones": self.var_observaciones.get(),
         }
-        if self.controller_pnf.modelo.update_pnf_asignado_docente(self.id_docente, datos):
-            messagebox.showinfo("Éxito", "La actualización se realizó exitosamente.", parent=self)
-            self.winfo_toplevel().destroy()
+
+       
+        if self.controller_pnf.modelo.update_pnf_asignado_docente(self.id_docente,datos,self.id_asignacion):
+            messagebox.showinfo("Éxito", "La actualización se realizó exitosamente.")
         else:
-            messagebox.showerror("Error", "No se pudo actualizar.", parent=self)
+            messagebox.showerror("Error", "No se pudo actualizar.")
 
     def habilitar_edicion_pnf(self):
         for widget in self.instancias_widgets:
@@ -208,8 +212,11 @@ class AsignarDocentePNFFrame(SectionFrameBase):
         """
         Carga los datos de la asignación PNF del docente y desactiva los campos.
         """
+        
+
         if datos_pnf:
             # PNF
+            self.id_asignacion= datos_pnf["id"]
             nombre_pnf = next((nombre for nombre, id_ in self.pnf_id_por_nombre.items() if id_ == datos_pnf["pnf_id"]), None)
             if nombre_pnf:
                 self.var_pnf.set(nombre_pnf)

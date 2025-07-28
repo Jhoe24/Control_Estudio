@@ -69,15 +69,17 @@ class ListaAsignacionPNF(SectionFrameBase):
             frames_update.habilitar_edicion_pnf()
 
     def actualizar_datos_completos(self):
-        #Primero Actualizar los existentes
-        for frames_update in self.listaFrameCargados:
-            frames_update.actualizar_datos_pnf()
-
-        #Luego Registrar los nuevos
+        #registrar los pnf nuevos
         for frames_new in self.listaFrameAgregados:
             if frames_new.winfo_exists():
                 frames_new.guardar_datos()
 
+        #actualizar los pnf existentes
+        for frames_update in self.listaFrameCargados:
+            frames_update.actualizar_datos_pnf()
+        
+        self.winfo_toplevel().destroy()
+        
         
     def existentes_pnf_asignados(self):
         framePnfAsignado = []

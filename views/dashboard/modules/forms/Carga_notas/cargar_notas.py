@@ -13,6 +13,8 @@ class CargaNotasFrame(SectionFrameBase):
         self.controller_secciones = controller_secciones
         
         self.nombres_periodos = self.controller_periodos_academicos.obtener_nombres_periodos()
+        if not self.nombres_periodos:
+            self.nombres_periodos = ["No hay periodos"]
         self.var_periodo = ctk.StringVar(value=self.nombres_periodos[0])
         
         

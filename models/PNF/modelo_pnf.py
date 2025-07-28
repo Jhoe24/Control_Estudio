@@ -770,7 +770,7 @@ class ModeloPNF:
             if con is not None:
                 con.close()
             
-    def update_pnf_asignado_docente(self, docente_id, datos):
+    def update_pnf_asignado_docente(self, docente_id, datos,id_asignacion):
         """
         Actualiza la asignación de PNF de un docente en la tabla docente_sede_pnf.
         """
@@ -787,7 +787,7 @@ class ModeloPNF:
                     coordinador = ?,
                     activo = ?,
                     observaciones = ?
-                WHERE docente_id = ?
+                WHERE id =? AND docente_id = ?
                 """,
                 (
                     datos["pnf_id"],
@@ -796,6 +796,7 @@ class ModeloPNF:
                     int(datos["coordinador"]),
                     int(datos["activo"]),
                     datos["observaciones"],
+                    id_asignacion,
                     docente_id
                 )
             )

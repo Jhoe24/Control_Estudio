@@ -46,6 +46,8 @@ class PeriodoAcademicoController:
     
     def obtener_nombres_periodos(self):
         dic_periodos = self.modelo_pa.obtener_periodos_academicos()
+        if not dic_periodos:
+            return []
         return [periodo["nombre"] for periodo in dic_periodos]
     
     #================================================================================================================================================================================
