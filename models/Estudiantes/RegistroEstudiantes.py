@@ -28,6 +28,25 @@ class ModelRegistroEstudiantes:
             raise
         finally:
             con.close()
+
+    def obtener_nota(self, inscripcion_id, unidad_curricular_id):
+        """
+        Guarda o actualiza la nota de un estudiante para una unidad curricular específica.
+        """
+        db_ruta = self.db_ruta
+        con = sql.connect(db_ruta)
+        cursor = con.cursor()
+        try:
+            # Verificar si ya existe una nota para esta inscripcion y unidad curricular
+            cursor.execute("SELECT valor FROM notas WHERE inscripcion_id = ? AND unidad_curricular_id = ?", (inscripcion_id, unidad_curricular_id))
+            resultado =  cursor.fetchone()
+            return resultado[0] if resultado else None
+        
+        except Exception as e:
+            print(f"Error al obtener la nota: {e}")
+            raise
+        finally:
+            con.close()
     
     def __init__(self):
         self.db_ruta = os.path.join('db', 'sistema_academico.db')
@@ -642,3 +661,4 @@ class ModelRegistroEstudiantes:
             return None
         finally:
             con.close()
+

@@ -5,16 +5,17 @@ from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from ..DatosPersonales import DatosPersonalesFrame
 
 class FrameNotaEstudiante(SectionFrameBase):
-    def __init__(self, master, controller_estudiante, tupla, unidad_curricular_id):
+    def __init__(self, master, controller_estudiante, tupla, unidad_curricular_id, solo_lectura=False):
         super().__init__(master, header_text="Gestión de Notas de Estudiantes")
         self.controller_estudiante = controller_estudiante
         self.unidad_curricular_id = unidad_curricular_id
+        self.solo_lectura = solo_lectura
         self.seccion_id = tupla[5]  # id de la sección que esta en la posicion de la tupla nuemero 5 
         print("\n\n=========================================================")
-        print(f'tupla es :{tupla}')
-        print(f"seccion_id recibido: {self.seccion_id}")
+        #print(f'tupla es :{tupla}')
+        #print(f"seccion_id recibido: {self.seccion_id}")
         self.lista_estudiantes = self.controller_estudiante.obtener_estudiantes_por_seccion(self.seccion_id)
-        print(f"lista_estudiantes obtenida: {self.lista_estudiantes}")
+        #print(f"lista_estudiantes obtenida: {self.lista_estudiantes}")
         
         # si la lista de estudiantes está vacía, mostrar un mensaje
         # y no continuar con la carga de notas
@@ -25,10 +26,10 @@ class FrameNotaEstudiante(SectionFrameBase):
         # crear los frames para cada estudiante
         elif self.lista_estudiantes != []:   
             self.frames_estudiantes = []
-            self.cargar_notas_estudiante()
+            self.cargar_o_ver_notas_estudiante()
             
 
-    def cargar_notas_estudiante(self):
+    def cargar_o_ver_notas_estudiante(self):
         """Crear frame por estudiante para cargar notas"""
 
         for idx, estudiante in enumerate(self.lista_estudiantes):
@@ -49,22 +50,39 @@ class FrameNotaEstudiante(SectionFrameBase):
             label_nombre = ctk.CTkLabel(frame, text=f"Nombres: {estudiante['nombres']}",font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL, anchor="w")
             label_nombre.grid(row=0, column=1, padx=(20, 5), pady=10, sticky="w")
 
-            label_nota = ctk.CTkLabel(frame, text="Ingrese Nota:",font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL, anchor="w")
-            label_nota.grid(row=0, column=3, padx=5, pady=10, sticky="w")
-
-            # Entry para nota
-            entry_nota = ctk.CTkEntry(frame, width=80, fg_color=COLOR_ENTRY_BG, text_color=COLOR_TEXTO_PRINCIPAL,font=FUENTE_LABEL_CAMPO)
-            entry_nota.grid(row=0, column=4, padx=5, pady=10, sticky="w")
-
             # Buscar inscripcion_id para este estudiante y sección
             inscripcion_id = self.controller_estudiante.obtener_inscripcion_id(estudiante['id'], self.seccion_id)
-            print(f"Inscripción ID para {estudiante['nombres']}: {inscripcion_id}")
+            #print(f"Inscripción ID para {estudiante['nombres']}: {inscripcion_id}")
+
+            if self.solo_lectura:
+                label_nota = ctk.CTkLabel(frame, text="Nota del Estudiante:",font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL, anchor="w")
+                label_nota.grid(row=0, column=3, padx=5, pady=10, sticky="w")
+
+                # Entry para nota
+                entry_nota = ctk.CTkEntry(frame, width=80, fg_color=COLOR_ENTRY_BG, text_color=COLOR_TEXTO_PRINCIPAL,font=FUENTE_LABEL_CAMPO)
+                entry_nota.grid(row=0, column=4, padx=5, pady=10, sticky="w")
+                valor = str(self.controller_estudiante.obtener_nota(inscripcion_id, self.unidad_curricular_id) or "No asignada")
+                entry_nota.insert(0, valor)
+
+                btn_actualizar = ctk.CTkButton(
+                    frame, width=150, text="Actualizar Nota",
+                    command=lambda e=entry_nota, insc_id=inscripcion_id: self.guardar_nota(insc_id, self.unidad_curricular_id, e)
+                )
+                btn_actualizar.grid(row=0, column=5, padx=10, pady=10, sticky="w")
+
+            else:
+                # Modo carga de notas: mostrar campo de entrada y botón de guardar
+                label_nota = ctk.CTkLabel(frame, text="Ingrese Nota:",font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL, anchor="w")
+                label_nota.grid(row=0, column=3, padx=5, pady=10, sticky="w")
+
+                entry_nota = ctk.CTkEntry(frame, width=80, fg_color=COLOR_ENTRY_BG, text_color=COLOR_TEXTO_PRINCIPAL,font=FUENTE_LABEL_CAMPO)
+                entry_nota.grid(row=0, column=4, padx=5, pady=10, sticky="w")
             
-            btn_guardar = ctk.CTkButton(
-                frame, width=150, text="Cargar Nota",
-                command=lambda e=entry_nota, insc_id=inscripcion_id: self.guardar_nota(insc_id, self.unidad_curricular_id, e)
-            )
-            btn_guardar.grid(row=0, column=5, padx=10, pady=10, sticky="w")
+                btn_guardar = ctk.CTkButton(
+                    frame, width=150, text="Cargar Nota",
+                    command=lambda e=entry_nota, insc_id=inscripcion_id: self.guardar_nota(insc_id, self.unidad_curricular_id, e)
+                )
+                btn_guardar.grid(row=0, column=5, padx=10, pady=10, sticky="w")
 
         #label = Documento    label = Nombre del estudiante    label = ingrese nota : entry    boton: cargar notas
 

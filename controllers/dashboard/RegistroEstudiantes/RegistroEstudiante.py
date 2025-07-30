@@ -3,13 +3,16 @@ import tkinter.messagebox as messagebox
 from models.Estudiantes.RegistroEstudiantes import ModelRegistroEstudiantes
 
 class EstudianteController:
+
+    def __init__(self):
+        self.modelo = ModelRegistroEstudiantes()
+
     def guardar_nota(self, inscripcion_id, unidad_curricular_id, valor):
         """
         Guarda o actualiza la nota de un estudiante para una unidad curricular específica.
         """
         return self.modelo.guardar_nota(inscripcion_id, unidad_curricular_id, valor)
-    def __init__(self):
-        self.modelo = ModelRegistroEstudiantes()
+    
 
     def procesar_guardado_estudiante(self, datos_estudiante, vista_formulario):
         """
@@ -57,7 +60,6 @@ class EstudianteController:
     def buscar_estudiante(self, tipo_doc, nro_doc):
         
         registro = self.modelo.buscar_estudiante(tipo_doc, nro_doc)
-        print(f"buscar estudiante {tipo_doc} : {nro_doc} : {registro}")
         if registro:
             return registro
         else:
@@ -248,3 +250,9 @@ class EstudianteController:
 
     def obtener_inscripcion_id(self, estudiante_id, seccion_id):
         return self.modelo.obtener_inscripcion_id(estudiante_id, seccion_id)
+    
+    def obtener_nota(self, inscripcion_id, unidad_curricular_id):
+        """
+        Obtiene la nota de un estudiante para una unidad curricular específica.
+        """
+        return self.modelo.obtener_nota(inscripcion_id, unidad_curricular_id)
