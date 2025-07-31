@@ -12,16 +12,6 @@ class ListadosEstudiantesPNF(ListarUC):
         self.controller_estudiantes_inscritos = controller_estudiantes_inscritos
         self.tuplas_datos = tuplas_datos
         
-        self.frame_contenido = ctk.CTkFrame(master, fg_color="transparent")
-        self.frame_contenido.pack(pady=(5, 0))
-
-        self.label_titulo = ctk.CTkLabel(
-            self.frame_contenido, 
-            text=f"{tuplas_datos[3]}  {tuplas_datos[4]}", 
-            font=("Arial", 16, "bold"), 
-            text_color="black")
-        self.label_titulo.pack()
-        
     def mostrar_listado(self):
         """
         Muestra la lista de UC en la tabla sin tener nada que ver con el filtrado 
@@ -53,29 +43,28 @@ class ListadosEstudiantesPNF(ListarUC):
             
             button = ctk.CTkButton(
                 frame_botones,
-                text="Cargar Notas",
+                text="Gestionar Notas",
                 width=100,
-                text_color= COLOR_ENTRY_BG,
-                command=lambda uc_id = dic_uc["id"]: self.cargar_nota_uc(uc_id)
-            )
-
-            button_ver_notas = ctk.CTkButton(
-                frame_botones, text="Ver Notas", width=100,
                 text_color="#ffffff",
                 fg_color=COLOR_BOTON_FONDO,
                 hover_color=COLOR_BOTON_FONDO_HOVER,
-                command=lambda uc_id = dic_uc["id"]: self.ver_notas_uc(uc_id)
+                command=lambda uc_id = dic_uc["id"]: self.cargar_nota_uc(uc_id)
             )
+
+            # button_ver_notas = ctk.CTkButton(
+            #     frame_botones, text="Ver Notas", width=100,
+            #     text_color="#ffffff",
+            #     fg_color=COLOR_BOTON_FONDO,
+            #     hover_color=COLOR_BOTON_FONDO_HOVER,
+            #     command=lambda uc_id = dic_uc["id"]: self.ver_notas_uc(uc_id)
+            # )
             button.pack(side="left", padx=(0,4), pady=5)
-            button_ver_notas.pack(side="left", pady=5)
+            #button_ver_notas.pack(side="left", pady=5)
 
             fila_widgets.append(celda_btn)
             self.fila_datos.append(fila_widgets)
 
-        print(f'la tupla es {self.tuplas_nombre}')
 
-            
-    
     def anterior_pagina(self):
         """
             Retrocede a la página anterior de la tabla.
@@ -107,9 +96,9 @@ class ListadosEstudiantesPNF(ListarUC):
             Crear una ventana modal para mostrar los datos.
         """
         top = ctk.CTkToplevel(self, fg_color="White")
-        top.title("Datos Completos del PNF")
-        ancho = 1000
-        alto = 700
+        top.title("Notas de la Unidad Curricular")
+        ancho = 1100
+        alto = 800
 
         # Centrar ventana
         top.update_idletasks()
@@ -121,12 +110,20 @@ class ListadosEstudiantesPNF(ListarUC):
         top.lift()
         top.focus_force()
         top.grab_set()
+        # Configurar el layout de la ventana modal para que el contenido principal se expanda
+        # La primera fila (donde estará el scroll_frame) debe expandirse
+        top.grid_rowconfigure(0, weight=1)
+        # La segunda fila (donde estará el botón) no se expandirá
+        top.grid_rowconfigure(1, weight=0)
+        # La única columna se expandirá para centrar el contenido
+        top.grid_columnconfigure(0, weight=1)
 
         # Scroll principal del modal
         scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
-        scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        scroll_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=(10, 0)) # pady(top, bottom)
+
         
-        print(unidad_curricular_id)
+        #print(unidad_curricular_id)
         carga_noras_estudiantes = FrameNotaEstudiante(
             scroll_frame,
             self.controller_estudiantes_inscritos,
@@ -135,6 +132,17 @@ class ListadosEstudiantesPNF(ListarUC):
             solo_lectura=False
         )
         carga_noras_estudiantes.pack(fill="x", padx=10, pady=10)
+
+        btn_cerrar = ctk.CTkButton(
+            top,
+            fg_color=COLOR_BOTON_FONDO,
+            hover_color=COLOR_BOTON_FONDO_HOVER,
+            text="Cerrar",
+            width=150,
+            height=40,
+            command=top.destroy
+        )
+        btn_cerrar.grid(row=1, column=0, pady=(10, 20), sticky="s")
 
     def ver_notas_uc(self, unidad_curricular_id):
         """

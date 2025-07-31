@@ -2,7 +2,7 @@ from tkcalendar import Calendar
 import customtkinter as ctk
 import tkinter as tk
 from tkcalendar import Calendar
-import os
+import re
 
 # --- CONSTANTES DE COLOR Y FUENTE ---
 COLOR_FONDO_FORMULARIO = "white"
@@ -86,3 +86,28 @@ def create_option_menu_row(parent_frame, label_text, options, variable, width=35
     optionmenu.pack(side="right", expand=False, fill="x", padx=(0, 20)) # Aumentar padx en el lado derecho del optionmenu
 
     return optionmenu
+
+def solo_decimal(new_text):
+        """
+        Función de validación para asegurar que solo se ingresen números (enteros o reales).
+        Permite:
+        - Dígitos (0-9)
+        - Un punto decimal opcional
+        - Un signo negativo opcional al principio
+        - Cadena vacía (para permitir borrar el contenido)
+        """
+        if new_text == "":  # Permite borrar el contenido del entry
+            return True
+        
+        # Expresión regular para números enteros o flotantes
+        # ^: inicio de la cadena
+        # -?: un signo negativo opcional
+        # \d+: uno o más dígitos
+        # (\.\d*)?: un punto seguido de cero o más dígitos, opcionalmente
+        # $: fin de la cadena
+        pattern = r"^-?\d*\.?\d*$"
+        
+        if re.fullmatch(pattern, new_text):
+            return True
+        else:
+            return False

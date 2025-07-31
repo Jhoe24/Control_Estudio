@@ -242,6 +242,7 @@ class ControllerPNF:
             return True
         else:
             return False
+        
     def validar_campos_obligatorios_tramos(self, datos_tramos, vista_formulario):
         try:
             campos_a_validar = [

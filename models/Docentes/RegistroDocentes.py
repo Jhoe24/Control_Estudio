@@ -549,5 +549,5 @@ class ModeloDocente:
     #         return False
         
               
-test = ModeloDocente()
-pprint(test.obtener_nombres_docentes(1))
+# test = ModeloDocente()
+# pprint(test.obtener_nombres_docentes(1))

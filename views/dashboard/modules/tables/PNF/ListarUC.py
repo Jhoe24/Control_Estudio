@@ -19,7 +19,6 @@ class ListarUC(ctk.CTkFrame):
                 if i == 0 or i == 3 or i == 4:
                     self.tuplas_nombre = self.tuplas_nombre + (tupla_datos[i],)
 
-            print(f"Tuplas con ids = {tupla_id}, Tupas nombres = {self.tuplas_nombre}")
             
             self.lista_UC = self.controller.obtener_UC(tupla_id)
         else:

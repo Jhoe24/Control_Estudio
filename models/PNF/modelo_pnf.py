@@ -828,5 +828,5 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
-bd = ModeloPNF()
-print(bd.obtener_nombres_por_id("trayectos",1))
+# bd = ModeloPNF()
+# print(bd.obtener_nombres_por_id("trayectos",1))
