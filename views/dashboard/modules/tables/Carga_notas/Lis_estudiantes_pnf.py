@@ -97,8 +97,8 @@ class ListadosEstudiantesPNF(ListarUC):
         """
         top = ctk.CTkToplevel(self, fg_color="White")
         top.title("Notas de la Unidad Curricular")
-        ancho = 1100
-        alto = 800
+        ancho = 1000
+        alto = 700
 
         # Centrar ventana
         top.update_idletasks()
