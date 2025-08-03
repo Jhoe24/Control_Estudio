@@ -292,8 +292,8 @@ class ListSeccionesView(ctk.CTkFrame):
         # sin un atributo o método que proporcione el pnf
         id_pnf = None
         try:
-            nombre_pnf = self.filtrado.var_pnf.get()
-            id_pnf = self.controlador_pnf.obtener_id_por_nombre(nombre_pnf) 
+            nombre_pnf = self.filtrado.var1.get()
+            id_pnf = self.controlador_secciones.obtener_id_por_nombre(nombre_pnf) 
         except Exception as e:
             print(f"No se pudo obtener id_pnf para listar secciones: {e}")
 

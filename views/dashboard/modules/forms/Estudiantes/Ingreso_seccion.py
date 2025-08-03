@@ -9,6 +9,7 @@ class AsignarSeccionFrame(SectionFrameBase):
         super().__init__(master,"Asignar Secciones a Estudiante",COLOR_HEADER_SECCION_BG_2)
         self.controller_secciones = controller_secciones
         self.pnf_id = pnf_id
+        #Secciones_disponibles es donde se extraen los datos de las secciones asignadas a ese pnf
         self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id)
         if self.secciones_disponibles:
             

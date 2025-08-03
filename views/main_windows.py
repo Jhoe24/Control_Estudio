@@ -58,6 +58,7 @@ class MainWindow(ctk.CTk):
             "Periodos": PeriodoAcademicoController(),
             "Sedes": ControladorSedes() ,
             "Secciones": ControllerSecciones(),
+            "mostrar_vista_login": self.mostrar_vista_login
             }  # Aquí se inicializa el controlador del dashboard, que es el panel de control de la aplicación. 
         # El servicio de usuario se inyecta en el controlador de autenticación, cuya funcion es manejar la lógica de autenticación y autorización de usuarios. 
 
@@ -75,9 +76,11 @@ class MainWindow(ctk.CTk):
         self.title(self.titulo + "  -  " + "Inicio de Sesion ")  # Cambiamos el titulo de la ventana a Login
         self.vista_actual = LoginView(self, self.auth_controller)
         self.vista_actual.pack(fill="both", expand=True, padx=10, pady=10) # Aplicamos el padding aquí
-    
+        self.deiconify()  # Asegura que la ventana esté visible
+        self.geometry(self.tamano_ventana)
+        self.resizable(False, False)
         AppConfig().centrar_ventana(self, *self.tamano_ventana.split("x"))  # Centramos la ventana en la pantalla
-   
+        
 
     def mostrar_vista_registro(self):
         self.limpiar_vista_actual()

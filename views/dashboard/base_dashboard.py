@@ -307,8 +307,14 @@ class BaseDashboardView(BaseView):
         """Confirma antes de cerrar sesión"""
         import tkinter.messagebox as msgbox
         if msgbox.askyesno("Confirmar", "¿Está seguro que desea cerrar sesión?"):
-            if hasattr(self.controller, 'mostrar_vista_login'):
-                self.controller.mostrar_vista_login()
+            # if hasattr(self.controller, 'mostrar_vista_login'):
+            #     self.controller.mostrar_vista_login()
+            try:
+                cerrar = self.controller["mostrar_vista_login"]
+                cerrar()
+            except Exception as e:
+                print(f"Error al cerrar sesión: {e}")
+
 
     
     def inicio(self): pass

@@ -182,7 +182,7 @@ class ModelRegistroEstudiantes:
                            FROM informacion_personal ip
                            JOIN estudiantes e ON ip.id= e.persona_id
                            WHERE ip.tipo='estudiante'
-                           LIMIT 10
+                           LIMIT 13
                            OFFSET ?
                            ''',(registro_inicio,))
             resultados = cursor.fetchall()

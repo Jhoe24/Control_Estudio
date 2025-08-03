@@ -2,6 +2,7 @@ import customtkinter as ctk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from controllers.dashboard.PNF.controller_pnf import ControllerPNF
+import tkinter.messagebox as messagebox
 import tkinter as tk
 
 class FiltradoPNFFrame(SectionFrameBase):
@@ -107,7 +108,7 @@ class FiltradoPNFFrame(SectionFrameBase):
         nombre_tramo = self.tramo_var.get()
 
         if nombre_pnf not in self.pnf_id_por_nombre:
-            ctk.CTkMessageBox.show_error("Error", "Por favor, seleccione un PNF válido.")
+            messagebox.showerror("Error", "Por favor, seleccione un PNF válido.")
             return
 
         id_pnf = self.pnf_id_por_nombre.get(nombre_pnf)

@@ -62,7 +62,7 @@ class ListarUC(ctk.CTkFrame):
         else:
             self.frame_paginacion.grid()
      
-            # Botones de paginación
+        # Botones de paginación
         self.boton_anterior = ctk.CTkButton(self.frame_paginacion, text="Anterior", command=self.anterior_pagina)
         self.label_pagina = ctk.CTkLabel(self.frame_paginacion, text=f"{self.pagina_actual} de {self.total_paginas}", text_color="#222")
         self.boton_siguiente = ctk.CTkButton(self.frame_paginacion, text="Siguiente", command=self.siguiente_pagina)
@@ -113,7 +113,7 @@ class ListarUC(ctk.CTkFrame):
                 celda_btn.grid(row=fila, column=4, padx=1, pady=1, sticky="nsew")
                 boton = ctk.CTkButton(
                     celda_btn, text="Ver datos", width=100,
-                    text_color="#222",
+                    text_color="white",
                     command=lambda uc=tupla_uc: self.ver_datos_completos(uc)
                 )
                 boton.pack(padx=10, pady=5)

@@ -140,7 +140,7 @@ class ModeloDocente:
                            FROM informacion_personal ip
                            JOIN docentes e ON ip.id= e.persona_id
                            WHERE ip.tipo='docente'
-                           LIMIT 10
+                           LIMIT 13
                            OFFSET ?
                            ''',(registro_inicio,))
             resultados = cursor.fetchall()

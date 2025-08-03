@@ -172,7 +172,7 @@ class EstudianteController:
             "tipo_institucion": vista_formulario.informacion_academica_frame.tipo_inst_menu.get(),
             "institucion": vista_formulario.informacion_academica_frame.institucion_entry.get(),
             "titulo_obtenido": vista_formulario.informacion_academica_frame.titulo_entry.get(),
-            "promedio_bachiller": vista_formulario.informacion_academica_frame.promedio_entry.get(),
+            #"promedio_bachiller": vista_formulario.informacion_academica_frame.promedio_entry.get(),
             "f_grado": vista_formulario.informacion_academica_frame.fgrado_entry.get(),
             "codigo_sni": vista_formulario.sistema_ingreso_frame.codigo_entry.get(),
             "anio_sni": vista_formulario.sistema_ingreso_frame.anio_entry.get(),

@@ -10,7 +10,6 @@ class BaseView(ctk.CTkFrame):
         self.pack(fill="both", expand=True)
          
     
-    
     def mostrar_mensaje(self, titulo, mensaje, tipo_mensaje="info"):
         if tipo_mensaje == "info":
             CTkMessageBox.showinfo(title=titulo, message=mensaje)

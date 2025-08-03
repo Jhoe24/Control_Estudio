@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
+from views.dashboard.components.caendario import CTKFecha
 from ..DatosPersonales import DatosPersonalesFrame
 
 class InformacionAcademicaFrame(SectionFrameBase):
@@ -14,12 +15,15 @@ class InformacionAcademicaFrame(SectionFrameBase):
         self._crear_fila_widgets([
             ("Institución:", crear_entry, {"width":300}, 1, self, 'institucion_entry'),
             ("Fecha Grado:", crear_entry, {"width":120, "placeholder_text":"dd-mm-aaaa", "validate":"key", "validatecommand":(vcmd_fecha, "%S"), "placeholder_text":"dd-mm-aaaa"}, 1, self, 'fgrado_entry'),
-            ("Promedio Bachillerato:", crear_entry, {
-                "width":120,
-                "validate":"key",
-                "validatecommand":(vcmd_decimal, "%P", "%S")
-            }, 1, self, 'promedio_entry')
+            # ("Promedio Bachillerato:", crear_entry, {
+            #     "width":120,
+            #     "validate":"key",
+            #     "validatecommand":(vcmd_decimal, "%P", "%S")
+            # }, 1, self, 'promedio_entry')
         ])
+        self.fecha_prueva = CTKFecha(self,"Fecha de Prueba")
+        self.fecha_prueva.pack(pady = 10, padx = 10, fill="x")
+        
         self._crear_fila_widgets([
             ("Título Obtenido:", crear_entry, {"width":300}, 1, self, 'titulo_entry')
         ])
@@ -48,9 +52,9 @@ class InformacionAcademicaFrame(SectionFrameBase):
         self.fgrado_entry.configure(state="disabled")
 
         #Configuaracion de promedio
-        self.promedio_entry.delete(0, ctk.END)
-        self.promedio_entry.insert(0,"000")
-        self.promedio_entry.configure(state="disabled")
+        # self.promedio_entry.delete(0, ctk.END)
+        # self.promedio_entry.insert(0,"000")
+        # self.promedio_entry.configure(state="disabled")
 
         self.titulo_entry.delete(0, ctk.END)
         if estudiante.get('mencion_bachiller') != None and estudiante.get('mencion_bachiller') != "":
@@ -69,7 +73,7 @@ class InformacionAcademicaFrame(SectionFrameBase):
         self.tipo_inst_menu.configure(state="normal")
         self.institucion_entry.configure(state="normal")
         self.fgrado_entry.configure(state="normal")
-        self.promedio_entry.configure(state="normal")
+        #self.promedio_entry.configure(state="normal")
         self.titulo_entry.configure(state="normal")
         self.condicion_menu.configure(state="normal")
     

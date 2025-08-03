@@ -49,12 +49,15 @@ def crear_check_box(master, **kwargs):
 def crear_radio_button(master, **kwargs):
     return ctk.CTkRadioButton(master, font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL, border_color=COLOR_ENTRY_BORDER, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, **kwargs)
 
-def create_option_menu_row(parent_frame, label_text, options, variable, width=350, font_size=15, funcion = None):
+def create_option_menu_row(parent_frame, label_text, options, variable, width=350, font_size=15, funcion = None, side_ = "right", fill_ = "x",crear_frame = True):
     """
     Crea una fila con una etiqueta y un CTkOptionMenu con tamaños ajustados.
     """
-    frame = ctk.CTkFrame(parent_frame, fg_color="transparent")
-    frame.pack(pady=10, fill="x", anchor="center") # Aumentar pady para más espacio vertical
+    if crear_frame:
+        frame = ctk.CTkFrame(parent_frame, fg_color="transparent")
+        frame.pack(pady=10, fill="x", anchor="center")
+    else:
+        frame = parent_frame
 
     # Fuente para la etiqueta
     label_font = ("Roboto", font_size) # Usar la misma fuente y tamaño que el optionmenu para consistencia
@@ -65,11 +68,30 @@ def create_option_menu_row(parent_frame, label_text, options, variable, width=35
     # Fuente para el OptionMenu
     optionmenu_font = ("Roboto", font_size)
 
-    optionmenu = ctk.CTkOptionMenu(
+    if funcion:
+        optionmenu = ctk.CTkOptionMenu(
+            frame,
+            values=options,
+            variable=variable,
+            command=funcion,
+            width=width,  # Aumentar el ancho fijo para los OptionMenu
+            height=font_size + 20, # Aumentar la altura basada en el tamaño de la fuente
+            font=optionmenu_font,
+            dropdown_font=optionmenu_font, # También el tamaño de la fuente del desplegable
+            dropdown_fg_color=("lightgray", "gray25"),
+            dropdown_hover_color=("gray75", "gray40"),
+            dropdown_text_color=("black", "white"),
+            fg_color="SkyBlue",
+            button_color="#1074ad",
+            button_hover_color="steelblue",
+            text_color="black",
+            corner_radius=8, # Un poco más redondeado para un look más moderno si lo deseas
+        )
+    else:
+        optionmenu = ctk.CTkOptionMenu(
         frame,
         values=options,
         variable=variable,
-        command=funcion,
         width=width,  # Aumentar el ancho fijo para los OptionMenu
         height=font_size + 20, # Aumentar la altura basada en el tamaño de la fuente
         font=optionmenu_font,
@@ -81,9 +103,10 @@ def create_option_menu_row(parent_frame, label_text, options, variable, width=35
         button_color="#1074ad",
         button_hover_color="steelblue",
         text_color="black",
-        corner_radius=8 # Un poco más redondeado para un look más moderno si lo deseas
-    )
-    optionmenu.pack(side="right", expand=False, fill="x", padx=(0, 20)) # Aumentar padx en el lado derecho del optionmenu
+        corner_radius=8, # Un poco más redondeado para un look más moderno si lo deseas
+        )
+
+    optionmenu.pack(side=side_, expand=False, fill=fill_, padx=(0, 10)) # Aumentar padx en el lado derecho del optionmenu
 
     return optionmenu
 

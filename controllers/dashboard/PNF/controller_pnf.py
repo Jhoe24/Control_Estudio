@@ -541,3 +541,4 @@ class ControllerPNF:
         
     def obtener_nombres_por_id(self, tabla, id):
         return self.modelo.obtener_nombres_por_id(tabla, id)
+        
