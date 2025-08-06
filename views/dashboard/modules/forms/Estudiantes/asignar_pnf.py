@@ -45,8 +45,8 @@ class AsignarPNFFrame(SectionFrameBase):
             self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[self.var_trayecto.get()])  # Obtener los tramos para el trayecto seleccionado
             self.valores_tramos = [tramo[1] for tramo in self.tupla_tramos]
             self.var_tramo = ctk.StringVar(value=self.valores_tramos[0] if self.valores_tramos else "No seleccionado")  # Valor por defecto para el tramo
-
-            print(f"Nombres PNF obtenidos: {self.nombres_pnf}")
+            self.tramo_id_por_nombre = self.tramo_id_por_nombre = {tramo[1]: tramo[0] for tramo in self.tupla_tramos}
+            
             self._crear_fila_widgets([
                 ("Seleccione un P.N.F:", crear_option_menu, {"values":self.nombres_pnf, "variable":self.var1, "command": self.set_trayecto  }, 1, self, 'pnf_menu')
             ])
@@ -66,7 +66,7 @@ class AsignarPNFFrame(SectionFrameBase):
 
             self._crear_fila_widgets([
                 ("Trayecto Actual:", crear_option_menu, {"values": self.valores_trayecto, "variable": self.var_trayecto,"command": self.set_tramo}, 1, self, 'trayecto_menu'),
-                ("Tramo Actual:", crear_option_menu, {"values": self.valores_tramos, "variable": self.var_tramo}, 1, self, 'tramo_menu'),
+                ("Tramo Actual:", crear_option_menu, {"values": self.valores_tramos, "variable": self.var_tramo, "command": self.set_seccion}, 1, self, 'tramo_menu'),
                 ("Creditos aprobados:", crear_entry, {"width":300,"placeholder_text":"Ingrese los créditos aprobados"}, 1, self, 'creditos_aprobados_entry'),
                 ("Creditos cursados:", crear_entry, {"width":300,"placeholder_text":"Ingrese los créditos cursados"}, 1, self, 'creditos_cursados_entry'),
                 ("Promedio General:", crear_entry, {"width":150,"placeholder_text":"Ingrese el promedio general","validate":"key","validatecommand":(vcmd,"%P")}, 1, self, 'promedio_general_entry'),
@@ -130,7 +130,11 @@ class AsignarPNFFrame(SectionFrameBase):
     def mostrar_form_seccion(self,datos = None):
         self.btn_secciones.configure(text="Cancelar Seccion", command=self.cancelar_asignacion_seccion)
 
-        self.asignacion_seccion = AsignarSeccionFrame(self,self.controller_secciones,self.pnf_id_por_nombre[self.var1.get()])
+        self.asignacion_seccion = AsignarSeccionFrame(self,self.controller_secciones,
+                                                      self.pnf_id_por_nombre[self.var1.get()],
+                                                      self.trayecto_id_por_nombre[self.var_trayecto.get()],
+                                                      self.tramo_id_por_nombre[self.var_tramo.get()])
+        
         self.asignacion_seccion.pack(pady = 10, padx = 10, fill="both", expand=True)
         if datos:
             self.asignacion_seccion.cargar_datos_secciones(datos)
@@ -223,8 +227,9 @@ class AsignarPNFFrame(SectionFrameBase):
         self.valores_trayecto = [trayecto[1] for trayecto in tupla_trayectos]  # Obtener solo los nombres de los trayectos
         self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")  # Valor por defecto para el trayecto
         self.trayecto_menu.configure(values=self.valores_trayecto)
+        self.set_tramo(self.var_trayecto.get())
         if self.asignacion_seccion:
-            self.asignacion_seccion.actualizar_datos_secciones(self.pnf_id_por_nombre[value])
+            self.asignacion_seccion.actualizar_datos_secciones(self.pnf_id_por_nombre[value],self.trayecto_id_por_nombre[self.var_trayecto.get()],self.tramo_id_por_nombre[self.var_tramo.get()])
 
 
     def set_tramo(self, value):
@@ -232,6 +237,17 @@ class AsignarPNFFrame(SectionFrameBase):
         self.valores_tramos = [tramo[1] for tramo in tupla_tramos]
         self.var_tramo.set(self.valores_tramos[0] if self.valores_tramos else "Tramo")
         self.tramo_menu.configure(values=self.valores_tramos)
+        self.tramo_id_por_nombre = {tramo[1]: tramo[0] for tramo in tupla_tramos}
+        if self.asignacion_seccion:
+            self.asignacion_seccion.actualizar_datos_secciones(self.pnf_id_por_nombre[self.var1.get()],self.trayecto_id_por_nombre[value],self.tramo_id_por_nombre[self.var_tramo.get()])
+
+    def set_seccion(self,value):
+         if self.asignacion_seccion:
+            
+            self.asignacion_seccion.actualizar_datos_secciones(self.pnf_id_por_nombre[self.var1.get()],
+                                                               self.trayecto_id_por_nombre[self.var_trayecto.get()],
+                                                               self.tramo_id_por_nombre[value])
+
 
     def guardar_datos(self):
         datos = self.controller_pnf.obtener_asignacion_pnf(self)

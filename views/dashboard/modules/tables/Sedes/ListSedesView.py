@@ -5,6 +5,7 @@ import threading
 import tkinter.messagebox as messagebox
 from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
+from views.dashboard.components.caendario import CTKFecha
 from views.dashboard.modules.forms.Sedes.formSedes import FormSedes
 
 class ListSedesView(ctk.CTkFrame):

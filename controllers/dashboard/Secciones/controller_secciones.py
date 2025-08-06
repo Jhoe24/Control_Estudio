@@ -67,19 +67,33 @@ class ControllerSecciones:
     def limpiar_formulario_completo(self, vista):
         pass
 
-    def obtener_nombres_secciones_por_pnf(self, pnf_id):
+    def obtener_nombres_secciones_por_pnf(self, pnf_id, trayecto_id = None, tramo_id = None):
         db_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'db', 'Sistema_academico.db')
         conn = sqlite3.connect(db_path)
         conn.execute("PRAGMA foreign_keys = ON;")
         cursor = conn.cursor()
+        
+        if trayecto_id and tramo_id:
+            sql = """
+                SELECT s.id, s.codigo_seccion || ' - ' || s.turno AS nombre
+                FROM secciones s
+                WHERE s.pnf_id = ? AND s.trayecto_id = ? AND tramo_id = ?
+                ORDER BY s.codigo_seccion 
+            """
+            tupla_datos = (pnf_id,trayecto_id,tramo_id)     
+        else:
+            sql = """
+                SELECT s.id, s.codigo_seccion || ' - ' || s.turno AS nombre
+                FROM secciones s
+                WHERE s.pnf_id = ?
+                ORDER BY s.codigo_seccion
+            """
+            tupla_datos = (pnf_id,)
 
-        cursor.execute('''
-            SELECT s.id, s.codigo_seccion || ' - ' || s.turno AS nombre
-            FROM secciones s
-            WHERE s.pnf_id = ?
-            ORDER BY s.codigo_seccion
-        ''', (pnf_id,))
+        cursor.execute(sql,tupla_datos)
+
         resultados = cursor.fetchall()
+
         conn.close()
 
         self._seccion_id_por_nombre = {nombre: id for id, nombre in resultados}

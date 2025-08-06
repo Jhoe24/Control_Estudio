@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
+from views.dashboard.components.caendario import CTKFecha
+
 
 class DatosPersonalesFrame(SectionFrameBase):
 
@@ -59,11 +61,14 @@ class DatosPersonalesFrame(SectionFrameBase):
         ])
 
         # --- Fila para fecha de nacimiento, lugar de nacimiento y fecha de ingreso ---
+        self.fecha_nacimiento = CTKFecha(self, "Fecha de Nacimiento")
+        self.fecha_nacimiento.pack(fill="x", pady=PADY_FILA, padx=15)
+
         self._crear_fila_widgets([
-            ("F. Nacimiento:", crear_entry, {"width":120, "placeholder_text":"dd-mm-aaaa"}, 1, self, 'fnac_entry'),
-            ("Lugar Nacimiento:", crear_entry, {"width":300}, 1, self, 'lugar_nac_entry'),
-            ("F. Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd-mm-aaaa"}, 1, self, 'fingreso_entry')
+            ("Lugar Nacimiento:", crear_entry, {"width":300}, 1, self, 'lugar_nac_entry')
         ])
+        self.fecha_ingreso = CTKFecha(self, "Fecha de Ingreso")
+        self.fecha_ingreso.pack(fill="x", pady=PADY_FILA, padx=15)
 
         # --- Fila para correo electronico ---
         self._crear_fila_widgets([
@@ -231,13 +236,9 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.nacionalidad_menu.configure(state="disabled")     
 
         #Configuracion de la fecha de nacimiento
-        self.fnac_entry.configure(state="normal")
-        self.fnac_entry.delete(0, ctk.END)
         fecha_nacimiento = estudiante.get('fecha_nacimiento')
         if fecha_nacimiento is not None and fecha_nacimiento != '':
-            self.fnac_entry.insert(0, str(fecha_nacimiento))
-            print(fecha_nacimiento)
-        self.fnac_entry.configure(state="disabled")
+            self.fecha_nacimiento.set_date(str(fecha_nacimiento))
 
         #Configuracion del lugar de nacimiento - CORREGIDO
         self.lugar_nac_entry.configure(state="normal")  # Asegurar que esté habilitado
@@ -248,13 +249,11 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.lugar_nac_entry.configure(state="disabled")
 
         #Configuracion de la fecha de ingreso
-        self.fingreso_entry.configure(state="normal")
-        self.fingreso_entry.delete(0, ctk.END)
-        fecha_ingreso = estudiante.get('fecha_ingreso')
-        if fecha_ingreso is not None and fecha_ingreso != '':
-            self.fingreso_entry.insert(0, str(fecha_ingreso))
-            print(fecha_ingreso)
-        self.fingreso_entry.configure(state="disabled")
+        if estudiante.get('fecha_registro'):
+            fecha = str(estudiante.get('fecha_registro')).split(" ")
+            fecha_ingreso = fecha[0]
+            if fecha_ingreso is not None and fecha_ingreso != '':
+                self.fecha_ingreso.set_date(str(fecha_ingreso))
 
         #Configuracion correo electronico - CORREGIDO
         self.correo_electronico_entry.configure(state="normal")  # Asegurar que esté habilitado
@@ -290,9 +289,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.genero_menu.configure(state="normal")
         self.edo_civil_menu.configure(state="normal")
         self.nacionalidad_menu.configure(state="normal")
-        self.fnac_entry.configure(state="normal")
         self.lugar_nac_entry.configure(state="normal")
-        self.fingreso_entry.configure(state="normal")
         self.correo_electronico_entry.configure(state="normal")
         
 

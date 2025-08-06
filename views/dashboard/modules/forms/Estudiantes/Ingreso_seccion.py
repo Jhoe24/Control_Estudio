@@ -5,12 +5,14 @@ from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from ..DatosPersonales import DatosPersonalesFrame
 
 class AsignarSeccionFrame(SectionFrameBase):
-    def __init__(self, master, controller_secciones,pnf_id):
+    def __init__(self, master, controller_secciones,pnf_id, trayecto_id, tramo_id):
         super().__init__(master,"Asignar Secciones a Estudiante",COLOR_HEADER_SECCION_BG_2)
         self.controller_secciones = controller_secciones
         self.pnf_id = pnf_id
+        self.trayecto_id = trayecto_id
+        self.tramo_id = tramo_id
         #Secciones_disponibles es donde se extraen los datos de las secciones asignadas a ese pnf
-        self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id)
+        self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id,trayecto_id,tramo_id)
         if self.secciones_disponibles:
             
             self.var_seccion = ctk.StringVar(value=self.secciones_disponibles[0] if self.secciones_disponibles else "Sin secciones")
@@ -32,11 +34,20 @@ class AsignarSeccionFrame(SectionFrameBase):
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
-    def actualizar_datos_secciones(self,pnf_id):
+    def actualizar_datos_secciones(self,pnf_id,trayecto_id,tramo_id):
         self.pnf_id = pnf_id
-        self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id)
-        self.var_seccion.set(self.secciones_disponibles[0])
-        self.secciones_menu.configure(values=self.secciones_disponibles)
+        self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id,trayecto_id,tramo_id)
+        if not self.secciones_disponibles:
+            self.var_seccion.set("Sin secciones")
+            self.secciones_menu.configure(values=["Sin secciones"],state = "disabled")
+        else:
+            self.secciones_menu.configure(state = "normal")
+            self.var_seccion.set(self.secciones_disponibles[0])
+            self.secciones_menu.configure(values=self.secciones_disponibles)
+
+        # if not self.secciones_disponibles:
+        #     # Si no hay secciones disponibles, hacemos como en el master.no_secciones_disponibles()
+        #     self.master.no_secciones_disponibles()
 
 
     def cargar_datos_secciones(self, datos):

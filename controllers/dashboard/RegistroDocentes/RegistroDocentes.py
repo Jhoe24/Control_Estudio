@@ -83,9 +83,7 @@ class DocenteController:
                 ("nombre", "Nombre"),
                 ("apellido", "Apellido"),
                 ("nacionalidad", "Nacionalidad"),
-                ("f_nacimiento", "Fecha de Nacimiento"),
                 ("lugar_nacimiento", "Lugar de Nacimiento"),
-                ("f_ingreso", "Fecha de Ingreso"),
                 ("correo_electronico", "Correo Electrónico"),
                 
             ]   
@@ -136,9 +134,9 @@ class DocenteController:
             "nacionalidad": vista_formulario.datos_personales_frame.nacionalidad_menu.get(),
             "genero": vista_formulario.datos_personales_frame.genero_menu.get(),
             "edo_civil": vista_formulario.datos_personales_frame.edo_civil_menu.get(),
-            "f_nacimiento": vista_formulario.datos_personales_frame.fnac_entry.get(),
+            "f_nacimiento": vista_formulario.datos_personales_frame.fecha_nacimiento.get_date(),
             "lugar_nacimiento": vista_formulario.datos_personales_frame.lugar_nac_entry.get(),
-            "f_ingreso": vista_formulario.datos_personales_frame.fingreso_entry.get(),
+            "f_ingreso": vista_formulario.datos_personales_frame.fecha_ingreso.get_date(),
             "correo_electronico": vista_formulario.datos_personales_frame.correo_electronico_entry.get(),
             "lista_telefonos": telefonos,
             
@@ -146,7 +144,7 @@ class DocenteController:
 
             "abreviatura_titulo": vista_formulario.datos_docente_frame.abreviatura_menu.get(),
             "especialidad": vista_formulario.datos_docente_frame.especialidad_entry.get(),
-            "fecha_ingreso": vista_formulario.datos_docente_frame.fecha_ingreso_entry.get(), #comentarle de esto a andy
+            "fecha_ingreso_uptrjf": vista_formulario.datos_docente_frame.fecha_ingreso_entry.get(), #comentarle de esto a andy
             "tipo_contrato": vista_formulario.datos_docente_frame.tipo_contrato_menu.get(),
             "categoria": vista_formulario.datos_docente_frame.categoria_entry.get(),
             "auxiliar": vista_formulario.datos_docente_frame.auxiliar_menu.get(),
@@ -169,9 +167,7 @@ class DocenteController:
             vista_formulario.datos_personales_frame.nro_documento_entry,
             vista_formulario.datos_personales_frame.nombre_entry,
             vista_formulario.datos_personales_frame.apellido_entry,
-            vista_formulario.datos_personales_frame.fnac_entry,
             vista_formulario.datos_personales_frame.lugar_nac_entry,
-            vista_formulario.datos_personales_frame.fingreso_entry,
             vista_formulario.datos_personales_frame.correo_electronico_entry,
             vista_formulario.datos_docente_frame.especialidad_entry,
             vista_formulario.datos_docente_frame.fecha_ingreso_entry, #comentarle de esto a andy

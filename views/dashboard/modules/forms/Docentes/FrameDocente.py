@@ -11,6 +11,7 @@ import customtkinter as ctk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from ..DatosPersonales import DatosPersonalesFrame
+from views.dashboard.components.caendario import CTKFecha
 
 class FrameDocente(SectionFrameBase):
     def __init__(self, master, vcmd_num, vcmd_fecha):
@@ -25,8 +26,10 @@ class FrameDocente(SectionFrameBase):
             ("Especialidad:", crear_entry, {"width":220}, 1, self, 'especialidad_entry')
         ])
         #("Cédula:", crear_entry, {"width":220, "validate":"key", "validatecommand":(vcmd_num, '%P')}, 1, self, 'cedula_entry')
+        self.fecha_ingreso_uptrjf = CTKFecha(self, "Fecha de Ingreso")
+        self.fecha_ingreso_uptrjf.pack(fill="x", pady=PADY_FILA, padx=15)
         self._crear_fila_widgets([
-            ("Fecha Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd-mm-aaaa"}, 1, self, 'fecha_ingreso_entry'),
+            #("Fecha Ingreso:", crear_entry, {"width":120,"placeholder_text":"dd-mm-aaaa"}, 1, self, 'fecha_ingreso_entry'),
             ("Tipo de Contrato:", crear_option_menu, {"values":["Tiempo completo", "Medio tiempo", "Por horas", "Contratado"],"variable": self.var_tipo_contrato, "command": lambda v: setattr(self.tipo_contrato_menu, '_current_value',v)}, 1, self, 'tipo_contrato_menu')
         ])
 
@@ -54,10 +57,9 @@ class FrameDocente(SectionFrameBase):
         self.especialidad_entry.configure(state="disabled")
 
         # Configurar fecha de ingreso
-        self.fecha_ingreso_entry.delete(0, ctk.END)
-        if docente.get('fecha_ingreso') is not None and docente.get('fecha_ingreso') != "":
-            self.fecha_ingreso_entry.insert(0, docente.get("fecha_ingreso"))
-        self.fecha_ingreso_entry.configure(state="disabled")
+        fecha_ingreso_uptrjf = docente.get('fecha_ingreso_uptrjf')
+        if fecha_ingreso_uptrjf is not None and fecha_ingreso_uptrjf != '':
+            self.fecha_ingreso_uptrjf.set_date(str(fecha_ingreso_uptrjf))
 
         # Configurar tipo de contrato
         self.tipo_contrato_menu.set(self.var_tipo_contrato.get())
@@ -85,7 +87,6 @@ class FrameDocente(SectionFrameBase):
     def habilitar_edicion(self):
         self.abreviatura_menu.configure(state="normal")
         self.especialidad_entry.configure(state="normal")
-        self.fecha_ingreso_entry.configure(state="normal")
         self.tipo_contrato_menu.configure(state="normal")
         self.categoria_entry.configure(state="normal")
         self.auxiliar_menu.configure(state="normal")

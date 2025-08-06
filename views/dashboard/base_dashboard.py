@@ -181,6 +181,7 @@ class BaseDashboardView(BaseView):
                     if self.user_role.lower() in ["admin", "administrador"]:
                         submenu_items = [
                             ("Usuarios", "configuracion_icon", self.configuracion_usuarios),
+                            ("Sistema", "configuracion_icon", self.configuracion_sistema),
                             ("Respaldos", "configuracion_icon", self.configuracion_respaldos)
                         ]
                 
@@ -338,5 +339,6 @@ class BaseDashboardView(BaseView):
     def mis_clases(self): pass
     def configuracion(self): pass
     def configuracion_usuarios(self): pass
+    def configuracion_sistema(self): pass
     def configuracion_respaldos(self): pass
     def _mostrar_ayuda(self): pass

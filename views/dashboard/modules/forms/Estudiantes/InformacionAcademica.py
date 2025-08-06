@@ -13,16 +13,16 @@ class InformacionAcademicaFrame(SectionFrameBase):
             ("Tipo Institución:", crear_option_menu, {"values":["Pública", "Privada"], "command": lambda v: setattr(self.tipo_inst_menu, '_current_value',v)}, 1, self, 'tipo_inst_menu', lambda w: w.set("Pública"))
         ])
         self._crear_fila_widgets([
-            ("Institución:", crear_entry, {"width":300}, 1, self, 'institucion_entry'),
-            ("Fecha Grado:", crear_entry, {"width":120, "placeholder_text":"dd-mm-aaaa", "validate":"key", "validatecommand":(vcmd_fecha, "%S"), "placeholder_text":"dd-mm-aaaa"}, 1, self, 'fgrado_entry'),
-            # ("Promedio Bachillerato:", crear_entry, {
-            #     "width":120,
-            #     "validate":"key",
-            #     "validatecommand":(vcmd_decimal, "%P", "%S")
-            # }, 1, self, 'promedio_entry')
+            ("Institución:", crear_entry, {"width":300}, 1, self, 'institucion_entry')
+            # ("Fecha Grado:", crear_entry, {"width":120, "placeholder_text":"dd-mm-aaaa", "validate":"key", "validatecommand":(vcmd_fecha, "%S"), "placeholder_text":"dd-mm-aaaa"}, 1, self, 'fgrado_entry'),
+            # # ("Promedio Bachillerato:", crear_entry, {
+            # #     "width":120,
+            # #     "validate":"key",
+            # #     "validatecommand":(vcmd_decimal, "%P", "%S")
+            # # }, 1, self, 'promedio_entry')
         ])
-        self.fecha_prueva = CTKFecha(self,"Fecha de Prueba")
-        self.fecha_prueva.pack(pady = 10, padx = 10, fill="x")
+        self.fecha_grado = CTKFecha(self,"Fecha de Grado")
+        self.fecha_grado.pack(pady = 10, padx = 10, fill="x")
         
         self._crear_fila_widgets([
             ("Título Obtenido:", crear_entry, {"width":300}, 1, self, 'titulo_entry')
@@ -46,11 +46,8 @@ class InformacionAcademicaFrame(SectionFrameBase):
         self.institucion_entry.configure(state="disabled")
 
         #Configuracion fecha de grado
-        self.fgrado_entry.delete(0, ctk.END)
         if estudiante.get('fecha_grado_bachiller') != None and estudiante.get('fecha_grado_bachiller') != "":
-            self.fgrado_entry.insert(0, estudiante.get("fecha_grado_bachiller")) 
-        self.fgrado_entry.configure(state="disabled")
-
+            self.fecha_grado.set_date(str(estudiante.get("fecha_grado_bachiller")))
         #Configuaracion de promedio
         # self.promedio_entry.delete(0, ctk.END)
         # self.promedio_entry.insert(0,"000")
@@ -72,7 +69,7 @@ class InformacionAcademicaFrame(SectionFrameBase):
         self.tipo_mencion_menu.configure(state="normal")
         self.tipo_inst_menu.configure(state="normal")
         self.institucion_entry.configure(state="normal")
-        self.fgrado_entry.configure(state="normal")
+        #self.fgrado_entry.configure(state="normal")
         #self.promedio_entry.configure(state="normal")
         self.titulo_entry.configure(state="normal")
         self.condicion_menu.configure(state="normal")

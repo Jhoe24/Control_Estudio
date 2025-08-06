@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
+from views.dashboard.components.caendario import CTKFecha
 
 from ..DatosPersonales import DatosPersonalesFrame
 
@@ -141,10 +142,12 @@ class DatosPNFPensumFrame(SectionFrameBase):
             #("Campo Ocupacional:", crear_entry, {"width":300,"placeholder_text":"Ingrese campo ocupacional"}, 1, self, 'campo_ocupacional_entry'),
         ])
 
-        self.registrar_fecha(self.set_fecha_resolucion,"Fecha Resolución")  # Registrar la fecha de resolución
+        #self.registrar_fecha(self.set_fecha_resolucion,"Fecha Resolución")  # Registrar la fecha de resolución
+        self.fecha_resolucion = CTKFecha(self,"Fecha Resolucion")
+        self.fecha_resolucion.pack(fill ="x", pady=PADY_FILA, padx = 15)
         #label para mostrar la fecha de resolución
-        self.fecha_resolucion_label = ctk.CTkLabel(self, text="Fecha de Resolución: No seleccionada", text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 14, "bold"))
-        self.fecha_resolucion_label.pack(pady=(10, 0), padx=10, anchor="w")
+        # self.fecha_resolucion_label = ctk.CTkLabel(self, text="Fecha de Resolución: No seleccionada", text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 14, "bold"))
+        # self.fecha_resolucion_label.pack(pady=(10, 0), padx=10, anchor="w")
         # Actualizar el label de fecha de resolución cuando se seleccione una fecha
 
         # --- Fila para datos del pensum ---
@@ -177,60 +180,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
-    def registrar_fecha(self,callback,titulo_btn="Seleccionar Fecha"):
-       
-        def calendario():
-            top = ctk.CTkToplevel(self, fg_color="White")
-            top.title("Seleccionar Fecha")
-
-            # Tamaño deseado de la ventana emergente
-            ancho = 350
-            alto = 350
-
-            # Obtén el tamaño de la pantalla
-            top.update_idletasks()  # Asegura que winfo_screenwidth/height sean correctos
-            screen_width = top.winfo_screenwidth()
-            screen_height = top.winfo_screenheight()
-
-            # Calcula la posición centrada
-            x = (screen_width // 2) - (ancho // 2)
-            y = (screen_height // 2) - (alto // 2)
-
-            top.geometry(f"{ancho}x{alto}+{x}+{y}")
-            top.lift()
-            top.focus_force()
-            top.grab_set()
-            label = ctk.CTkLabel(top, text="Seleccione Fecha", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
-            label.pack(pady=10)
-            self.cal = Calendar(top, locale='es_ES', date_pattern='yyyy-mm-dd')
-            self.cal.pack(pady=20)
-
-            def mostrar_fecha(date):
-                label.configure(text=f"Fecha seleccionada: {date}")
-
-            def guardar_fecha():
-                fecha = self.cal.get_date()
-                callback(fecha)  # Llama al callback con la fecha seleccionada
-                top.destroy()
-
-            self.cal.bind("<<CalendarSelected>>", lambda e: mostrar_fecha(self.cal.get_date()))
-            boton_guardar = ctk.CTkButton(top, text="Guardar Fecha", command=guardar_fecha)
-            boton_guardar.pack(pady=10)
-             # Crea una ventana emergente
-        frame_fecha = ctk.CTkFrame(self, fg_color="transparent")
-        frame_fecha.pack(fill="x", pady=(10, 0), padx=10)
-        self.btn_fecha = ctk.CTkButton(
-            frame_fecha,
-            text=titulo_btn,
-            command=calendario,
-            width=100,
-            font=FUENTE_BOTON,
-            fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-            text_color=COLOR_BOTON_PRIMARIO_TEXT
-        )
-        self.btn_fecha.pack(side="left", pady=(10, 0), anchor="w")
-
     def solo_numeros(self, char_input):
         """Validación para permitir solo números en los campos de entrada."""
         return char_input.isdigit()
@@ -250,16 +199,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
             "V": 5
         }
         return self.dict_trayectos.get(self.var_cantidad_trayectos.get(), 1)
-    
-    #Crear un método para establecer la fecha de resolución
-    def set_fecha_resolucion(self,fecha):
-        if fecha:
-            self.fecha_resolucion = fecha
-            print("Fecha de resolución establecida:", self.fecha_resolucion)
-            self.fecha_resolucion_label.configure(text=f"Fecha de Resolución: {self.fecha_resolucion}")
-            # Llama a la validación en el formulario principal
-            if hasattr(self.master, "validar_campos_trayecto"):
-                self.master.validar_campos_trayecto()
 
     def deshabilitar_campos(self):
         # Deshabilita todos los entries a validar
@@ -270,8 +209,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.duracion_trayectos_entry.configure(state="disabled")
         self.duracion_semanas_entry.configure(state="disabled")
         self.estado_menu.configure(state="disabled")
-        # Deshabilita el botón de fecha
-        self.btn_fecha.configure(state="disabled")
         # Deshabilita el botón de grabar Trayecto
         if hasattr(self.master, 'button_siguiente'):
             self.master.button_siguiente.configure(state="disabled")
@@ -320,8 +257,7 @@ class DatosPNFPensumFrame(SectionFrameBase):
 
         # Fecha de resolución
         if "fecha_resolucion" in datos and datos["fecha_resolucion"]:
-            self.set_fecha_resolucion(datos["fecha_resolucion"])
-        self.btn_fecha.configure(state="disabled")
+            self.fecha_resolucion.set_date(str(datos["fecha_resolucion"]))
 
         cantidad = self.dict_trayectos_invertido[len(datos["lista_trayectos"])]
         if cantidad:
@@ -343,7 +279,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
             campo.configure(state="normal")
             self.duracion_trayectos_entry.configure(state="normal")
             self.duracion_semanas_entry.configure(state="normal")
-            self.btn_fecha.configure(state="normal")
             self.estado_menu.configure(state="normal")
             self.tipo_pnf_menu.configure(state="normal")
             self.duracion_tramos_entry.configure("normal")
@@ -370,11 +305,6 @@ class DatosPNFPensumFrame(SectionFrameBase):
             for menu in self.optines_menus:
                 menu.configure(state="normal")
 
-            
-
-            self.fecha_resolucion = None
-            self.fecha_resolucion_label.configure(text="Fecha de Resolución: No seleccionada")
-            self.btn_fecha.configure(state="normal")
         except Exception as e:
             print(f"Error al limpiar el formulario: {e}")
         

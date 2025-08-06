@@ -90,7 +90,7 @@ class CTKFecha(ctk.CTkFrame):
         anio = self.var_year.get()
         mes = self.var_month.get()
         mes = self.month_values.index(mes) + 1
-        dia = self.var_day.get
+        dia = self.var_day.get()
         return f"{anio}-{mes}-{dia}"
         
     def set_date(self, fecha: str):

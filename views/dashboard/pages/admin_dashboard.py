@@ -29,6 +29,7 @@ from views.dashboard.modules.SeccionesView import SeccionView
 from views.dashboard.modules.tables.Sedes.ListSedesView import ListSedesView
 
 from views.dashboard.modules.configuracion import Config_user
+from views.dashboard.modules.configuracion_sistema import Config_system
 
 from views.dashboard.modules.tables.Secciones.ListadoSeccionesView import ListSeccionesView
 
@@ -174,6 +175,13 @@ class AdminDashboardView(BaseDashboardView):
             widget.pack_forget()
         
         configuracion = Config_user(self.cuerpo_principal)
+        configuracion.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def configuracion_sistema(self):
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+
+        configuracion = Config_system(self.cuerpo_principal)
         configuracion.pack(fill="both", expand=True, padx=10, pady=10)
         
     

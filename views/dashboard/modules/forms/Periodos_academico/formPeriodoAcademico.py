@@ -3,7 +3,7 @@ import tkinter as tk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from ..DatosPersonales import DatosPersonalesFrame
-
+from views.dashboard.components.caendario import CTKFecha
 
 class FormPeriodoAcademico(SectionFrameBase):
     def __init__(self, master, controller):
@@ -37,40 +37,40 @@ class FormPeriodoAcademico(SectionFrameBase):
 
         # Labels para mostrar las fechas seleccionadas
         # Período Académico General
-        self.registrar_fecha(self.set_fecha_inicio, titulo_btn="Inicio Período")
-        self.fecha_inicio_label = ctk.CTkLabel(self, text="Fecha de Inicio del Período: No seleccionada",text_color=COLOR_TEXTO_PRINCIPAL)  
-        self.fecha_inicio_label.pack(pady=(10, 0), padx=20, anchor="w")
+        #self.registrar_fecha(self.set_fecha_inicio, titulo_btn="Inicio Período")
+        self.fecha_inicio = CTKFecha(self,"Inicio Período")
+        self.fecha_inicio.pack(fill ="x", pady=PADY_FILA, padx = 15)
         
-        self.registrar_fecha(self.set_fecha_fin, titulo_btn="Fin Período")
-        self.fecha_fin_label = ctk.CTkLabel(self, text="Fecha de Fin del Período: No seleccionada",text_color=COLOR_TEXTO_PRINCIPAL)
-        self.fecha_fin_label.pack(pady=(5, 0), padx=20, anchor="w")
-
+        #self.registrar_fecha(self.set_fecha_fin, titulo_btn="Fin Período")
+        self.fecha_fin = CTKFecha(self,"Fin Período")
+        self.fecha_fin.pack(fill ="x", pady=PADY_FILA, padx = 15)
+        
         # Inscripciones
-        self.registrar_fecha(self.set_fecha_inicio_inscripcion, titulo_btn="Inicio Inscripción")
-        self.fecha_inicio_inscripcion_label = ctk.CTkLabel(self, text="Inicio de Inscripción: No seleccionada",text_color=COLOR_TEXTO_PRINCIPAL)
-        self.fecha_inicio_inscripcion_label.pack(pady=(10, 0), padx=20, anchor="w")
+        #self.registrar_fecha(self.set_fecha_inicio_inscripcion, titulo_btn="Inicio Inscripción")
+        self.fecha_inicio_inscripcion = CTKFecha(self,"Inicio Inscripción")
+        self.fecha_inicio_inscripcion.pack(fill ="x", pady=PADY_FILA, padx = 15)
 
-        self.registrar_fecha(self.set_fecha_fin_inscripcion, titulo_btn="Fin Inscripción")
-        self.fecha_fin_inscripcion_label = ctk.CTkLabel(self, text="Fin de Inscripción: No seleccionada",text_color=COLOR_TEXTO_PRINCIPAL)
-        self.fecha_fin_inscripcion_label.pack(pady=(5, 0), padx=20, anchor="w")
+        #self.registrar_fecha(self.set_fecha_fin_inscripcion, titulo_btn="Fin Inscripción")
+        self.fecha_fin_inscripcion = CTKFecha(self,"Fin Inscripción")
+        self.fecha_fin_inscripcion.pack(fill ="x", pady=PADY_FILA, padx = 15)
         
         # Clases
-        self.registrar_fecha(self.set_fecha_inicio_clases, titulo_btn="Inicio Clases")
-        self.fecha_inicio_clases_label = ctk.CTkLabel(self, text="Inicio de Clases: No seleccionada",text_color=COLOR_TEXTO_PRINCIPAL)
-        self.fecha_inicio_clases_label.pack(pady=(10, 0), padx=20, anchor="w")
+        #self.registrar_fecha(self.set_fecha_inicio_clases, titulo_btn="Inicio Clases")
+        self.fecha_inicio_clases = CTKFecha(self,"Inicio Clases")
+        self.fecha_inicio_clases.pack(fill ="x", pady=PADY_FILA, padx = 15)
         
-        self.registrar_fecha(self.set_fecha_fin_clases, titulo_btn="Fin Clases")
-        self.fecha_fin_clases_label = ctk.CTkLabel(self, text="Fin de Clases: No seleccionada",text_color=COLOR_TEXTO_PRINCIPAL)
-        self.fecha_fin_clases_label.pack(pady=(5, 0), padx=20, anchor="w")
+        #self.registrar_fecha(self.set_fecha_fin_clases, titulo_btn="Fin Clases")
+        self.fecha_fin_clases = CTKFecha(self,"Fin Clases")
+        self.fecha_fin_clases.pack(fill ="x", pady=PADY_FILA, padx = 15)
         
         # Evaluaciones
-        self.registrar_fecha(self.set_fecha_inicio_evaluaciones, titulo_btn="Inicio Evaluaciones")
-        self.fecha_inicio_evaluaciones_label = ctk.CTkLabel(self, text="Inicio de Evaluaciones: No seleccionada",text_color=COLOR_TEXTO_PRINCIPAL)
-        self.fecha_inicio_evaluaciones_label.pack(pady=(10, 0), padx=20, anchor="w")
+        #self.registrar_fecha(self.set_fecha_inicio_evaluaciones, titulo_btn="Inicio Evaluaciones")
+        self.fecha_inicio_evaluaciones = CTKFecha(self,"Inicio Evaluaciones")
+        self.fecha_inicio_evaluaciones.pack(fill ="x", pady=PADY_FILA, padx = 15)
         
-        self.registrar_fecha(self.set_fecha_fin_evaluaciones, titulo_btn="Fin Evaluaciones")
-        self.fecha_fin_evaluaciones_label = ctk.CTkLabel(self, text="Fin de Evaluaciones: No seleccionada",text_color=COLOR_TEXTO_PRINCIPAL)
-        self.fecha_fin_evaluaciones_label.pack(pady=(5, 0), padx=20, anchor="w")
+        #self.registrar_fecha(self.set_fecha_fin_evaluaciones, titulo_btn="Fin Evaluaciones")
+        self.fecha_fin_evaluaciones = CTKFecha(self,"Fin Evaluaciones")
+        self.fecha_fin_evaluaciones.pack(fill ="x", pady=PADY_FILA, padx = 15)
         
         self._crear_fila_widgets([
             ("Duración en semanas", crear_entry, {"width": 200, "placeholder_text": "Ingrese la duración en semanas"},1,self,"duracion_semanas_entry"),

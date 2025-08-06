@@ -36,13 +36,14 @@ class ModeloDocente:
             
             cursor.execute('''
                            INSERT INTO docentes
-                           (persona_id, abreviatura_titulo, especialidad, fecha_ingreso, tipo_contrato, categoria, auxiliar, dedicacion, estado)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                           (persona_id, abreviatura_titulo, especialidad, fecha_ingreso,fecha_ingreso_uptrjf ,tipo_contrato, categoria, auxiliar, dedicacion, estado)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                            ''', (
                             persona_id,
                             datos_docentes.get('abreviatura_titulo', ''),
                             datos_docentes.get('especialidad', ''),
                             datos_docentes.get('fecha_ingreso', ''),
+                            datos_docentes.get('fecha_ingreso_uptrjf'),
                             datos_docentes.get('tipo_contrato', ''),
                             datos_docentes.get('categoria', ''),
                             datos_docentes.get('auxiliar', ''),

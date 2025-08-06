@@ -203,7 +203,7 @@ class ControllerPNF:
             "duracion_creditos": vista_pnf.duracion_creditos_entry.get(),
             "duracion_horas": vista_pnf.duracion_horas_entry.get(),
 
-            "fecha_resolucion": vista_pnf.fecha_resolucion,
+            "fecha_resolucion": vista_pnf.fecha_resolucion.get_date(),
             "titulo_otorga": vista_pnf.titulo_otorga_entry.get(),
             "perfil_egreso": vista_pnf.perfil_egreso_entry.get(),
             "version_pensum": vista_pnf.version_pensum_entry.get(),

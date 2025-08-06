@@ -1,6 +1,8 @@
 import customtkinter as ctk
 import tkinter as tk
 import tkinter.messagebox as messagebox
+import subprocess
+import platform
 
 from views.dashboard.components.widget_utils import *
 
@@ -170,4 +172,4 @@ class Config_user(ctk.CTkFrame):
 
         messagebox.showinfo("Éxito", "Datos personales de Usuario actualizados correctamente.")
 
-
+    

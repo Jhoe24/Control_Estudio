@@ -4,6 +4,7 @@ import threading
 import tkinter.messagebox as messagebox
 from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
+from views.dashboard.components.caendario import CTKFecha
 from views.dashboard.modules.forms.Periodos_academico.formPeriodoAcademico import FormPeriodoAcademico
 
 class ListPeriodoAcademicoView(ctk.CTkFrame):
@@ -312,22 +313,29 @@ class ListPeriodoAcademicoView(ctk.CTkFrame):
             form.observacion_entry.insert(0, periodo.get("observaciones", ""))
 
             # Fechas
-            if periodo.get("fecha_inicio"):
-                form.set_fecha_inicio(periodo["fecha_inicio"])
-            if periodo.get("fecha_fin"):
-                form.set_fecha_fin(periodo["fecha_fin"])
-            if periodo.get("fecha_inicio_inscripcion"):
-                form.set_fecha_inicio_inscripcion(periodo["fecha_inicio_inscripcion"])
-            if periodo.get("fecha_fin_inscripcion"):
-                form.set_fecha_fin_inscripcion(periodo["fecha_fin_inscripcion"])
-            if periodo.get("fecha_inicio_clases"):
-                form.set_fecha_inicio_clases(periodo["fecha_inicio_clases"])
-            if periodo.get("fecha_fin_clases"):
-                form.set_fecha_fin_clases(periodo["fecha_fin_clases"])
-            if periodo.get("fecha_inicio_evaluaciones"):
-                form.set_fecha_inicio_evaluaciones(periodo["fecha_inicio_evaluaciones"])
-            if periodo.get("fecha_fin_evaluaciones"):
-                form.set_fecha_fin_evaluaciones(periodo["fecha_fin_evaluaciones"])
+            if "fecha_inicio" in periodo and periodo["fecha_inicio"]:
+                form.fecha_inicio.set_date(str(periodo["fecha_inicio"]))
+
+            if "fecha_fin" in periodo and periodo["fecha_fin"]:
+                form.fecha_fin.set_date(str(periodo["fecha_fin"]))
+
+            if "fecha_inicio_inscripcion" in periodo and periodo["fecha_inicio_inscripcion"]:
+                form.fecha_inicio_inscripcion.set_date(str(periodo["fecha_inicio_inscripcion"]))
+                
+            if "fecha_fin_inscripcion" in periodo and periodo["fecha_fin_inscripcion"]:
+                form.fecha_fin_inscripcion.set_date(str(periodo["fecha_fin_inscripcion"]))
+
+            if "fecha_inicio_clases" in periodo and periodo["fecha_inicio_clases"]:
+                form.fecha_inicio_clases.set_date(str(periodo["fecha_inicio_clases"]))
+
+            if "fecha_fin_clases" in periodo and periodo["fecha_fin_clases"]:
+                form.fecha_fin_clases.set_date(str(periodo["fecha_fin_clases"]))
+
+            if "fecha_inicio_evaluaciones" in periodo and periodo["fecha_inicio_evaluaciones"]:
+                form.fecha_inicio_evaluaciones.set_date(str(periodo["fecha_inicio_evaluaciones"]))
+
+            if "fecha_fin_evaluaciones" in periodo and periodo["fecha_fin_evaluaciones"]:
+                form.fecha_fin_evaluaciones.set_date(str(periodo["fecha_fin_evaluaciones"]))
 
             # AHORA bloquear campos
             form.deshabilitar_campos()
