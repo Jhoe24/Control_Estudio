@@ -809,6 +809,28 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
+    def obtener_nombre_pnf_asignado_docente(self, docente_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT dsp.*, pnf.nombre AS nombre_pnf
+                FROM docente_sede_pnf dsp
+                JOIN pnf ON dsp.pnf_id = pnf.id
+                WHERE dsp.docente_id = ?
+                """, (docente_id,)
+            )
+            return cursor.fetchall()  # Lista de diccionarios con nombre_pnf incluido
+        except Exception as e:
+            print(f"Error al obtener el PNF asignado: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
+
 
     def obtener_nombres_por_id(self, tabla, id):
         con = None

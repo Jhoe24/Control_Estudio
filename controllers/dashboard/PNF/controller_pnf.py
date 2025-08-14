@@ -542,3 +542,9 @@ class ControllerPNF:
     def obtener_nombres_por_id(self, tabla, id):
         return self.modelo.obtener_nombres_por_id(tabla, id)
         
+    def obtener_uc_por_pnf(self, pnf_id):
+        """
+        Retorna las Unidades Curriculares asociadas a un PNF específico.
+        """
+        sentencia = "SELECT id, nombre FROM unidades_curriculares WHERE pnf_id = ?"
+        return self.modelo.buscar_uc_por_pnf(sentencia, (pnf_id,), es_dic=True)

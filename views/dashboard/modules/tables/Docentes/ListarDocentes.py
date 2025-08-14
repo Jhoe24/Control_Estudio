@@ -5,6 +5,7 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame
 from views.dashboard.modules.RegistrarDocentes import FormularioDocenteView
 from views.dashboard.modules.forms.Docentes.listaAsignacion import ListaAsignacionPNF
+from views.dashboard.modules.forms.Docentes.listaAsignacionUC import ListaAsignacionUC
 
 class ListDocenteView(ctk.CTkFrame):
     def __init__(self, master, controlador, controller_pnf):
@@ -189,8 +190,15 @@ class ListDocenteView(ctk.CTkFrame):
 
             )
 
+            btn_uc = ctk.CTkButton(
+                frame_botones, text="Gestion U.C", width=100,
+                text_color="#ffffff",
+                command=lambda est=docente: self.cargar_uc(est)
+            )
+
             boton.pack(side="left", padx=(0, 4), pady=5)
             btn_pnf.pack(side="left", pady=5)
+            btn_uc.pack(side="left", padx=(4, 0), pady=5)
 
             boton.pack(padx=10, pady=5)
             fila_widgets.append(celda_btn)
@@ -241,5 +249,33 @@ class ListDocenteView(ctk.CTkFrame):
         # Crea el frame para asignar PNF
         lista_asignacion = ListaAsignacionPNF(scroll_frame,self.controller_pnf,docente)
 
+    def cargar_uc(self, docente):
+        """
+        Abre el formulario para asignar Unidades Curriculares al docente seleccionado.
+        """
+        top = ctk.CTkToplevel(self, fg_color="White")
+        top.title("Asignar Unidades Curriculares")
+        
+        ancho = 900
+        alto = 500
+
+        # Centrar ventana
+        top.update_idletasks()
+        screen_width = top.winfo_screenwidth()
+        screen_height = top.winfo_screenheight()
+        x = (screen_width // 2) - (ancho // 2) + 100
+        y = (screen_height // 2) - (alto // 2)
+        top.geometry(f"{ancho}x{alto}+{x}+{y}")
+        top.lift()
+        top.focus_force()
+        top.grab_set()
+
+        # Scroll principal del modal
+        scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
+        scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Crea el frame para asignar Unidades Curriculares
+        
+        lista_asignacion_uc = ListaAsignacionUC(scroll_frame, self.controller_pnf, docente)
        
     
