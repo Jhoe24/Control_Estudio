@@ -190,15 +190,8 @@ class ListDocenteView(ctk.CTkFrame):
 
             )
 
-            btn_uc = ctk.CTkButton(
-                frame_botones, text="Gestion U.C", width=100,
-                text_color="#ffffff",
-                command=lambda est=docente: self.cargar_uc(est)
-            )
-
             boton.pack(side="left", padx=(0, 4), pady=5)
             btn_pnf.pack(side="left", pady=5)
-            btn_uc.pack(side="left", padx=(4, 0), pady=5)
 
             boton.pack(padx=10, pady=5)
             fila_widgets.append(celda_btn)

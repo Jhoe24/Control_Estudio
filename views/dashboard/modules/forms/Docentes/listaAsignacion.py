@@ -73,10 +73,16 @@ class ListaAsignacionPNF(SectionFrameBase):
         for frames_new in self.listaFrameAgregados:
             if frames_new.winfo_exists():
                 frames_new.guardar_datos()
+                uc_seleccionadas = frames_new.obtener_uc_seleccionadas()
+                print("Docente inscrito en las siguientes UC:", [uc['nombre'] for uc in uc_seleccionadas])
+
 
         #actualizar los pnf existentes
         for frames_update in self.listaFrameCargados:
             frames_update.actualizar_datos_pnf()
+            uc_seleccionadas = frames_update.obtener_uc_seleccionadas()
+            print("Docente inscrito en las siguientes UC (nuevas):", [uc['nombre'] for uc in uc_seleccionadas])
+
         
         self.winfo_toplevel().destroy()
         

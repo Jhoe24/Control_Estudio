@@ -2,6 +2,7 @@ import tkinter.messagebox as messagebox
 import customtkinter as ctk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
+from views.dashboard.modules.forms.Docentes.listaAsignacionUC import ListaAsignacionUC
 from ..DatosPersonales import DatosPersonalesFrame
 
 class AsignarDocentePNFFrame(SectionFrameBase):
@@ -20,6 +21,7 @@ class AsignarDocentePNFFrame(SectionFrameBase):
         self.para_edicion = para_edicion
         self.id_asignacion = None
 
+        self.uc_frame = None
 
         if not self.controller_pnf:
             print("Error: El controlador de PNF no está definido.")
@@ -70,6 +72,14 @@ class AsignarDocentePNFFrame(SectionFrameBase):
                     ("Observaciones:", crear_entry, {"width":300, "placeholder_text":"Ingrese observaciones", "textvariable": self.var_observaciones}, 1, self, 'observaciones_entry'),
                 ])
 
+                # --- Botón para mostrar UC ---
+                self.btn_uc = ctk.CTkButton(
+                    self,
+                    text="Asignar Unidades Curriculares",
+                    command=self.mostrar_uc_frame
+                )
+                self.btn_uc.pack(pady=(10, 0), padx=10, anchor="w")
+
                 self.instancias_widgets = [
                     self.pnf_menu,
                     self.btn_fecha_asignacion,
@@ -77,6 +87,7 @@ class AsignarDocentePNFFrame(SectionFrameBase):
                     self.check_coordinador,
                     self.check_activo,
                     self.observaciones_entry,
+                    self.btn_uc,
                 ]
             else:
                 self.master.no_pnf_disponibles()
@@ -152,6 +163,7 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             "coordinador": self.var_coordinador.get(),
             "activo": self.var_activo.get(),
             "observaciones": self.var_observaciones.get(),
+            "uc_seleccionadas": [uc['id'] for uc in self.obtener_uc_seleccionadas()],
         }
        
         if self.controller_pnf.modelo.registrar_asignacion_docente_pnf(datos):
@@ -168,6 +180,7 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             "coordinador": self.var_coordinador.get(),
             "activo": self.var_activo.get(),
             "observaciones": self.var_observaciones.get(),
+            "uc_seleccionadas": [uc['id'] for uc in self.obtener_uc_seleccionadas()],
         }
 
        
@@ -248,4 +261,21 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             #self.btn_guardar.configure(state="disabled")
         else:
             messagebox.showerror("Error", "No se pudieron cargar los datos del PNF.", parent=self)
-            
+
+#===================================================================================
+
+    def mostrar_uc_frame(self):
+        # Si ya existe, destrúyelo antes de crear uno nuevo
+        if self.uc_frame:
+            self.uc_frame.destroy()
+        self.uc_frame = ListaAsignacionUC(self, self.controller_pnf, self.docente)
+        self.uc_frame.pack(fill="both", expand=True, pady=(10, 0))
+
+    def obtener_uc_seleccionadas(self):
+        if hasattr(self, 'uc_frame') and self.uc_frame:
+            return [uc for uc, var in self.uc_frame.uc_vars if var.get()]
+        return []
+        
+    
+    
+    
