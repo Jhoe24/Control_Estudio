@@ -11,6 +11,7 @@ class AsignarSeccionFrame(SectionFrameBase):
         self.pnf_id = pnf_id
         self.trayecto_id = trayecto_id
         self.tramo_id = tramo_id
+        self.var_seccion = None
         #Secciones_disponibles es donde se extraen los datos de las secciones asignadas a ese pnf
         self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id,trayecto_id,tramo_id)
         if self.secciones_disponibles:
@@ -53,8 +54,8 @@ class AsignarSeccionFrame(SectionFrameBase):
     def cargar_datos_secciones(self, datos):
         if datos["seccion_id"]:
             nombre = self.controller_secciones.obtener_nombre_por_id(datos["seccion_id"])
-            
-            self.var_seccion.set(nombre["codigo_seccion"])
+            if self.var_seccion:
+                self.var_seccion.set(nombre["codigo_seccion"])
         self.secciones_menu.configure(state="disabled")
 
         self.var_condicion.set(datos["condicion"])
