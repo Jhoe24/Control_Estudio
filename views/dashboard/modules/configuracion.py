@@ -5,17 +5,19 @@ import subprocess
 import platform
 
 from views.dashboard.components.widget_utils import *
+from views.dashboard.modules.ListadoRolesUser import FrameRoles
 
 from config.app_config import AppConfig
 
 class Config_user(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, controller):
         super().__init__(master, fg_color="transparent")
         self.master = master
+        self.controller = controller
 
         ctk.CTkLabel(
             self,
-            text="Gestión de Datos de Docente",
+            text="Gestión de Configuración de Usuario",
             font=FUENTE_TITULO_FORMULARIO,
             text_color=COLOR_TEXTO_PRINCIPAL
         ).pack(pady=(10, 20), padx=20, anchor="w")
@@ -24,29 +26,46 @@ class Config_user(ctk.CTkFrame):
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.pack(pady=(10, 20))
 
-        self.btn_contrasena = ctk.CTkButton(
-            self.button_frame, text="Cambio de Contraseña", width=180,
-            command=self.mostrar_cambiar_contrasena,
-            font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT
+        # Estilo tipo tarjeta para los botones
+        card_btn_style = {
+            "width": 220,
+            "height": 80,
+            "corner_radius": 16,
+            "fg_color": "#23272f",
+            "hover_color": "#31343c",
+            "text_color": "#fff",
+            "font": ("Segoe UI", 16, "bold"),
+            "border_width": 2,
+            "border_color": "#444857"
+        }
+
+        self.btn_asignar_roles = ctk.CTkButton(
+            self.button_frame, text="  Gestión Roles  ",
+            command=self.asignar_roles,
+            **card_btn_style
         )
-        self.btn_contrasena.pack(side="left", padx=10)
+        self.btn_asignar_roles.pack(side="left", padx=15)
+
+        self.btn_contrasena = ctk.CTkButton(
+            self.button_frame, text="   Cambio de Contraseña   ", 
+            command=self.mostrar_cambiar_contrasena,
+            **card_btn_style
+        )
+        self.btn_contrasena.pack(side="left", padx=15)
 
         self.btn_datos = ctk.CTkButton(
-            self.button_frame, text="Cambio de Datos Personales", width=180,
+            self.button_frame, text="Cambio de Datos Personales", 
             command=self.mostrar_cambiar_datos_personales,
-            font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG,
-            hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT
+            **card_btn_style
         )
-        self.btn_datos.pack(side="left", padx=10)
+        self.btn_datos.pack(side="left", padx=15)
 
         self.btn_desbloqueo = ctk.CTkButton(
-            self.button_frame, text="Desbloqueo de Usuarios", width=180,
+            self.button_frame, text="  Desbloqueo de Usuarios  ", 
             command=self.mostrar_desbloqueo_usuarios,
-            font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT
+            **card_btn_style
         )
-        self.btn_desbloqueo.pack(side="left", padx=10)
+        self.btn_desbloqueo.pack(side="left", padx=15)
 
         # Frame donde se actualiza el contenido según el botón presionado
         self.contenido_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -171,5 +190,15 @@ class Config_user(ctk.CTkFrame):
         print("Campos a actualizar: ", campos_a_actualizar)
 
         messagebox.showinfo("Éxito", "Datos personales de Usuario actualizados correctamente.")
+
+    def asignar_roles(self):
+        self.limpiar_contenido_frame()
+
+        # Crear instancia del FrameRoles
+        frame_roles = FrameRoles(self.contenido_frame, controller=self.controller)
+        frame_roles.pack(fill="both", expand=True)
+
+        # Cargar los roles en el FrameRoles
+        frame_roles.cargar_datos()
 
     

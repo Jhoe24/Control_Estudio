@@ -2,10 +2,12 @@ import customtkinter as ctk
 
 from views.auth.login_view import LoginView
 from views.auth.register_view import RegisterView
+from views.auth.register_personal import RegisterPersonalView
 
 from views.dashboard.pages.admin_dashboard import AdminDashboardView
 
 from controllers.auth.auth_controller import AuthController
+from controllers.auth.user_controller import UserController
 from services.usuario_services import UsuarioService
 
 from controllers.dashboard.RegistroEstudiantes.RegistroEstudiante import EstudianteController
@@ -49,9 +51,11 @@ class MainWindow(ctk.CTk):
         
         self.auth_controller = {
             "Mostrar_Ventanas": self,
-            "Autenticacion": (AuthController(UsuarioService), self)
+            #"Autenticacion": (AuthController(UsuarioService), self),
+            "LoginAuth": AuthController()
             }  # Aquí se inicializa el controlador de autenticación, osea lo del login, registro, etc.
         self.dashboard_controller = {
+            "Usuario": UserController(),
             "Estudiantes": EstudianteController(),
             "Docentes":  DocenteController(),
             "PNF": ControllerPNF(),
@@ -82,12 +86,17 @@ class MainWindow(ctk.CTk):
         AppConfig().centrar_ventana(self, *self.tamano_ventana.split("x"))  # Centramos la ventana en la pantalla
         
 
-    def mostrar_vista_registro(self):
+    def mostrar_vista_registro(self, perosna_id):
         self.limpiar_vista_actual()
         self.title(self.titulo + "  -  " + "Registro de Usuario")
-        self.vista_actual = RegisterView(self, self.auth_controller)
+        self.vista_actual = RegisterView(self, self.auth_controller, perosna_id)
         self.vista_actual.pack(fill="both", expand=True, padx=10, pady=10) # Aplicamos el padding aquí
-        
+    
+    def mostrar_vista_registro_personal(self):
+        self.limpiar_vista_actual()
+        self.title(self.titulo + "  -  " + "Registro de Usuario")
+        self.vista_actual = RegisterPersonalView(self, self.auth_controller)
+        self.vista_actual.pack(fill="both", expand=True, padx=10, pady=10) # Aplicamos el padding aquí
         
         # nuevo_tamano = str(self.winfo_screenmmwidth())+"x"+str(self.winfo_screenmmheight())
         # AppConfig().centrar_ventana(self, nuevo_tamano.split("x"))  

@@ -174,7 +174,7 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
         
-        configuracion = Config_user(self.cuerpo_principal)
+        configuracion = Config_user(self.cuerpo_principal, self.controller)
         configuracion.pack(fill="both", expand=True, padx=10, pady=10)
 
     def configuracion_sistema(self):

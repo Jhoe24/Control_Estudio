@@ -36,7 +36,7 @@ class LoginView(BaseAuthVisualView):
             self.frame_contenido,
             '¿No tienes cuenta?',
             "Registrate Aqui",
-            self.controller["Mostrar_Ventanas"].mostrar_vista_registro
+            self.controller["Mostrar_Ventanas"].mostrar_vista_registro_personal
         )
         
         # Crear enlace de ayuda
@@ -61,7 +61,7 @@ class LoginView(BaseAuthVisualView):
             
             self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))
         
-        elif username == "admin" and password == "123":
+        elif self.controller["LoginAuth"].login(username, password):
             # Si las credenciales son correctas, muestra un mensaje y procede al dashboard
             # self.mensaje_label.configure(text="Inicio de Sesión Exitoso!", text_color="green")
             # self.mensaje_label.pack_forget()
@@ -71,16 +71,16 @@ class LoginView(BaseAuthVisualView):
             
         else:
             
-            if username != "admin":
-                self.mensaje_label.configure(text="Usuario Incorrecto.", text_color="red")
-                self.mensaje_label.pack_forget()
-                self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))  
-            elif password != "123":
-                self.mensaje_label.configure(text="Contraseña Incorrecta.", text_color="red")
-                self.mensaje_label.pack_forget()
-                self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))
+            # if username != "admin":
+            #     self.mensaje_label.configure(text="Usuario Incorrecto.", text_color="red")
+            #     self.mensaje_label.pack_forget()
+            #     self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))  
+            # elif password != "123":
+            #     self.mensaje_label.configure(text="Contraseña Incorrecta.", text_color="red")
+            #     self.mensaje_label.pack_forget()
+            #     self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))
             
-            else:
+           # else:
                 self.mensaje_label.configure(text="Credenciales Incorrectas.", text_color="red")
                 self.mensaje_label.pack_forget()
                 self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))

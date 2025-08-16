@@ -41,7 +41,7 @@ class LoginUserModel:
                 con.close()
 
     
-    def register_user(self, user_name, password):
+    def register_user(self, user_name, password, persona_id):
         con = None
         try:
             con = sql.connect(self.db_ruta)
@@ -49,12 +49,13 @@ class LoginUserModel:
             password_hash = hashlib.sha256(password.encode()).hexdigest()
             cursor.execute(
                 """
-                INSERT INTO usuarios (nombre_usuario, password_hash) VALUES (?, ?)
+                INSERT INTO usuarios (persona_id, nombre_usuario, password_hash) VALUES (?, ?, ?)
                 """,
-                (user_name, password_hash)
+                (persona_id,user_name, password_hash)
             )
             con.commit()
-            return True
+            user_id = cursor.lastrowid
+            return user_id
         except Exception as e:
             print(f"Error al registrar usuario: {e}")
             return False
@@ -84,18 +85,61 @@ class LoginUserModel:
         finally:
             if con is not None:
                 con.close()
-        
-    def register_person(self, dic_dates):
+
+    def search_document(self, tip_document,document):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM informacion_personal WHERE tipo_documento = ? AND documento_identidad = ? 
+                """,
+                (tip_document,document,)
+            )
+            result = cursor.fetchone()
+            return result
+        except Exception as e:
+            print(f"Error al buscar documento: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
+
+    def exists_username(self, perosna_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM usuarios WHERE persona_id = ?
+                """,
+                (perosna_id,)
+            )
+            result = cursor.fetchone()
+            if result:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(f"Error al verificar si el usuario existe: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+    def register_person(self, dic_dates,fecha_registro):
         con = None 
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
             cursor.execute(
                 """
-                INSERT INTO informacion_personal (documento_identidad, tipo_documento, nombre, apellido, 
+                INSERT INTO informacion_personal (documento_identidad, tipo_documento, nombres, apellidos, 
                 fecha_nacimiento, sexo, estado_civil, nacionalidad, lugar_nacimiento, correo_electronico, 
                 fecha_registro, tipo, estado)
-                VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     dic_dates['documento_identidad'],
@@ -108,53 +152,21 @@ class LoginUserModel:
                     dic_dates['nacionalidad'],
                     dic_dates['lugar_nacimiento'],
                     dic_dates['correo_electronico'],
-                    dic_dates['fecha_registro'],
-                    dic_dates['genero'],
+                    fecha_registro,
                     dic_dates['tipo'],
                     dic_dates['estado']
                 )
             )
 
             persona_id = cursor.lastrowid
-
-            telefonos = dic_dates.get('lista_telefonos', [])
-
-            for idx, (tipo, numero) in enumerate(telefonos):
-                cursor.execute('''
-                    INSERT INTO telefonos
-                    (persona_id, tipo_telefono, numero, principal)
-                    VALUES (?, ?, ?, ?)
-                ''', (
-                    persona_id,
-                    tipo,
-                    numero,
-                    1 if idx == 0 else 0  # El primero es principal, los demás secundarios
-                ))
-
-
-            cursor.execute('''
-                            INSERT INTO direcciones
-                            (persona_id, estado, municipio, parroquia, sector, calle, casa_edificio, direccion_completa, tipo_direccion, principal)
-                            VALUES (?,?,?,?,?,?,?,?,?,?)
-                           ''',(
-                               persona_id,
-                               dic_dates['estado'],
-                               dic_dates['municipio'],
-                               dic_dates['parroquia'],
-                               dic_dates['sector'],
-                               dic_dates['calle'],
-                               dic_dates['casa_apart'],
-                               f"{dic_dates['estado']}, {dic_dates['municipio']}, {dic_dates['parroquia']},{dic_dates['sector']},{dic_dates['calle']},{dic_dates['casa_apart']}",
-                               dic_dates['tipo_direccion'],
-                               1 #True
-                           ))
             con.commit()
-            return True
-        
-
+            return persona_id
         except Exception as e:                      
             print(f"Error al registrar persona: {e}")
             return False
         finally:
             if con is not None:
                 con.close()
+
+
+    
