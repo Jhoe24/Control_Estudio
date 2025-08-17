@@ -68,14 +68,21 @@ class BaseAuthVisualView(BaseView):
         label_titulo = ctk.CTkLabel(self.frame_cabecera, text=texto, font=('Arial', 30), text_color="#fff")
         label_titulo.pack(expand=ctk.YES, fill=ctk.BOTH)
 
-    def crear_campo(self, frame, etiqueta, es_password=False):
+    def crear_campo(self, frame, etiqueta, es_password=False, textvariable_=None):
         label = ctk.CTkLabel(frame, text=etiqueta, font=('Arial', 14), anchor='w', text_color="#fff")
         label.pack(fill=ctk.X, padx=20, pady=0)
-        if not es_password:
+
+        if not es_password and textvariable_ is None:
             campo = ctk.CTkEntry(frame, font=('Arial', 14), text_color="black", fg_color="#fff")
             campo.pack(fill=ctk.X, padx=20, pady=2)
             return campo
-        else:
+        
+        elif textvariable_ is not None and not es_password:
+            campo = ctk.CTkEntry(frame, font=('Arial', 14), text_color="black", fg_color="#fff", textvariable=textvariable_)
+            campo.pack(fill=ctk.X, padx=20, pady=2)
+            return campo
+        
+        elif es_password:
             campo = ctk.CTkEntry(frame, font=('Arial', 14), show="*", text_color="black", fg_color="#fff")
             campo.pack(fill=ctk.X, padx=20, pady=2)
             return campo
@@ -93,3 +100,10 @@ class BaseAuthVisualView(BaseView):
         boton.pack(side="left", padx=0, pady=0)
         
         return boton
+
+    def crear_radio_texto(self, frame, texto, variable, valor):
+        """Crea un botón de opción (radio button) con texto"""
+        radio = ctk.CTkRadioButton(frame, text=texto, variable=variable, value=valor, 
+                                   font=('Arial', 14), text_color="#fff", fg_color="#fff")
+        radio.pack(side="left", padx=10, pady=0)
+        return radio

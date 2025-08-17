@@ -180,9 +180,9 @@ class ModelRegistroEstudiantes:
             cursor.execute('''
                            SELECT ip.*, e.*
                            FROM informacion_personal ip
-                           JOIN estudiantes e ON ip.id= e.persona_id
+                           LEFT JOIN estudiantes e ON ip.id= e.persona_id
                            WHERE ip.tipo='estudiante'
-                           LIMIT 13
+                           LIMIT 11
                            OFFSET ?
                            ''',(registro_inicio,))
             resultados = cursor.fetchall()
@@ -307,7 +307,7 @@ class ModelRegistroEstudiantes:
             cursor.execute('''
                 SELECT ip.id AS persona_id, ip.*, e.id AS estudiante_id, e.*
                 FROM informacion_personal ip
-                JOIN estudiantes e ON ip.id= e.persona_id
+                LEFT JOIN estudiantes e ON ip.id= e.persona_id
                 WHERE ip.tipo='estudiante' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
                 LIMIT 1
             ''', (tipo_documento, nro_documento))

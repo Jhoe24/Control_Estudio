@@ -49,7 +49,7 @@ def crear_check_box(master, **kwargs):
 def crear_radio_button(master, **kwargs):
     return ctk.CTkRadioButton(master, font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL, border_color=COLOR_ENTRY_BORDER, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, **kwargs)
 
-def create_option_menu_row(parent_frame, label_text, options, variable, width=350, font_size=15, funcion = None, side_ = "right", fill_ = "x",crear_frame = True):
+def create_option_menu_row(parent_frame, label_text, options, variable, width=350, font_size=15, funcion = None, side_ = "right", fill_ = "x",crear_frame = True, text_color_=COLOR_TEXTO_PRINCIPAL):
     """
     Crea una fila con una etiqueta y un CTkOptionMenu con tamaños ajustados.
     """
@@ -62,7 +62,7 @@ def create_option_menu_row(parent_frame, label_text, options, variable, width=35
     # Fuente para la etiqueta
     label_font = ("Roboto", font_size) # Usar la misma fuente y tamaño que el optionmenu para consistencia
 
-    label = ctk.CTkLabel(frame, text=label_text, font=label_font,text_color=COLOR_TEXTO_PRINCIPAL)
+    label = ctk.CTkLabel(frame, text=label_text, font=label_font,text_color=text_color_)
     label.pack(side="left", padx=(20, 10)) # Aumentar padx para más espacio horizontal
 
     # Fuente para el OptionMenu

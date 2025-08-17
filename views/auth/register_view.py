@@ -2,9 +2,9 @@ import customtkinter as ctk
 from views.auth.base_auth_visual import BaseAuthVisualView
 
 class RegisterView(BaseAuthVisualView):
-    def __init__(self, master, controller, **kwargs):
+    def __init__(self, master, controller, persona_id,**kwargs):
         super().__init__(master, controller, titulo="Registrar Usuario", es_login=False, **kwargs)
-
+        self.persona_id = persona_id
     def crear_contenido_especifico(self):
         self.crear_titulo("Registrar Nuevo Usuario")
 
@@ -33,20 +33,17 @@ class RegisterView(BaseAuthVisualView):
         if not nuevo_usuario or not nueva_contraseña or not confi_contraseña:
             self.mostrar_mensaje("Mensaje", "Error: campos vacíos", "error")
         else:
-            # Aquí deberías tener tu lógica de verificación de usuario y registro
-            if True:#hasattr(self.controller, "registro_controlador") and \
-               #self.controller.registro_controlador.verificarUsuario(nuevo_usuario):
-                self.mostrar_mensaje("Mensaje", "Error: el usuario ya existe", "error")
+           
+            if nueva_contraseña != confi_contraseña:
+                self.mostrar_mensaje("Mensaje", "Error: las contraseñas son diferentes", "error")
             else:
-                if nueva_contraseña != confi_contraseña:
-                    self.mostrar_mensaje("Mensaje", "Error: las contraseñas son diferentes", "error")
+                # Aquí puedes llamar a la función para mostrar la siguiente vista o guardar el usuario
+                if self.controller["LoginAuth"].register_user(self.persona_id,nuevo_usuario, nueva_contraseña):
+                    self.mostrar_mensaje("Mensaje", "Registro exitoso", "info")
+                    self.controller["Mostrar_Ventanas"].mostrar_vista_login()
+
                 else:
-                    # Aquí puedes llamar a la función para mostrar la siguiente vista o guardar el usuario
-                    if True:#hasattr(self.controller, "mostrar_vista_preguntas"):
-                        self.mostrar_mensaje("Mensaje", "Registro exitoso (simulado)", "info")
-                        #self.controller.mostrar_vista_preguntas(nuevo_usuario, "", nueva_contraseña)
-                    else:
-                        self.mostrar_mensaje("Mensaje", "Registro exitoso (simulado)", "info")
+                    self.mostrar_mensaje("Mensaje", "Registro exitoso (simulado)", "info")
 
     def validarCampo(self, text):
         return text.isdecimal() and len(text) <= 8 or text == ""

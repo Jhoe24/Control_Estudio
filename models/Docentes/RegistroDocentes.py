@@ -139,7 +139,7 @@ class ModeloDocente:
             cursor.execute('''
                            SELECT ip.*, e.*
                            FROM informacion_personal ip
-                           JOIN docentes e ON ip.id= e.persona_id
+                           JOIN docentes e ON ip.id = e.persona_id
                            WHERE ip.tipo='docente'
                            LIMIT 13
                            OFFSET ?
