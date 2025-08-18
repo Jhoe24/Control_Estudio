@@ -129,11 +129,15 @@ class AsignarPNFFrame(SectionFrameBase):
 
     def mostrar_form_seccion(self,datos = None):
         self.btn_secciones.configure(text="Cancelar Seccion", command=self.cancelar_asignacion_seccion)
+        state_frame = False
+        if datos:
+            state_frame = True
 
         self.asignacion_seccion = AsignarSeccionFrame(self,self.controller_secciones,
                                                       self.pnf_id_por_nombre[self.var1.get()],
                                                       self.trayecto_id_por_nombre[self.var_trayecto.get()],
-                                                      self.tramo_id_por_nombre[self.var_tramo.get()])
+                                                      self.tramo_id_por_nombre[self.var_tramo.get()],
+                                                      carga_datos=state_frame)
         
         self.asignacion_seccion.pack(pady = 10, padx = 10, fill="both", expand=True)
         if datos:
@@ -247,7 +251,6 @@ class AsignarPNFFrame(SectionFrameBase):
             self.asignacion_seccion.actualizar_datos_secciones(self.pnf_id_por_nombre[self.var1.get()],
                                                                self.trayecto_id_por_nombre[self.var_trayecto.get()],
                                                                self.tramo_id_por_nombre[value])
-
 
     def guardar_datos(self):
         datos = self.controller_pnf.obtener_asignacion_pnf(self)

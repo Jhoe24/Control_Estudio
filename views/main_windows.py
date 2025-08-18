@@ -124,9 +124,23 @@ class MainWindow(ctk.CTk):
     def _create_dashboard_view(self, username, user_rol):
         """Método auxiliar para crear la vista del dashboard después de un pequeño retraso."""
         # Dependiendo del rol del usuario, mostramos la vista correspondiente
-        if user_rol == "admin":
+        if user_rol == "ADMIN":
             self.vista_actual = AdminDashboardView(self, self.dashboard_controller, username, user_rol)
+        elif user_rol == "COORD_GENERAL":
+            #periodos academicos, sedes, registro de docentes, registro de estudiantes, carga de notas y modificaciones de cada vista
+            pass  # Aquí iría la vista para COORD_GENERAL
+        elif user_rol == "COORD_PNF":
+            #registro de unidades curriculares, listado de unidades curriculares correspondientes a su pnf en q está inscrito, y puede asignar docentes al pnf del q es coordinador
+            pass  # Aquí iría la vista para COORD_PNF
+        elif user_rol == "DOCENTE":
+            #carga de notas, y q muestre solo las unidades curriculares a las que está asignado
+            pass  # Aquí iría la vista para DOCENTE
+        elif user_rol == "ESTUDIANTE":
+            #mostrar solo sus datos personales y sus notas en las unidades curriculares a las que está inscrito
+            pass  # Aquí iría la vista para ESTUDIANTE
+ 
 
+    #coordinador sede todos los pnf, coordinador pnf solo su pnf y docente va cargar las secciones que tiene asignadas a su pnf
 
     def run(self):
         self.mainloop()

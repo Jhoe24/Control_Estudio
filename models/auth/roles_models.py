@@ -108,16 +108,16 @@ class RolUserModel:
             if con is not None:
                 con.close()
 
-    def obtener_id_por_codigo(self, codigo):
+    def obtener_valor_especifico(self, campo_obtener,campo_filtro, valor_filtro):
         con = None
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
             cursor.execute(
-                """
-                SELECT id FROM roles WHERE codigo = ?
+                f"""
+                SELECT {campo_obtener} FROM roles WHERE {campo_filtro} = ?
                 """,
-                (codigo,)
+                (valor_filtro,)
             )
             result = cursor.fetchone()
             if result:
@@ -150,5 +150,3 @@ class RolUserModel:
             if con is not None:
                 con.close()
 
-# bd = RolUserModel()
-# print(bd.listar_registros())

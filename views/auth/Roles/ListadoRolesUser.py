@@ -26,7 +26,7 @@ class FrameRoles(ctk.CTkFrame):
             self.cantidad_total_paginas = 1
 
         # headers de la tabla
-        headers = ["Doc. Identidad", "Nombres", "Apellidos", "Usuario", "Gestión Rol"]
+        headers = ["Doc. Identidad", "Nombres", "Apellidos", "Usuario", "Rol", "Gestión Rol"]
         for col, header in enumerate(headers):
             celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)
             celda.grid(row=1, column=col, padx=1, pady=1, sticky="nsew")
@@ -41,7 +41,8 @@ class FrameRoles(ctk.CTkFrame):
         self.frame_paginacion.grid_columnconfigure(1, weight=0)
         self.frame_paginacion.grid_columnconfigure(2, weight=0)
         self.frame_paginacion.grid_columnconfigure(3, weight=0)
-        self.frame_paginacion.grid_columnconfigure(4, weight=1)
+        self.frame_paginacion.grid_columnconfigure(4, weight=0)
+        self.frame_paginacion.grid_columnconfigure(5, weight=1)
 
         # Botones de paginación
         self.boton_anterior = ctk.CTkButton(self.frame_paginacion, text="Anterior", command=self.anterior_pagina)
@@ -105,7 +106,7 @@ class FrameRoles(ctk.CTkFrame):
             for widget in fila:
                 widget.destroy()
         self.fila_datos.clear()
-        
+
         self.fila_datos = []
         # se obtienen los datos y me devuelve el diccionario
         for fila, dic_user in enumerate(self.usuarios_dato, start=2):
@@ -116,25 +117,39 @@ class FrameRoles(ctk.CTkFrame):
                 self._crear_celda(fila, 3, dic_user['nombre_usuario']),
                 #self._crear_celda(fila, 4, dic_user['rol_id']),
             ]
+            celda_optionmenu = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=6)
+            celda_optionmenu.grid(row=fila, column=4, padx=1, pady=6, sticky="nsew")
+
+            roles = self.controller_user.obtener_roles()
+            var_role = ctk.StringVar(value=roles[0] if roles else "")  
+            state_asignar = "normal"
+            state_actualizar = "disabled"
+            
+            hay_rol = self.controller_user.obtener_rol(dic_user['id'])
+            if hay_rol:
+                state_asignar = "disabled"
+                state_actualizar = "normal"
+                var_role.set(hay_rol)
+
+            role_menu = ctk.CTkOptionMenu(
+                celda_optionmenu,
+                values=roles,
+                variable=var_role,
+                width=120,
+                state=state_asignar
+            )
+            role_menu.pack(padx=10, pady=5)
+            fila_widgets.append(celda_optionmenu)
+
             celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=6)
-            celda_btn.grid(row=fila, column=4, padx=1, pady=6, sticky="nsew")
+            celda_btn.grid(row=fila, column=5, padx=1, pady=6, sticky="nsew")
 
             # Frame interno para centrar los botones
             frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
             frame_botones.pack(expand=True)
-            
-            roles = self.controller_user.obtener_roles()
-            self.var_role = ctk.StringVar(value=roles[0] if roles else "")
-            role_menu = ctk.CTkOptionMenu(
-                frame_botones,
-                values=roles,
-                variable=self.var_role,
-                width=120
-                
-            )
-            role_menu.pack(side="left",padx=10, pady=5)
 
-            boton= ctk.CTkButton(
+            # Botón para asignar rol
+            boton = ctk.CTkButton(
                 frame_botones,
                 text="Asignar Rol",
                 width=120,
@@ -143,10 +158,25 @@ class FrameRoles(ctk.CTkFrame):
                 text_color = "#fff",
                 border_width = 2,
                 border_color =  "#444857",
-                command=lambda user_id=dic_user['id']: self.asignar_rol(user_id)
+                command=lambda rol=var_role, user_id=dic_user['id']: self.asignar_rol(rol,user_id),
+                state=state_asignar 
                 
             )
             boton.pack(side="left", padx=10, pady=5)
+            # Boton para habilitar el boton de asignar rol
+            btn = ctk.CTkButton(
+                frame_botones, 
+                text="Habilitar Rol",
+                width=120,
+                fg_color = "#23272f",
+                hover_color = "#31343c",
+                text_color = "#fff",
+                border_width = 2,
+                border_color =  "#444857",
+                command=lambda boton=boton, role_menu=role_menu: self.habilitar_botones(boton, role_menu),
+                state=state_actualizar
+            )
+            btn.pack(side="left", padx=10, pady=5)
 
             fila_widgets.append(celda_btn)
             self.fila_datos.append(fila_widgets)
@@ -166,13 +196,26 @@ class FrameRoles(ctk.CTkFrame):
         label.pack(padx=10, pady=5)
         return celda
     
-    def asignar_rol(self, user_id):
+    def asignar_rol(self,var_role, user_id):
         """
         Asigna un rol a un usuario seleccionado.
         """
         
-        if self.controller_user.register_rol(self.var_role.get(), user_id):
+        if self.controller_user.register_rol(var_role.get(), user_id):
             messagebox.showinfo("Éxito", "Rol asignado correctamente.")
+            self.actualizar_pagina()
         else:
-                messagebox.showerror("Error", "No se pudo asignar el rol.")
+            messagebox.showerror("Error", "No se pudo asignar el rol.")
+        
+    def habilitar_botones(self,boton,role_menu):
+        boton.configure(state="normal")
+        role_menu.configure(state="normal")
+
+    def actualizar_pagina(self):
+        """
+        Actualiza la página actual y recarga los datos.
+        """
+        self.paginas_mostrar = self.usuarios_dato[(self.pagina_actual-1)*self.registros_por_pagina:self.pagina_actual*self.registros_por_pagina]
+        self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
+        self.mostrar_pagina()
     

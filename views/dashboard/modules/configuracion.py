@@ -5,7 +5,7 @@ import subprocess
 import platform
 
 from views.dashboard.components.widget_utils import *
-from views.dashboard.modules.ListadoRolesUser import FrameRoles
+from views.auth.Roles.ListadoRolesUser import FrameRoles
 
 from config.app_config import AppConfig
 

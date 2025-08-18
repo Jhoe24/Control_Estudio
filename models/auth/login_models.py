@@ -26,7 +26,19 @@ class LoginUserModel:
                 password_hash = hashlib.sha256(password.encode()).hexdigest()
                 
                 if password_db == password_hash:
-                    return True
+                # Obtenemos el ID del usuario
+                    cursor.execute(
+                        """
+                        SELECT id FROM usuarios WHERE nombre_usuario = ? AND password_hash = ?
+                        """,
+                        (user, password_hash)
+                    )
+                    user_id_result = cursor.fetchone()
+                    if user_id_result:
+                        return user_id_result[0]
+                    else:
+                        return False
+                    
                 else:
                     return False
             else:
@@ -129,6 +141,26 @@ class LoginUserModel:
             if con is not None:
                 con.close()
 
+    def exists_user(self, user_name):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM usuarios WHERE nombre_usuario = ?
+                """,
+                (user_name,)
+            )
+            result = cursor.fetchone()
+            return result is not None
+        except Exception as e:
+            print(f"Error al verificar si el usuario existe: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
     def register_person(self, dic_dates,fecha_registro):
         con = None 
         try:
@@ -169,4 +201,3 @@ class LoginUserModel:
                 con.close()
 
 
-    

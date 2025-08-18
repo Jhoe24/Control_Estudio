@@ -60,14 +60,21 @@ class LoginView(BaseAuthVisualView):
                 self.mensaje_label.configure(text="Contraseña no puede estar vacía.", text_color="red")
             
             self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))
+            return
         
-        elif self.controller["LoginAuth"].login(username, password):
+        user_id = self.controller["LoginAuth"].login(username, password)
+        if user_id:
             # Si las credenciales son correctas, muestra un mensaje y procede al dashboard
             # self.mensaje_label.configure(text="Inicio de Sesión Exitoso!", text_color="green")
             # self.mensaje_label.pack_forget()
             # self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))
             #self.mostrar_mensaje("Éxito", "Inicio de Sesión Exitoso!", "info")
-            self.controller['Mostrar_Ventanas'].mostrar_vista_dashboardd("Andy", "admin")
+            rol = self.controller["LoginAuth"].obtener_rol(user_id)
+            if rol:    
+                self.controller['Mostrar_Ventanas'].mostrar_vista_dashboardd(username, rol)
+            else:
+                self.mensaje_label.configure(text="Rol no asignado al usuario.", text_color="red")
+                self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))
             
         else:
             

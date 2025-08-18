@@ -5,7 +5,7 @@ from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from ..DatosPersonales import DatosPersonalesFrame
 
 class AsignarSeccionFrame(SectionFrameBase):
-    def __init__(self, master, controller_secciones,pnf_id, trayecto_id, tramo_id):
+    def __init__(self, master, controller_secciones,pnf_id, trayecto_id, tramo_id, carga_datos=False):
         super().__init__(master,"Asignar Secciones a Estudiante",COLOR_HEADER_SECCION_BG_2)
         self.controller_secciones = controller_secciones
         self.pnf_id = pnf_id
@@ -14,7 +14,7 @@ class AsignarSeccionFrame(SectionFrameBase):
         self.var_seccion = None
         #Secciones_disponibles es donde se extraen los datos de las secciones asignadas a ese pnf
         self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id,trayecto_id,tramo_id)
-        if self.secciones_disponibles:
+        if self.secciones_disponibles or carga_datos == True:
             
             self.var_seccion = ctk.StringVar(value=self.secciones_disponibles[0] if self.secciones_disponibles else "Sin secciones")
             self.var_condicion = ctk.StringVar(value="Regular")

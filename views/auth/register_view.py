@@ -33,8 +33,10 @@ class RegisterView(BaseAuthVisualView):
         if not nuevo_usuario or not nueva_contraseña or not confi_contraseña:
             self.mostrar_mensaje("Mensaje", "Error: campos vacíos", "error")
         else:
-           
-            if nueva_contraseña != confi_contraseña:
+            if self.controller["LoginAuth"].exists_name_user(nuevo_usuario):
+                self.mostrar_mensaje("Mensaje", "Error: el usuario ya existe", "error")
+            
+            elif nueva_contraseña != confi_contraseña:
                 self.mostrar_mensaje("Mensaje", "Error: las contraseñas son diferentes", "error")
             else:
                 # Aquí puedes llamar a la función para mostrar la siguiente vista o guardar el usuario

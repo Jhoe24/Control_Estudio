@@ -6,6 +6,9 @@ class UserController:
         self.user_model = UserModel()
         self.rol_model = RolUserModel()
 
+    def obtener_rol(self, user_id):
+        return self.rol_model.obtener_rol(user_id)
+
     def obtener_tipo_user(self, id):
         return self.user_model.obtener_tipo_user(id)
 
@@ -23,20 +26,20 @@ class UserController:
         return self.rol_model.obtener_roles()
     
     def register_rol(self, codigo, id_user):
-
-        rol_id = self.rol_model.obtener_id_por_codigo(codigo)
+        """Registra un rol para un usuario dado."""
+        rol_id = self.rol_model.obtener_valor_especifico('id', 'codigo', codigo)
         if rol_id is not None:
             if self.rol_model.obtener_rol(id_user) is None:
                 result = self.rol_model.asignar_rol(id_user, rol_id)
                 if result:
-                    print(f"Error al asignar rol {codigo} a usuario con ID {id_user}.")
+                   # print(f"Error al asignar rol {codigo} a usuario con ID {id_user}.")
                     return False
-                print(f"Rol {codigo} asignado a usuario con ID {id_user}.")
+                #print(f"Rol {codigo} asignado a usuario con ID {id_user}.")
                 return True 
             else:
                 result = self.rol_model.cambiar_rol(id_user, rol_id)
                 if not result:
-                    print(f"Error al cambiar rol a {codigo} para usuario con ID {id_user}.")
+                    #print(f"Error al cambiar rol a {codigo} para usuario con ID {id_user}.")
                     return False
                 print(f"Rol {codigo} cambiado a usuario con ID {id_user}.")
                 return True
