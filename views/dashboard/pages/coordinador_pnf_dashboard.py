@@ -6,12 +6,21 @@ from config.settings import Settings
 from views.dashboard.components.label_Bienvenida import LabelBienvenida
 from views.dashboard.components.card import Card, CardDisplay
 
+from views.dashboard.modules.tables.Docentes.ListarDocentes import ListDocenteView
+
+from views.dashboard.modules.PNF import FormularioPNFPensumView
+
+from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
+from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
+
 from views.dashboard.modules.Carga_notas import CargaNotasView
+#from views.dashboard.modules.Sedes import ListSedesView
 
 from views.dashboard.modules.configuracion import Config_user
 from views.dashboard.modules.configuracion_sistema import Config_system
 
-class DocenteDashboardView(BaseDashboardView):
+
+class CoordinadorPNFDashboardView(BaseDashboardView):
     
     def __init__(self, master, controller, username, user_role, **kwargs):
         super().__init__(master, controller, username, user_role, **kwargs)
@@ -50,13 +59,34 @@ class DocenteDashboardView(BaseDashboardView):
 
         card_display = CardDisplay(card_display_frame, cards_info1)
         card_display.grid(row=0, column=0, sticky="nsew")
-
-    def carga_notas(self): 
+    
+    def list_docente(self):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
-                
-        carga_notas = CargaNotasView(self.cuerpo_principal, self.controller['Periodos'], self.controller['PNF'], self.controller['Secciones'], self.controller["Estudiantes"],)
-        carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        list_docente = ListDocenteView(self.cuerpo_principal, self.controller['Docentes'],self.controller["PNF"])
+        list_docente.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def pnf(self):
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+
+        pnf = FormularioPNFPensumView(self.cuerpo_principal, self.controller['PNF'])
+        pnf.pack(fill="both", expand=True, padx=10, pady=10)
+    
+    def unid_Curr(self):
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+
+        unid_Curr = UnidadCurricular(self.cuerpo_principal, None, controlador= None)
+        unid_Curr.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def listar_uc(self):
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+        
+        listar_uc = ListarUC(self.cuerpo_principal, self.controller['PNF'])
+        listar_uc.pack(fill="both", expand=True, padx=10, pady=10)
     
     def configuracion_usuarios(self):
         for widget in self.cuerpo_principal.winfo_children():

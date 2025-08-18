@@ -159,7 +159,6 @@ class ListDocenteView(ctk.CTkFrame):
         # Cargar nueva página (desde la fila 2)
         for i, docente in enumerate(datos, start=2):
             telefonos = docente.get('telefonos', [])
-            print(telefonos)
             fila_widgets = [
                 self._crear_celda(i, 0, docente['tipo_documento']),
                 self._crear_celda(i, 1, docente['documento_identidad']),

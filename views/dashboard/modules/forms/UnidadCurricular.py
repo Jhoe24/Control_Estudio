@@ -8,7 +8,8 @@ import pprint
 from config.app_config import AppConfig
 
 class UnidadCurricular(SectionFrameBase):
-    def __init__(self, master, vcmd_num, controlador=None, mostrar_botones=True):
+    def __init__(self, master, vcmd_num, controlador=None, mostrar_botones=True, user_name = None, rol_user = None):
+        
         super().__init__(master, "Unidad Curricular PNF")
         self.vcmd_num = vcmd_num # Validación para números
 

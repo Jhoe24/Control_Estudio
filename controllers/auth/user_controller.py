@@ -21,6 +21,9 @@ class UserController:
             if usuario['id'] == id:
                 return usuario
         return None
+    
+    def obtener_persona_id(self, user_name):
+        return self.user_model.obtener_valor_especifico('persona_id', 'nombre_usuario', user_name)
 
     def obtener_roles(self):
         return self.rol_model.obtener_roles()

@@ -529,7 +529,55 @@ class ModeloDocente:
         finally:
             if con is not None:
                 con.close()
-                           
+
+    def obtener_id_docente(self, persona_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+
+            cursor.execute('''
+                            SELECT id FROM docentes 
+                            WHERE persona_id = ?
+                            ''',(persona_id,))
+            resultado = cursor.fetchone()
+            if con is not None:
+                con.close()
+            if resultado:
+                return resultado[0]
+            else:
+                return None
+        
+        except Exception as e:
+            if con is not None:
+                con.close()
+            print(f"Error al realizar la consulta: {e}") 
+            return False
+    
+    def obtener_pnf_id(self, docente_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+
+            cursor.execute('''
+                            SELECT pnf_id FROM docente_sede_pnf 
+                            WHERE docente_id = ?
+                            ''',(docente_id,))
+            resultado = cursor.fetchone()
+            if con is not None:
+                con.close()
+            if resultado:
+                return resultado[0]
+            else:
+                return None
+        
+        except Exception as e:
+            if con is not None:
+                con.close()
+            print(f"Error al realizar la consulta: {e}") 
+            return False
+        
                            
     # def obtener_campo(self, table, columna, value):
     #     try:

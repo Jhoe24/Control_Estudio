@@ -4,7 +4,12 @@ from views.auth.login_view import LoginView
 from views.auth.register_view import RegisterView
 from views.auth.register_personal import RegisterPersonalView
 
+#Imortamos las vistas del dashboard
 from views.dashboard.pages.admin_dashboard import AdminDashboardView
+from views.dashboard.pages.coordinador_dashboard import CoordinadorDashboardView
+from views.dashboard.pages.coordinador_pnf_dashboard import CoordinadorPNFDashboardView
+from views.dashboard.pages.docente_dashboard import DocenteDashboardView
+from views.dashboard.pages.estudiante_dashboard import EstudianteDashboardView
 
 from controllers.auth.auth_controller import AuthController
 from controllers.auth.user_controller import UserController
@@ -128,16 +133,16 @@ class MainWindow(ctk.CTk):
             self.vista_actual = AdminDashboardView(self, self.dashboard_controller, username, user_rol)
         elif user_rol == "COORD_GENERAL":
             #periodos academicos, sedes, registro de docentes, registro de estudiantes, carga de notas y modificaciones de cada vista
-            pass  # Aquí iría la vista para COORD_GENERAL
+            self.vista_actual = CoordinadorDashboardView(self, self.dashboard_controller, username, user_rol)
         elif user_rol == "COORD_PNF":
-            #registro de unidades curriculares, listado de unidades curriculares correspondientes a su pnf en q está inscrito, y puede asignar docentes al pnf del q es coordinador
-            pass  # Aquí iría la vista para COORD_PNF
+            #registro de unidades curriculares, listado de unidades curriculares correspondientes a su pnf en q está inscrito, y puede asignar uc a docentes que estén en su pnf
+           self.vista_actual = CoordinadorPNFDashboardView(self, self.dashboard_controller, username, user_rol)
         elif user_rol == "DOCENTE":
             #carga de notas, y q muestre solo las unidades curriculares a las que está asignado
-            pass  # Aquí iría la vista para DOCENTE
+            self.vista_actual = DocenteDashboardView(self, self.dashboard_controller, username, user_rol)
         elif user_rol == "ESTUDIANTE":
             #mostrar solo sus datos personales y sus notas en las unidades curriculares a las que está inscrito
-            pass  # Aquí iría la vista para ESTUDIANTE
+            self.vista_actual = EstudianteDashboardView(self, self.dashboard_controller, username, user_rol)
  
 
     #coordinador sede todos los pnf, coordinador pnf solo su pnf y docente va cargar las secciones que tiene asignadas a su pnf
