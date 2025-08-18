@@ -6,14 +6,18 @@ import tkinter.messagebox as messagebox
 import tkinter as tk
 
 class FiltradoPNFFrame(SectionFrameBase):
-    def __init__(self, master, controlador):
+    def __init__(self, master, controlador, user_role=None, username=None):
         super().__init__(master, header_text="Filtrar Unidades Curriculares por PNF")
         self.controlador = controlador if controlador is not None else ControllerPNF()
 
         # --- Lista de PNF del controlador ---
         self.lista_pnf = self.controlador.listado_pnf  # lista de tuplas (id_pnf, nombre_pnf, nombre_pnf)
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.lista_pnf}
-        self.nombre_pnf = self.obtener_nombre_pnf()
+
+        if user_role and user_role.lower() == "coord_pnf" and username:
+            self.nombre_pnf = [username] if username in self.pnf_id_por_nombre else ["Sin opciones disponibles"]
+        else:
+            self.nombre_pnf = self.obtener_nombre_pnf()
 
         self.pnf_var = ctk.StringVar(value="Seleccione un PNF")
         self.trayecto_var = ctk.StringVar(value="No seleccionado")
@@ -31,6 +35,9 @@ class FiltradoPNFFrame(SectionFrameBase):
             command=self.actualizar_trayectos_por_pnf
         )
         self.option_menu_pnf.pack(side="left", padx=(0, 15))
+        if user_role and user_role.lower() == "coord_pnf" and self.pnf_id_por_nombre:
+            self.pnf_var.set(self.nombre_pnf[0])
+            self.option_menu_pnf.configure(state="disabled")
 
         # --- OptionMenu Trayecto ---
         self.option_menu_trayecto = crear_option_menu(

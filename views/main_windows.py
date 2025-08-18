@@ -67,7 +67,8 @@ class MainWindow(ctk.CTk):
             "Periodos": PeriodoAcademicoController(),
             "Sedes": ControladorSedes() ,
             "Secciones": ControllerSecciones(),
-            "mostrar_vista_login": self.mostrar_vista_login
+            "mostrar_vista_login": self.mostrar_vista_login,
+            "Usuario":UserController()
             }  # Aquí se inicializa el controlador del dashboard, que es el panel de control de la aplicación. 
         # El servicio de usuario se inyecta en el controlador de autenticación, cuya funcion es manejar la lógica de autenticación y autorización de usuarios. 
 

@@ -45,7 +45,7 @@ class AsignarPNFFrame(SectionFrameBase):
             self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[self.var_trayecto.get()])  # Obtener los tramos para el trayecto seleccionado
             self.valores_tramos = [tramo[1] for tramo in self.tupla_tramos]
             self.var_tramo = ctk.StringVar(value=self.valores_tramos[0] if self.valores_tramos else "No seleccionado")  # Valor por defecto para el tramo
-            self.tramo_id_por_nombre = self.tramo_id_por_nombre = {tramo[1]: tramo[0] for tramo in self.tupla_tramos}
+            self.tramo_id_por_nombre = {tramo[1]: tramo[0] for tramo in self.tupla_tramos}
             
             self._crear_fila_widgets([
                 ("Seleccione un P.N.F:", crear_option_menu, {"values":self.nombres_pnf, "variable":self.var1, "command": self.set_trayecto  }, 1, self, 'pnf_menu')
@@ -129,6 +129,10 @@ class AsignarPNFFrame(SectionFrameBase):
 
     def mostrar_form_seccion(self,datos = None):
         self.btn_secciones.configure(text="Cancelar Seccion", command=self.cancelar_asignacion_seccion)
+
+        self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[self.var_trayecto.get()])  # Obtener los tramos para el trayecto seleccionado
+        self.tramo_id_por_nombre = {tramo[1]: tramo[0] for tramo in self.tupla_tramos}
+
         state_frame = False
         if datos:
             state_frame = True

@@ -3,13 +3,16 @@ import tkinter as tk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
-
+from views.dashboard.components.SectionFrameBase import SectionFrameBase
 
 class ListarUC(ctk.CTkFrame):
-
-    def __init__(self, master, controller,tupla_datos = None):
+    def __init__(self, master, controllers,tupla_datos = None, user_role=None, username=None):
         super().__init__(master, fg_color="white")
-        self.controller = controller
+        self.controller = controllers['PNF']
+        self.controller_docente = controllers['Docentes']
+        self.controller_user = controllers['Usuario']
+        self.user_role = user_role
+        self.username = username
         tupla_id = ()
         self.tuplas_nombre = ()
         if tupla_datos:

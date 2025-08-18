@@ -22,6 +22,8 @@ class EstudianteDashboardView(BaseDashboardView):
         super().__init__(master, controller, username, user_role, **kwargs)
         self.master = master
         self.controller = controller
+        self.username = username
+        self.user_role = user_role
         
         self.inicio()
     
@@ -67,7 +69,7 @@ class EstudianteDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
         
-        configuracion = Config_user(self.cuerpo_principal, self.controller)
+        configuracion = Config_user(self.cuerpo_principal, self.controller,username=self.username,user_rol=self.user_role)
         configuracion.pack(fill="both", expand=True, padx=10, pady=10)
 
     def configuracion_sistema(self):

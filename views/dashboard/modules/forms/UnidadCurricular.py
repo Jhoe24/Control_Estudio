@@ -2,22 +2,18 @@ import customtkinter as ctk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from views.dashboard.modules.forms.DatosPersonales import DatosPersonalesFrame
-from controllers.dashboard.PNF.controller_pnf import ControllerPNF
-import pprint
 
 from config.app_config import AppConfig
 
 class UnidadCurricular(SectionFrameBase):
-    def __init__(self, master, vcmd_num, controlador=None, mostrar_botones=True, user_name = None, rol_user = None):
+    def __init__(self, master, vcmd_num, controllers, mostrar_botones=True, user_name = None, rol_user = None):
         
         super().__init__(master, "Unidad Curricular PNF")
         self.vcmd_num = vcmd_num # Validación para números
 
-        if controlador is not None:
-            self.controlador = controlador
-        else:
-            self.controlador = ControllerPNF()
-        #self.vcmd_fecha = vcmd_fecha # Guardar para usar en fechas
+        self.controlador = controllers['PNF']
+        self.controlador_docente = controllers['Docentes']
+        self.controlador_user = controllers['Usuario']
 
         #obtener la lista de pnf
         self.lista_pnf = self.controlador.listado_pnf
@@ -90,9 +86,25 @@ class UnidadCurricular(SectionFrameBase):
         # Crear un frame para la fila de PNF, Trayecto y Tramo con etiquetas
         self.fila_pnf_trayecto_tramo = ctk.CTkFrame(self.scroll, fg_color="transparent")
         self.fila_pnf_trayecto_tramo.pack(fill="x", padx=10, pady=5)
-
+#==========================================================================================================================
         # Valores seguros por defecto si las listas están vacías
-        valores_pnf = self.nombre_pnf if self.nombre_pnf else ["Sin opciones disponibles"]
+        valores_pnf = self.obtener_nombre_pnf() if self.obtener_nombre_pnf() else ["Sin opciones disponibles"]
+        if rol_user == "coord_pnf" and user_name:
+            persona_id = self.controlador_user.obtener_persona_id(user_name)
+            docente_id = self.controlador_docente.obtener_docente_id(persona_id)
+            pnf_id = self.controlador_docente.obtener_pnf_id(docente_id)
+            # Busca el nombre del PNF por id
+            nombre_pnf = None
+            for tupla in self.lista_pnf:
+                if tupla[0] == pnf_id:
+                    nombre_pnf = tupla[2]
+                    break
+            if nombre_pnf:
+                valores_pnf = [nombre_pnf]
+            else:
+                self.deshabilitar_campos()
+                valores_pnf = ["Sin opciones disponibles"]
+
         valores_trayecto = self.nombre_trayecto if self.nombre_trayecto else ["Sin opciones disponibles"]
         valores_tramo = self.nombre_tramo if self.nombre_tramo else ["Sin opciones disponibles"]
 
@@ -107,6 +119,10 @@ class UnidadCurricular(SectionFrameBase):
             text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
         )
         self.pnfmenu.pack(side="left")
+        if rol_user and rol_user.lower() == "coord_pnf":
+            self.pnfmenu.set(valores_pnf[0])    # selecciona el único valor
+            self.pnfmenu.configure(state="disabled")  # lo bloquea
+            #==========================================================
 
         # Trayecto
         trayecto_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")

@@ -212,3 +212,9 @@ class DocenteController:
         #         vista_formulario.datos_personales_frame.nombre_entry.focus_set()
         vista_formulario.datos_personales_frame.nro_documento_entry.focus_set()
         vista_formulario.datos_personales_frame.nro_documento_entry.configure(state="normal")
+
+    def obtener_pnf_id(self, docente_id):
+        return self.modelo_docente.obtener_pnf_id(docente_id)
+    
+    def obtener_id_docente(self, persona_id):
+        return self.modelo_docente.obtener_docente_por_id(persona_id)

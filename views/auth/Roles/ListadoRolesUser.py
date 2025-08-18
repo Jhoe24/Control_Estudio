@@ -14,7 +14,7 @@ class FrameRoles(ctk.CTkFrame):
         self.pagina_actual = 1
         self.registros_por_pagina = 7
         # Primeras páginas a mostrar
-        self.paginas_mostrar = self.usuarios_dato[:self.registros_por_pagina]
+        self.paginas_mostrar = self.usuarios_dato
         self.posicion_actual = len(self.paginas_mostrar)
         self.fila_datos = []
        
@@ -71,6 +71,19 @@ class FrameRoles(ctk.CTkFrame):
         if self.pagina_actual == self.cantidad_total_paginas:
             estado_btn_siguiente = "disabled"
         self.boton_siguiente.configure(state=estado_btn_siguiente)
+        print(f"Usuarios totales: {len(self.usuarios_dato)}")
+        # 1. Calcular el rango de usuarios para la página actual
+        inicio = (self.pagina_actual - 1) * self.registros_por_pagina
+        fin = inicio + self.registros_por_pagina
+        
+        # 2. Actualizar self.paginas_mostrar con los usuarios de la página
+        self.paginas_mostrar = self.usuarios_dato[inicio:fin]
+        
+        # 3. Actualizar la etiqueta de la página
+        self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
+        
+        # 4. Llamar a cargar_datos para renderizar la tabla con la nueva lista
+        print(f"Usuarios en esta página: {len(self.paginas_mostrar)}")
         self.cargar_datos()
 
     def siguiente_pagina(self):
@@ -101,6 +114,7 @@ class FrameRoles(ctk.CTkFrame):
         """
         Muestra el listado de usuarios para asignar los roles a cada uno de ellos.
         """
+        print(f"Cargando {len(self.paginas_mostrar)} usuarios en la tabla")
         # Se limpia la tabla
         for fila in self.fila_datos:
             for widget in fila:
@@ -109,7 +123,7 @@ class FrameRoles(ctk.CTkFrame):
 
         self.fila_datos = []
         # se obtienen los datos y me devuelve el diccionario
-        for fila, dic_user in enumerate(self.usuarios_dato, start=2):
+        for fila, dic_user in enumerate(self.paginas_mostrar, start=2):
             fila_widgets = [
                 self._crear_celda(fila, 0, dic_user['documento_identidad']),
                 self._crear_celda(fila, 1, dic_user['nombres']),
@@ -183,7 +197,7 @@ class FrameRoles(ctk.CTkFrame):
 
 
         # Se añaden las filas a la tabla
-        fila_paginacion = len(self.usuarios_dato) + 2
+        fila_paginacion = len(self.paginas_mostrar) + 2
         self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=6, pady=15, sticky="ew")
 
     def _crear_celda(self, row, col, texto):
@@ -203,7 +217,7 @@ class FrameRoles(ctk.CTkFrame):
         
         if self.controller_user.register_rol(var_role.get(), user_id):
             messagebox.showinfo("Éxito", "Rol asignado correctamente.")
-            self.actualizar_pagina()
+            self.mostrar_pagina()
         else:
             messagebox.showerror("Error", "No se pudo asignar el rol.")
         
@@ -211,11 +225,11 @@ class FrameRoles(ctk.CTkFrame):
         boton.configure(state="normal")
         role_menu.configure(state="normal")
 
-    def actualizar_pagina(self):
-        """
-        Actualiza la página actual y recarga los datos.
-        """
-        self.paginas_mostrar = self.usuarios_dato[(self.pagina_actual-1)*self.registros_por_pagina:self.pagina_actual*self.registros_por_pagina]
-        self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
-        self.mostrar_pagina()
+    # def actualizar_pagina(self):
+    #     """
+    #     Actualiza la página actual y recarga los datos.
+    #     """
+    #     self.paginas_mostrar = self.usuarios_dato[(self.pagina_actual-1)*self.registros_por_pagina:self.pagina_actual*self.registros_por_pagina]
+    #     self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
+    #     self.mostrar_pagina()
     

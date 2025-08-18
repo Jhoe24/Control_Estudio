@@ -42,9 +42,10 @@ class UserModel:
                 SELECT ip.documento_identidad, ip.nombres, ip.apellidos,u.id, u.nombre_usuario
                 from informacion_personal ip
                 JOIN usuarios u ON ip.id = u.persona_id
-                WHERE ip.tipo = 'estudiante'
+
                 ORDER BY ip.nombres, ip.apellidos
                 """)
+            #nelson pilla eso
             result = cursor.fetchall()
             return result if result else []
         except Exception as e:

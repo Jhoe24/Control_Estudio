@@ -40,6 +40,8 @@ class CoordinadorDashboardView(BaseDashboardView):
         super().__init__(master, controller, username, user_role, **kwargs)
         self.master = master
         self.controller = controller
+        self.username = username
+        self.user_role = user_role
         
         self.inicio()
     
@@ -114,7 +116,7 @@ class CoordinadorDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
 
-        unid_Curr = UnidadCurricular(self.cuerpo_principal, None, controlador= None)
+        unid_Curr = UnidadCurricular(self.cuerpo_principal, None, self.controller, user_name=self.username, rol_user=self.user_role)
         unid_Curr.pack(fill="both", expand=True, padx=10, pady=10)
 
     def list_pnf(self):
@@ -130,7 +132,7 @@ class CoordinadorDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
         
-        listar_uc = ListarUC(self.cuerpo_principal, self.controller['PNF'])
+        listar_uc = ListarUC(self.cuerpo_principal, self.controller, user_role=self.user_role, username=self.username)
         listar_uc.pack(fill="both", expand=True, padx=10, pady=10)
     
     def carga_notas(self): 
@@ -172,7 +174,7 @@ class CoordinadorDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
         
-        configuracion = Config_user(self.cuerpo_principal, self.controller)
+        configuracion = Config_user(self.cuerpo_principal, self.controller,username=self.username,user_rol=self.user_role)
         configuracion.pack(fill="both", expand=True, padx=10, pady=10)
 
     def configuracion_sistema(self):

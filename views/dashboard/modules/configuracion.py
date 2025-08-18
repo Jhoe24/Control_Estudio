@@ -10,7 +10,7 @@ from views.auth.Roles.ListadoRolesUser import FrameRoles
 from config.app_config import AppConfig
 
 class Config_user(ctk.CTkFrame):
-    def __init__(self, master, controller):
+    def __init__(self, master, controller,username = None, user_rol = None):
         super().__init__(master, fg_color="transparent")
         self.master = master
         self.controller = controller
@@ -32,19 +32,19 @@ class Config_user(ctk.CTkFrame):
             "height": 80,
             "corner_radius": 16,
             "fg_color": "#23272f",
-            "hover_color": "#31343c",
+            #"hover_color": "#31343c",
             "text_color": "#fff",
             "font": ("Segoe UI", 16, "bold"),
-            "border_width": 2,
-            "border_color": "#444857"
+            #"border_width": 2,
+            #"border_color": "#444857"
         }
-
-        self.btn_asignar_roles = ctk.CTkButton(
-            self.button_frame, text="  Gestión Roles  ",
-            command=self.asignar_roles,
-            **card_btn_style
-        )
-        self.btn_asignar_roles.pack(side="left", padx=15)
+        if user_rol == "ADMIN":
+            self.btn_asignar_roles = ctk.CTkButton(
+                self.button_frame, text="  Gestión Roles  ",
+                command=self.asignar_roles,
+                **card_btn_style
+            )
+            self.btn_asignar_roles.pack(side="left", padx=15)
 
         self.btn_contrasena = ctk.CTkButton(
             self.button_frame, text="   Cambio de Contraseña   ", 
@@ -53,19 +53,23 @@ class Config_user(ctk.CTkFrame):
         )
         self.btn_contrasena.pack(side="left", padx=15)
 
-        self.btn_datos = ctk.CTkButton(
-            self.button_frame, text="Cambio de Datos Personales", 
-            command=self.mostrar_cambiar_datos_personales,
+        self.btn_datos = ctk.CTkOptionMenu(
+            self.button_frame, 
+            values=["Cambiar datos personales", "Cambiar Direccion"],
+            #command=self.mostrar_cambiar_datos_personales,
+            button_color = "#23272f",
+            dropdown_font = ("Segoe UI", 16),
             **card_btn_style
         )
         self.btn_datos.pack(side="left", padx=15)
 
-        self.btn_desbloqueo = ctk.CTkButton(
-            self.button_frame, text="  Desbloqueo de Usuarios  ", 
-            command=self.mostrar_desbloqueo_usuarios,
-            **card_btn_style
-        )
-        self.btn_desbloqueo.pack(side="left", padx=15)
+        if user_rol == "ADMIN":
+            self.btn_desbloqueo = ctk.CTkButton(
+                self.button_frame, text="  Desbloqueo de Usuarios  ", 
+                command=self.mostrar_desbloqueo_usuarios,
+                **card_btn_style
+            )
+            self.btn_desbloqueo.pack(side="left", padx=15)
 
         # Frame donde se actualiza el contenido según el botón presionado
         self.contenido_frame = ctk.CTkFrame(self, fg_color="transparent")
