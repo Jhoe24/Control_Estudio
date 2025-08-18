@@ -3,29 +3,38 @@ import tkinter as tk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
-from views.dashboard.components.SectionFrameBase import SectionFrameBase
 
 class ListarUC(ctk.CTkFrame):
     def __init__(self, master, controllers,tupla_datos = None, user_role=None, username=None):
         super().__init__(master, fg_color="white")
-        self.controller = controllers['PNF']
-        self.controller_docente = controllers['Docentes']
-        self.controller_user = controllers['Usuario']
+        self.lis_controlador = controllers
+        self.controlador = controllers["PNF"]
+        self.controlador_docente = controllers['Docentes']
+        self.controlador_user = controllers['Usuario']
         self.user_role = user_role
         self.username = username
+
         tupla_id = ()
         self.tuplas_nombre = ()
+        # Obtener lista de UC según el rol
         if tupla_datos:
+            # Lógica existente para tupla_datos
             for i in range(len(tupla_datos)):
                 if i == 0 or i == 1 or i == 2:
                     tupla_id = tupla_id + (tupla_datos[i],)
                 if i == 0 or i == 3 or i == 4:
                     self.tuplas_nombre = self.tuplas_nombre + (tupla_datos[i],)
-
-            
             self.lista_UC = self.controller.obtener_UC(tupla_id)
         else:
-            self.lista_UC = self.controller.obtener_UC()
+            # Si es coordinador, obtener solo sus UC
+            if self.user_role == "coord_pnf" and self.username:
+                persona_id = self.controller_user.obtener_persona_id(self.username)
+                docente_id = self.controller_docente.obtener_docente_id(persona_id)
+                pnf_id = self.controller_docente.obtener_pnf_id(docente_id)
+                self.lista_UC = self.controller.obtener_UC((pnf_id,)) if pnf_id else []
+            else:
+                # Usuario normal - obtener todas las UC
+                self.lista_UC = self.controlador.obtener_UC()
 
         self.pagina_actual = 1
         self.uc_por_pagina = 13
@@ -36,9 +45,19 @@ class ListarUC(ctk.CTkFrame):
         self.button_uc = None
         self.frame_uc = None
 
+        # Solo mostrar filtro si no hay tupla_datos
         if not tupla_datos:
-            self.busqueda_frame = FiltradoPNFFrame(self, self.controller)
+            self.busqueda_frame = FiltradoPNFFrame(
+                self, 
+                controllers=self.lis_controlador,
+                user_role=self.user_role,
+                username=self.username
+            )
             self.busqueda_frame.grid(row=0, column=0, columnspan=5, padx=15, pady=(10, 0), sticky="ew")
+            
+            # Si es coordinador, ejecutar búsqueda automáticamente
+            if self.user_role == "coord_pnf" and self.username:
+                self.busqueda_frame.ejecutar_busqueda()
 
         self.fila_datos = []
 

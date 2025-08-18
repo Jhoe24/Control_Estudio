@@ -6,15 +6,17 @@ import platform
 
 from views.dashboard.components.widget_utils import *
 from views.auth.Roles.ListadoRolesUser import FrameRoles
+from views.dashboard.modules.forms.DatosPersonales import DatosPersonalesFrame
+from views.dashboard.modules.forms.DatosUbicacion import DatosUbicacionFrame
 
 from config.app_config import AppConfig
 
-class Config_user(ctk.CTkFrame):
+class Config_user(ctk.CTkScrollableFrame):
     def __init__(self, master, controller,username = None, user_rol = None):
-        super().__init__(master, fg_color="transparent")
+        super().__init__(master, fg_color="white")
         self.master = master
+        self.username = username
         self.controller = controller
-
         ctk.CTkLabel(
             self,
             text="Gestión de Configuración de Usuario",
@@ -58,7 +60,11 @@ class Config_user(ctk.CTkFrame):
             values=["Cambiar datos personales", "Cambiar Direccion"],
             #command=self.mostrar_cambiar_datos_personales,
             button_color = "#23272f",
+            dropdown_fg_color = "#ffffff",
+            dropdown_text_color="#000000",
+            dropdown_hover_color = "#f0f0f0",
             dropdown_font = ("Segoe UI", 16),
+            command=self.cambio_update_datos,
             **card_btn_style
         )
         self.btn_datos.pack(side="left", padx=15)
@@ -153,6 +159,33 @@ class Config_user(ctk.CTkFrame):
             hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT
         )
         btn_desbloquear.pack(pady=10)
+
+
+    def cambio_update_datos(self, new_value):
+        self.limpiar_contenido_frame()
+        persona_id = self.controller["Usuario"].obtener_persona_id(self.username)
+        datos = self.controller["Usuario"].obtener_datos_personales(persona_id)
+        nro_doc = datos.get("documento_identidad")
+        
+        
+        if new_value == "Cambiar datos personales":
+            self.frame_datos_personales = DatosPersonalesFrame(self.contenido_frame,None,None)
+            self.frame_datos_personales.set_datos(datos,nro_doc)
+            self.frame_datos_personales.nro_documento_entry.configure(state="normal")
+            self.frame_datos_personales.nro_documento_entry.insert(0,nro_doc)
+
+
+        elif new_value == "Cambiar Direccion":
+            self.frame_datos_ubicacion = DatosUbicacionFrame(self.contenido_frame,None)
+            self.frame_datos_ubicacion.set_datos(datos)
+
+        btn_actualizar = ctk.CTkButton(
+            self.contenido_frame, text="Actualizar Datos Personales",
+            command=self.actualizar_datos_personales,
+            font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG,
+            hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT
+        )
+        btn_actualizar.pack(pady=20)
 #======================================================================================================================================================================
 
     def actualizar_contrasena(self):

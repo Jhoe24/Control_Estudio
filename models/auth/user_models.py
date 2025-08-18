@@ -74,6 +74,62 @@ class UserModel:
         finally:
             if con is not None:
                 con.close()
-                
+    
+    def obtener_datos_personales(self, id_persona):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM informacion_personal WHERE id = ?
+                """,(id_persona,))
+            result = cursor.fetchone()
+            return result if result else {}
+        except Exception as e:
+            print(f"Error al obtener datos personales: {e}")
+            return {}
+        finally:
+            if con is not None:
+                con.close()
 
+    def obtener_telefono(self, id_persona):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+           
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT tipo_telefono, numero FROM telefonos WHERE persona_id = ?
+                """,(id_persona,))
+            result = cursor.fetchall()
+            return result if result else []
+        except Exception as e:
+            print(f"Error al obtener telefono: {e}")
+            return {}
+        finally:
+            if con is not None:
+                con.close()
 
+    def obtener_direccion(self, id_persona):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM direcciones WHERE persona_id = ?
+                """,(id_persona,))
+            result = cursor.fetchone()
+            return result if result else {}
+        except Exception as e:
+            print(f"Error al obtener direccion: {e}")
+            return ""
+        finally:
+            if con is not None:
+                con.close()
+
+n = UserModel()

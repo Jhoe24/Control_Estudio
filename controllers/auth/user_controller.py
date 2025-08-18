@@ -23,7 +23,7 @@ class UserController:
         return None
     
     def obtener_persona_id(self, user_name):
-        return self.user_model.obtener_valor_especifico('persona_id', 'nombre_usuario', user_name)
+        return self.rol_model.obtener_valor_especifico('persona_id', 'nombre_usuario', user_name, table='usuarios')
 
     def obtener_roles(self):
         return self.rol_model.obtener_roles()
@@ -48,5 +48,14 @@ class UserController:
                 return True
 
         return False
+
+    def obtener_datos_personales(self, id_persona):
+        dict_persona = self.user_model.obtener_datos_personales(id_persona)
+        dict_persona['telefonos'] = self.user_model.obtener_telefono(id_persona)
+        dict_direccion = self.user_model.obtener_direccion(id_persona)
+        dic_completo =  dict_persona | dict_direccion
+        #print(dic_completo)
+        return dic_completo
+        
 
     

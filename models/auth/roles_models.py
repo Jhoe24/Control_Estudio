@@ -108,14 +108,14 @@ class RolUserModel:
             if con is not None:
                 con.close()
 
-    def obtener_valor_especifico(self, campo_obtener,campo_filtro, valor_filtro):
+    def obtener_valor_especifico(self,campo_obtener,campo_filtro, valor_filtro,table = 'roles'):
         con = None
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
             cursor.execute(
                 f"""
-                SELECT {campo_obtener} FROM roles WHERE {campo_filtro} = ?
+                SELECT {campo_obtener} FROM {table} WHERE {campo_filtro} = ?
                 """,
                 (valor_filtro,)
             )

@@ -190,19 +190,30 @@ class DatosPersonalesFrame(SectionFrameBase):
 
     
 
-    def set_datos(self, estudiante):
+    def set_datos(self, estudiante, nro_doc = None):
         """
         Carga los datos del estudiante en los campos y deshabilita la edición.
         Adapta los campos fijos de teléfono a la vista dinámica.
         """
-        tipo_doc = estudiante.get("tipo_documento", "Cédula")
-        self.radio_cedula.configure(state="disabled")
-        self.radio_pasaporte.configure(state="disabled")
-        
+        tipo_doc = estudiante.get("tipo_documento", "cedula")
+        self.tipo_documento_var.set(tipo_doc)
+        self._actualizar_estado_nro_doc()
+
+        self.radio_cedula.configure(state="normal")
+        self.radio_pasaporte.configure(state="normal")
+
         self.nro_documento_entry.configure(state="normal")
         self.nro_documento_entry.delete(0, 'end')
-        self.nro_documento_entry.insert(0, str(estudiante.get("documento_identidad", "")))
+        
+        if nro_doc:
+            self.nro_documento_entry.insert(0, nro_doc)
+        else:
+            self.nro_documento_entry.insert(0, estudiante.get("documento_identidad", ""))
+
         self.nro_documento_entry.configure(state="disabled")
+
+        self.radio_cedula.configure(state="disabled")
+        self.radio_pasaporte.configure(state="disabled")
 
         self.nombre_entry.configure(state="normal")
         self.nombre_entry.delete(0, 'end')
@@ -266,7 +277,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         # --- Teléfonos dinámicos: mostrar todos los guardados ---
         self.limpiar_telefonos()
         telefonos = estudiante.get('telefonos', [])
-        for tipo, numero, principal in telefonos:
+        for tipo, numero in telefonos:
             self.agregar_telefono()
             fila, var_tipo, tipo_menu, entry_num = self.telefono_widgets[-1]
             var_tipo.set(tipo)

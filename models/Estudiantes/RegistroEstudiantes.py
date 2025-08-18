@@ -662,3 +662,5 @@ class ModelRegistroEstudiantes:
         finally:
             con.close()
 
+#bd = ModelRegistroEstudiantes()
+#print(bd.lista_Estudiantes())

@@ -71,19 +71,17 @@ class FrameRoles(ctk.CTkFrame):
         if self.pagina_actual == self.cantidad_total_paginas:
             estado_btn_siguiente = "disabled"
         self.boton_siguiente.configure(state=estado_btn_siguiente)
-        print(f"Usuarios totales: {len(self.usuarios_dato)}")
-        # 1. Calcular el rango de usuarios para la página actual
+        # Calcular el rango de usuarios para la página actual
         inicio = (self.pagina_actual - 1) * self.registros_por_pagina
         fin = inicio + self.registros_por_pagina
         
-        # 2. Actualizar self.paginas_mostrar con los usuarios de la página
+        # Actualizar self.paginas_mostrar con los usuarios de la página
         self.paginas_mostrar = self.usuarios_dato[inicio:fin]
         
-        # 3. Actualizar la etiqueta de la página
+        # Actualizar la etiqueta de la página
         self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
         
-        # 4. Llamar a cargar_datos para renderizar la tabla con la nueva lista
-        print(f"Usuarios en esta página: {len(self.paginas_mostrar)}")
+        # Llamar a cargar_datos para renderizar la tabla con la nueva lista
         self.cargar_datos()
 
     def siguiente_pagina(self):
