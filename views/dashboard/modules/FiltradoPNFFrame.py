@@ -19,6 +19,7 @@ class FiltradoPNFFrame(SectionFrameBase):
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.lista_pnf}
         self.nombre_pnf = self.obtener_nombre_pnf()
 
+        # variables de control
         self.pnf_var = ctk.StringVar(value="Seleccione un PNF")
         self.trayecto_var = ctk.StringVar(value="No seleccionado")
         self.tramo_var = ctk.StringVar(value="No seleccionado")
@@ -26,34 +27,43 @@ class FiltradoPNFFrame(SectionFrameBase):
         self.frame_filtro_pnf = ctk.CTkFrame(self, fg_color="transparent")
         self.frame_filtro_pnf.pack(fill="x", pady=PADY_FILA, padx=15)
 
-        valores_pnf = self.obtener_nombre_pnf() if self.obtener_nombre_pnf() else ["Sin opciones disponibles"]
-        if rol_user == "coord_pnf" and user_name:
+        # caso de coord_pnf
+        valores_pnf = []
+        if rol_user and rol_user.lower() == "COORD_PNF" and user_name:
             persona_id = self.controlador_user.obtener_persona_id(user_name)
             docente_id = self.controlador_docente.obtener_id_docente(persona_id)
             pnf_id = self.controlador_docente.obtener_pnf_id(docente_id)
+
             # Busca el nombre del PNF por id
-            nombre_pnf = None
-            for tupla in self.lista_pnf:
-                if tupla[0] == pnf_id:
-                    nombre_pnf = tupla[2]
-                    break
+            #nombre_pnf = None
+            nombre_pnf = next((tupla[2] for tupla in self.lista_pnf if tupla[0] == pnf_id), None)
+      
+            # for tupla in self.lista_pnf:
+            #     if tupla[0] == pnf_id:
+            #         nombre_pnf = tupla[2]
+            #         break
+            valores_pnf = [tupla[2] for tupla in self.lista_pnf]
             if nombre_pnf:
-                valores_pnf = [nombre_pnf]
+                self.pnf_var.set(nombre_pnf)
             else:
-                self.deshabilitar_campos()
-                valores_pnf = ["Sin opciones disponibles"]
+                self.pnf_var.set("Seleccione un PNF")
+        else:
+            valores_pnf = [tupla[2] for tupla in self.lista_pnf]
+            #self.deshabilitar_campos()
+            self.pnf_var.set("Seleccione un PNF")
 
         # --- OptionMenu PNF ---
         self.option_menu_pnf = crear_option_menu(
             self.frame_filtro_pnf,
             values=valores_pnf,
+            variable=self.pnf_var,
             width=300,
             command=self.actualizar_trayectos_por_pnf
         )
         self.option_menu_pnf.pack(side="left", padx=(0, 15))
+
         if rol_user and rol_user.lower() == "coord_pnf":
-            self.option_menu_pnf.set(valores_pnf[0])    # selecciona el único valor
-            self.option_menu_pnf.configure(state="disabled")  # lo bloquea
+            self.pnf_var.set(valores_pnf[0])    # selecciona el único valor
 
         # --- OptionMenu Trayecto ---
         self.option_menu_trayecto = crear_option_menu(
