@@ -10,9 +10,9 @@ class ListarUC(ctk.CTkFrame):
     def __init__(self, master, controller,tupla_datos = None, user_role=None, username=None):
         super().__init__(master, fg_color="white")
         self.controller = controller
+        self.controller_pnf = controller["PNF"]
         self.user_role = user_role
         self.username = username
-        
 
         tupla_id = ()
         self.tuplas_nombre = ()
@@ -24,12 +24,12 @@ class ListarUC(ctk.CTkFrame):
                     self.tuplas_nombre = self.tuplas_nombre + (tupla_datos[i],)
 
             
-            self.lista_UC = self.controller.obtener_UC(tupla_id)
+            self.lista_UC = self.controller_pnf.obtener_UC(tupla_id)
         else:
-            self.lista_UC = self.controller.obtener_UC()
+            self.lista_UC = self.controller_pnf.obtener_UC()
 
         self.pagina_actual = 1
-        self.uc_por_pagina = 13
+        self.uc_por_pagina = 11
         self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
 
         self.paginas_mostrar = self.lista_UC[:self.uc_por_pagina]
@@ -38,7 +38,7 @@ class ListarUC(ctk.CTkFrame):
         self.frame_uc = None
 
         if not tupla_datos:
-            self.busqueda_frame = FiltradoPNFFrame(self, self.controller)
+            self.busqueda_frame = FiltradoPNFFrame(self, self.controller, user_role, username)
             self.busqueda_frame.grid(row=0, column=0, columnspan=5, padx=15, pady=(10, 0), sticky="ew")
 
         self.fila_datos = []
@@ -208,7 +208,7 @@ class ListarUC(ctk.CTkFrame):
         """
         Muestra los datos completos de la UC seleccionada.
         """
-        dic_datos = self.controller.obtener_datos_completos_uc(uc[0])
+        dic_datos = self.controller_pnf.obtener_datos_completos_uc(uc[0])
         #dic_id = self.controller.obtener_id(dic_datos)
         top = ctk.CTkToplevel(self, fg_color="White")
         top.title("Datos Completos de las Unidades Curriculares")
@@ -240,7 +240,7 @@ class ListarUC(ctk.CTkFrame):
         top.protocol("WM_DELETE_WINDOW", on_close)
 
         #Frame de los datos generales de UC
-        self.frame_uc = UnidadCurricular(content_frame, self.controller, mostrar_botones=False)
+        self.frame_uc = UnidadCurricular(content_frame, self.controller_pnf, mostrar_botones=False)
         self.frame_uc.set_datos(dic_datos)
         self.frame_uc.pack(fill="both", expand=True, padx=0, pady=0)
 
@@ -285,8 +285,8 @@ class ListarUC(ctk.CTkFrame):
         """
         Actualiza los datos de UC en la base de datos.
         """
-        datos_uc = self.controller.getUnidadCurricular(frame_uc)
-        exito = self.controller.update_unidad_curricular(datos_uc, id_uc, top)
+        datos_uc = self.controller_pnf.getUnidadCurricular(frame_uc)
+        exito = self.controller_pnf.update_unidad_curricular(datos_uc, id_uc, top)
         if exito:
             top.destroy()
             #self.lista_uc = self.controller.obtener_lista_uc()

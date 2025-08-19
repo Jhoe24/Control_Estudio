@@ -1,6 +1,6 @@
 from models.auth.user_models import UserModel
 from models.auth.roles_models import RolUserModel
-
+import tkinter.messagebox as messagebox
 class UserController:
     def __init__(self):
         self.user_model = UserModel()
@@ -51,11 +51,30 @@ class UserController:
 
     def obtener_datos_personales(self, id_persona):
         dict_persona = self.user_model.obtener_datos_personales(id_persona)
-        dict_persona['telefonos'] = self.user_model.obtener_telefono(id_persona)
         dict_direccion = self.user_model.obtener_direccion(id_persona)
         dic_completo =  dict_persona | dict_direccion
         #print(dic_completo)
         return dic_completo
-        
+    
+    def update_datos_personales(self, id_persona, datos, tabla):
+        print(datos)
+        if tabla == "datos_perosonales":
+            if self.user_model.update_datos_personales(id_persona, datos):
+                if self.user_model.update_telefonos(id_persona, datos['telefonos']):
+                    return True
+                else:
+                    messagebox.showerror("Error", "Hubo un error al actualizar los teléfonos.")
+            else:
+                messagebox.showerror("Error", "Hubo un error al actualizar los datos personales.")
+                return False
+        else:
+            if self.user_model.update_direccion(id_persona, datos['direccion']):
+                return True
+            else:
+                messagebox.showerror("Error", "Hubo un error al actualizar la dirección.")
+                return False
+
+            
+
 
     

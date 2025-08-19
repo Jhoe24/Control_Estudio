@@ -277,7 +277,8 @@ class DatosPersonalesFrame(SectionFrameBase):
         # --- Teléfonos dinámicos: mostrar todos los guardados ---
         self.limpiar_telefonos()
         telefonos = estudiante.get('telefonos', [])
-        for tipo, numero in telefonos:
+        print(telefonos)
+        for tipo, numero, p in telefonos:
             self.agregar_telefono()
             fila, var_tipo, tipo_menu, entry_num = self.telefono_widgets[-1]
             var_tipo.set(tipo)

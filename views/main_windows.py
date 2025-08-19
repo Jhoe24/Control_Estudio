@@ -68,6 +68,8 @@ class MainWindow(ctk.CTk):
             "Sedes": ControladorSedes() ,
             "Secciones": ControllerSecciones(),
             "mostrar_vista_login": self.mostrar_vista_login,
+            "Mostrar_Ventanas": self,
+            "Ventana_Actual": self.vista_actual,
             "Usuario":UserController()
             }  # Aquí se inicializa el controlador del dashboard, que es el panel de control de la aplicación. 
         # El servicio de usuario se inyecta en el controlador de autenticación, cuya funcion es manejar la lógica de autenticación y autorización de usuarios. 
@@ -76,6 +78,11 @@ class MainWindow(ctk.CTk):
         self.mostrar_vista_login()
         #self.mostrar_vista_dashboardd("Master", "admin")  # Por defecto mostramos el dashboard de admin, pero esto se puede cambiar dependiendo del rol del usuario que inicie sesión.
     
+    def reducir_ventana(self, tamanio):
+        self.tamano_ventana = tamanio
+        self.geometry(self.tamano_ventana)
+        self.resizable(False, False)
+
     def limpiar_vista_actual(self):
         if self.vista_actual:
             self.vista_actual.destroy()

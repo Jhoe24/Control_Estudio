@@ -163,25 +163,28 @@ class Config_user(ctk.CTkScrollableFrame):
 
     def cambio_update_datos(self, new_value):
         self.limpiar_contenido_frame()
-        persona_id = self.controller["Usuario"].obtener_persona_id(self.username)
-        datos = self.controller["Usuario"].obtener_datos_personales(persona_id)
+        self.persona_id = self.controller["Usuario"].obtener_persona_id(self.username)
+        datos = self.controller["Usuario"].obtener_datos_personales(self.persona_id)
         nro_doc = datos.get("documento_identidad")
-        
-        
         if new_value == "Cambiar datos personales":
             self.frame_datos_personales = DatosPersonalesFrame(self.contenido_frame,None,None)
             self.frame_datos_personales.set_datos(datos,nro_doc)
             self.frame_datos_personales.nro_documento_entry.configure(state="normal")
             self.frame_datos_personales.nro_documento_entry.insert(0,nro_doc)
-
+            self.frame_datos_personales.habilitar_edicion()
+            self.frame_datos_personales.nro_documento_entry.configure(state="disabled")
+            command = self.actualizar_datos_personales
 
         elif new_value == "Cambiar Direccion":
             self.frame_datos_ubicacion = DatosUbicacionFrame(self.contenido_frame,None)
             self.frame_datos_ubicacion.set_datos(datos)
+            self.frame_datos_ubicacion.habilitar_edicion()
+            command = self.actualizar_direccion
+
 
         btn_actualizar = ctk.CTkButton(
             self.contenido_frame, text="Actualizar Datos Personales",
-            command=self.actualizar_datos_personales,
+            command=command,
             font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG,
             hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT
         )
@@ -204,29 +207,53 @@ class Config_user(ctk.CTkScrollableFrame):
         messagebox.showinfo("Éxito", "Contraseña actualizada correctamente")
 
     def actualizar_datos_personales(self):
-        usuario = self.entries["Usuario:"].get()
-        nombres = self.entries["Nombres:"].get()
-        apellidos = self.entries["Apellidos:"].get()
-        correo = self.entries["Correo Electrónico:"].get()
+        
+        datos = {
+            "nombres": self.frame_datos_personales.nombre_entry.get(),
+            "apellidos": self.frame_datos_personales.apellido_entry.get(),
+            "correo_electronico": self.frame_datos_personales.correo_electronico_entry.get(),
+            "sexo": self.frame_datos_personales.var_sexo.get(),
+            "estado_civil": self.frame_datos_personales.var_estadoCivil.get(),
+            "nacionalidad": self.frame_datos_personales.var_nacionalidad.get(),
+            "lugar_nacimiento": self.frame_datos_personales.lugar_nac_entry.get(),
+            "telefonos": self.frame_datos_personales.obtener_telefonos()
+            
+        }
+        # campos_a_actualizar = {k: v for k, v in datos.items() if v}
+        # print("Campos a actualizar: ", campos_a_actualizar)
 
-        campos_a_actualizar = {}
-        if usuario:
-            campos_a_actualizar["usuario"] = usuario
-        if nombres:
-            campos_a_actualizar["nombres"] = nombres
-        if apellidos:
-            campos_a_actualizar["apellidos"] = apellidos
-        if correo:
-            campos_a_actualizar["correo"] = correo
+        # if not campos_a_actualizar:
+        #     messagebox.showwarning("Advertencia", "Debes completar al menos un campo para actualizar.")
+        #     return
 
-        if not campos_a_actualizar:
-            messagebox.showwarning("Advertencia", "Debes completar al menos un campo para actualizar.")
-            return
+        # # Para pasarle al controlador el diccionario
+        # print("Campos a actualizar: ", campos_a_actualizar)
 
-        # Para pasarle al controlador el diccionario
-        print("Campos a actualizar: ", campos_a_actualizar)
+        if self.controller["Usuario"].update_datos_personales(self.persona_id, datos, "datos_perosonales"):
+            messagebox.showinfo("Éxito", "Datos personales de Usuario actualizados correctamente.")
+    
+    def actualizar_direccion(self):
+        
+        datos = {
+            "estado":self.frame_datos_ubicacion.estado_entry.get(),
+            "municipio":self.frame_datos_ubicacion.municipio_entry.get(),
+            "parroquia":self.frame_datos_ubicacion.parroquia_entry.get(),
+            "sector":self.frame_datos_ubicacion.sector_entry.get(),
+            "calle":self.frame_datos_ubicacion.calle_entry.get(),
+            "nro_casa":self.frame_datos_ubicacion.casa_apart_entry.get(),
+            "tipo_recidencia":self.frame_datos_ubicacion.var_opcion.get(),   
+        }
 
-        messagebox.showinfo("Éxito", "Datos personales de Usuario actualizados correctamente.")
+        # campos_a_actualizar = {k: v for k, v in datos.items() if v}
+        # print("Campos a actualizar: ", campos_a_actualizar)
+
+        # if not campos_a_actualizar:
+        #     messagebox.showwarning("Advertencia", "Debes completar al menos un campo para actualizar.")
+        #     return
+        
+        if self.controller["Usuario"].update_datos_personales(self.persona_id, datos, "direccion"):
+            messagebox.showinfo("Éxito", "Datos de direccion actualizados correctamente.")
+    
 
     def asignar_roles(self):
         self.limpiar_contenido_frame()

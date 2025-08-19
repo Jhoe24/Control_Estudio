@@ -356,6 +356,7 @@ class BaseDashboardView(BaseView):
             try:
                 cerrar = self.controller["mostrar_vista_login"]
                 cerrar()
+                self.controller["Mostrar_Ventanas"].reducir_ventana("800x600")
             except Exception as e:
                 print(f"Error al cerrar sesión: {e}")
 

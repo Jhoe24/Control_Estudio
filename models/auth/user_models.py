@@ -79,14 +79,29 @@ class UserModel:
         con = None
         try:
             con = sql.connect(self.db_ruta)
-            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            #con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
             cursor = con.cursor()
             cursor.execute(
                 """
                 SELECT * FROM informacion_personal WHERE id = ?
                 """,(id_persona,))
-            result = cursor.fetchone()
-            return result if result else {}
+            resultado = cursor.fetchone()
+            if not resultado:
+                con.close()
+                return None  # No encontrado
+
+            nombres_columnas = [desc[0] for desc in cursor.description]
+            datos = dict(zip(nombres_columnas, resultado))
+        
+            cursor.execute('''
+                SELECT tipo_telefono, numero, principal FROM telefonos
+                WHERE persona_id = ?
+            ''', (id_persona,))
+
+            telefonos = cursor.fetchall()
+            datos['telefonos'] = [(tipo_telefono, numero, principal) for tipo_telefono, numero, principal in telefonos]
+
+            return datos if datos else {}
         except Exception as e:
             print(f"Error al obtener datos personales: {e}")
             return {}
@@ -102,7 +117,7 @@ class UserModel:
             cursor = con.cursor()
             cursor.execute(
                 """
-                SELECT tipo_telefono, numero FROM telefonos WHERE persona_id = ?
+                SELECT tipo_telefono, numero, principal FROM telefonos WHERE persona_id = ?
                 """,(id_persona,))
             result = cursor.fetchall()
             return result if result else []
@@ -132,4 +147,69 @@ class UserModel:
             if con is not None:
                 con.close()
 
-n = UserModel()
+    def update_datos_personales(self, id_persona, datos):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                UPDATE informacion_personal SET nombres = ?, apellidos = ?, correo_electronico = ?, sexo = ?, estado_civil = ?, nacionalidad = ?, lugar_nacimiento = ? WHERE id = ?
+                """,(datos['nombres'], datos['apellidos'], datos['correo_electronico'], datos['sexo'], datos['estado_civil'], datos['nacionalidad'], datos['lugar_nacimiento'], id_persona))
+            con.commit()    
+            return True
+        except Exception as e:
+            print(f"Error al actualizar datos personales: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+    
+    def update_telefonos(self, id_persona, telefonos):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                DELETE FROM telefonos WHERE persona_id = ?
+                """,(id_persona,))
+            con.commit()
+            for tipo, numero in telefonos:
+                cursor.execute( 
+                """
+                INSERT INTO telefonos (persona_id, tipo_telefono, numero) VALUES (?, ?, ?)
+                """,(id_persona, tipo, numero))
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al actualizar telefonos: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close() 
+
+    def update_direccion(self, id_persona, direccion):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                DELETE FROM direcciones WHERE persona_id = ?
+                """,(id_persona,))
+            con.commit()
+            cursor.execute("""
+                INSERT INTO direcciones (persona_id, direccion) VALUES (?, ?)
+                """,(id_persona, direccion))
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al actualizar direccion: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+bd = UserModel()
+print(bd.obtener_datos_personales(22))

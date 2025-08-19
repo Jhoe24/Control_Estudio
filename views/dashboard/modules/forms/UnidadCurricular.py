@@ -122,7 +122,7 @@ class UnidadCurricular(SectionFrameBase):
         if rol_user and rol_user.lower() == "coord_pnf":
             self.pnfmenu.set(valores_pnf[0])    # selecciona el único valor
             self.pnfmenu.configure(state="disabled")  # lo bloquea
-            #==========================================================
+#==========================================================================================================================
 
         # Trayecto
         trayecto_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")

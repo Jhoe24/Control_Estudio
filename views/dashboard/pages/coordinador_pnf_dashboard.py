@@ -87,7 +87,7 @@ class CoordinadorPNFDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
         
-        listar_uc = ListarUC(self.cuerpo_principal, self.controller['PNF'],user_role=self.user_role, username=self.username)
+        listar_uc = ListarUC(self.cuerpo_principal, self.controller, user_role=self.user_role, username=self.username)
         listar_uc.pack(fill="both", expand=True, padx=10, pady=10)
     
     def configuracion_usuarios(self):

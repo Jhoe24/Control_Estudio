@@ -133,7 +133,10 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
         botones_frame.pack(pady=10)
 
         # Botón para actualizar datos
-        estudiante_id = estudiante['persona_id']
+        if estudiante['persona_id']:
+            estudiante_id = estudiante['persona_id']
+        else:
+            estudiante_id = estudiante['id']
         self.btn_actualizar = ctk.CTkButton(
             botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_estudiante(estudiante_id,ventana,listado_estudiantes)  # Cambia el comando aquí
         )

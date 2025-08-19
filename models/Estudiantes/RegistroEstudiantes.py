@@ -189,6 +189,7 @@ class ModelRegistroEstudiantes:
                         
             nombres_columnas = [descripcion[0] for descripcion in cursor.description]
             
+            
             # Telefonos
             
             # cursor.execute('''
@@ -318,7 +319,7 @@ class ModelRegistroEstudiantes:
 
             nombres_columnas = [desc[0] for desc in cursor.description]
             estudiante = dict(zip(nombres_columnas, resultado))
-            persona_id = estudiante['persona_id']  # Usar el alias correcto
+            persona_id = estudiante['persona_id']  
 
             # Telefonos del estudiante
             cursor.execute('''
