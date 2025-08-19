@@ -4,37 +4,29 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
 
+
 class ListarUC(ctk.CTkFrame):
-    def __init__(self, master, controllers,tupla_datos = None, user_role=None, username=None):
+
+    def __init__(self, master, controller,tupla_datos = None, user_role=None, username=None):
         super().__init__(master, fg_color="white")
-        self.lis_controlador = controllers
-        self.controlador = controllers["PNF"]
-        self.controlador_docente = controllers['Docentes']
-        self.controlador_user = controllers['Usuario']
+        self.controller = controller
         self.user_role = user_role
         self.username = username
+        
 
         tupla_id = ()
         self.tuplas_nombre = ()
-        # Obtener lista de UC según el rol
         if tupla_datos:
-            # Lógica existente para tupla_datos
             for i in range(len(tupla_datos)):
                 if i == 0 or i == 1 or i == 2:
                     tupla_id = tupla_id + (tupla_datos[i],)
                 if i == 0 or i == 3 or i == 4:
                     self.tuplas_nombre = self.tuplas_nombre + (tupla_datos[i],)
+
+            
             self.lista_UC = self.controller.obtener_UC(tupla_id)
         else:
-            # Si es coordinador, obtener solo sus UC
-            if self.user_role == "coord_pnf" and self.username:
-                persona_id = self.controller_user.obtener_persona_id(self.username)
-                docente_id = self.controller_docente.obtener_docente_id(persona_id)
-                pnf_id = self.controller_docente.obtener_pnf_id(docente_id)
-                self.lista_UC = self.controller.obtener_UC((pnf_id,)) if pnf_id else []
-            else:
-                # Usuario normal - obtener todas las UC
-                self.lista_UC = self.controlador.obtener_UC()
+            self.lista_UC = self.controller.obtener_UC()
 
         self.pagina_actual = 1
         self.uc_por_pagina = 13
@@ -45,19 +37,9 @@ class ListarUC(ctk.CTkFrame):
         self.button_uc = None
         self.frame_uc = None
 
-        # Solo mostrar filtro si no hay tupla_datos
         if not tupla_datos:
-            self.busqueda_frame = FiltradoPNFFrame(
-                self, 
-                controllers=self.lis_controlador,
-                user_role=self.user_role,
-                username=self.username
-            )
+            self.busqueda_frame = FiltradoPNFFrame(self, self.controller)
             self.busqueda_frame.grid(row=0, column=0, columnspan=5, padx=15, pady=(10, 0), sticky="ew")
-            
-            # Si es coordinador, ejecutar búsqueda automáticamente
-            if self.user_role == "coord_pnf" and self.username:
-                self.busqueda_frame.ejecutar_busqueda()
 
         self.fila_datos = []
 
@@ -84,6 +66,7 @@ class ListarUC(ctk.CTkFrame):
         else:
             self.frame_paginacion.grid()
      
+            # Botones de paginación
         # Botones de paginación
         self.boton_anterior = ctk.CTkButton(self.frame_paginacion, text="Anterior", command=self.anterior_pagina)
         self.label_pagina = ctk.CTkLabel(self.frame_paginacion, text=f"{self.pagina_actual} de {self.total_paginas}", text_color="#222")
@@ -135,7 +118,7 @@ class ListarUC(ctk.CTkFrame):
                 celda_btn.grid(row=fila, column=4, padx=1, pady=1, sticky="nsew")
                 boton = ctk.CTkButton(
                     celda_btn, text="Ver datos", width=100,
-                    text_color="white",
+                    text_color="#222",
                     command=lambda uc=tupla_uc: self.ver_datos_completos(uc)
                 )
                 boton.pack(padx=10, pady=5)

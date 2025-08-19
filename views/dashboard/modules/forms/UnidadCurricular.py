@@ -91,7 +91,7 @@ class UnidadCurricular(SectionFrameBase):
         valores_pnf = self.obtener_nombre_pnf() if self.obtener_nombre_pnf() else ["Sin opciones disponibles"]
         if rol_user == "coord_pnf" and user_name:
             persona_id = self.controlador_user.obtener_persona_id(user_name)
-            docente_id = self.controlador_docente.obtener_docente_id(persona_id)
+            docente_id = self.controlador_docente.obtener_id_docente(persona_id)
             pnf_id = self.controlador_docente.obtener_pnf_id(docente_id)
             # Busca el nombre del PNF por id
             nombre_pnf = None

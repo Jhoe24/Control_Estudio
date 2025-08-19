@@ -7,38 +7,48 @@ import tkinter as tk
 class FiltradoPNFFrame(SectionFrameBase):
     def __init__(self, master, controllers, user_role=None, username=None):
         super().__init__(master, header_text="Filtrar Unidades Curriculares por PNF")
+        self.master = master
         self.user_role = user_role
         self.username = username
-        self.controlador = controllers['PNF']
-        self.controlador_docente = controllers['Docentes']
-        self.controlador_user = controllers['Usuario']
+        self.controlador = controllers
+        # self.controlador_docente = controllers['Docentes']
+        # self.controlador_user = controllers['Usuario']
 
          # --- Lista de PNF del controlador ---
         self.lista_pnf = self.controlador.listado_pnf  # lista de tuplas (id_pnf, nombre_pnf, nombre_pnf)
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.lista_pnf}
 
-        nombre_pnf = next((nombre for nombre, id_ in self.pnf_id_por_nombre.items() if id_ == pnf_id), None)
-        # Configurar valores iniciales según el rol
-        if user_role == "coord_pnf" and username:
-            # Lógica para coordinador - obtener su PNF específico
-            persona_id = self.controlador.obtener_persona_id(username)
-            docente_id = self.controlador.obtener_docente_id(persona_id)
-            pnf_id = self.controlador.obtener_pnf_id(docente_id)
-            
-            # Buscar el nombre del PNF por id
-            #como encontrar una llave del dic por el valor
-            
-            if nombre_pnf:
-                pass
-            else:
-                self.valores_pnf = ["Sin opciones disponibles"]
-        else:
-            # Usuario normal - mostrar todos los PNFs
-            self.valores_pnf = self.obtener_nombre_pnf() if self.obtener_nombre_pnf() else ["Sin opciones disponibles"]
-            valor_inicial_pnf = "Seleccione un PNF"
-            
+        # Inicializar variables
+        pnf_coordinador = None
+        self.valores_pnf = self.obtener_nombre_pnf() or ["Sin opciones disponibles"]
+        valor_inicial = self.valores_pnf[0]
 
-        self.pnf_var = ctk.StringVar(value="Seleccione un PNF")
+        # Configurar valores para coordinador
+        if user_role and user_role.lower() == "coord_pnf" and username:
+            try:
+                persona_id = self.controlador_user.obtener_persona_id(username)
+                docente_id = self.controlador_docente.obtener_id_docente(persona_id)
+                pnf_id = self.controlador_docente.obtener_pnf_id(docente_id)
+                
+                if pnf_id:
+                    pnf_coordinador = next(
+                        (nombre for nombre, id_ in self.pnf_id_por_nombre.items() if id_ == pnf_id),
+                        None
+                    )
+                    
+                    if pnf_coordinador:
+                        self.valores_pnf = [pnf_coordinador]
+                        valor_inicial = pnf_coordinador
+                    else:
+                        self.valores_pnf = ["Sin opciones disponibles"]
+                        valor_inicial = "Sin opciones disponibles"
+            except Exception as e:
+                print(f"Error obteniendo PNF del coordinador: {e}")
+                self.valores_pnf = ["Error al cargar PNF"]
+                valor_inicial = "Error al cargar PNF"
+
+
+        self.pnf_var = ctk.StringVar(value=valor_inicial)
         self.trayecto_var = ctk.StringVar(value="No seleccionado")
         self.tramo_var = ctk.StringVar(value="No seleccionado")
 
@@ -57,13 +67,14 @@ class FiltradoPNFFrame(SectionFrameBase):
             command=self.actualizar_trayectos_por_pnf
         )
 
-        if nombre_pnf:
-            self.pnf_var.set(nombre_pnf)
-            self.option_menu_pnf.configure(state="disabled")
+        # if nombre_pnf:
+        #     self.pnf_var.set(nombre_pnf)
+        #     self.option_menu_pnf.configure(state="disabled")
 
         self.option_menu_pnf.pack(side="left", padx=(0, 15))
+
         # Bloquear PNF si es coordinador
-        if user_role.lower() == "coord_pnf":
+        if user_role and user_role.lower() == "coord_pnf" and pnf_coordinador:
             self.option_menu_pnf.configure(state="disabled")
             # Ejecutar búsqueda automáticamente para coordinador
             self.ejecutar_busqueda()
@@ -150,7 +161,7 @@ class FiltradoPNFFrame(SectionFrameBase):
         id_pnf = self.pnf_id_por_nombre.get(nombre_pnf)
         id_trayecto = self.trayecto_id_por_nombre.get(nombre_trayecto) if hasattr(self, 'trayecto_id_por_nombre') else None
         id_tramo = self.tramo_id_por_nombre.get(nombre_tramo) if hasattr(self, 'tramo_id_por_nombre') else None
-
+        
         # Lógica de búsqueda según los filtros seleccionados
         if not id_trayecto and not id_tramo:
             lista_uc = self.controlador.buscar_uc_por_pnf_trayecto_tramo(id_pnf)
@@ -165,8 +176,5 @@ class FiltradoPNFFrame(SectionFrameBase):
         self.master.actualizar_pagina()
 
     def obtener_nombre_pnf(self):
-        nombre_pnf = []
-        if self.lista_pnf:
-            for tupla in self.lista_pnf:
-                nombre_pnf.append(tupla[2])
-        return nombre_pnf
+            """Obtiene los nombres completos de los PNFs"""
+            return [tupla[2] for tupla in self.lista_pnf] if self.lista_pnf else []
