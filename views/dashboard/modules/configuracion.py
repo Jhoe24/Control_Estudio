@@ -173,6 +173,11 @@ class Config_user(ctk.CTkScrollableFrame):
             self.frame_datos_personales.nro_documento_entry.insert(0,nro_doc)
             self.frame_datos_personales.habilitar_edicion()
             self.frame_datos_personales.nro_documento_entry.configure(state="disabled")
+
+            for telefono in datos.get('telefonos', []):
+                print(telefono)
+                self.frame_datos_personales.agregar_telefono(telefono)
+
             command = self.actualizar_datos_personales
 
         elif new_value == "Cambiar Direccion":

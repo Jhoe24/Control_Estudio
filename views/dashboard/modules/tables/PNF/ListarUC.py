@@ -6,24 +6,27 @@ from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
 
 
 class ListarUC(ctk.CTkFrame):
-
     def __init__(self, master, controller,tupla_datos = None, user_role=None, username=None):
         super().__init__(master, fg_color="white")
+        #diccionario de controladores disponible
         self.controller = controller
         self.controller_pnf = controller["PNF"]
         self.user_role = user_role
         self.username = username
 
+        #preparación de filtros a partir de la tupla recibida
         tupla_id = ()
         self.tuplas_nombre = ()
+        # tupla_datos es para los datos relacionados con el filtro aplicado
         if tupla_datos:
+            # se construyen dos tuplas: una con IDs y otra con nombres
             for i in range(len(tupla_datos)):
                 if i == 0 or i == 1 or i == 2:
                     tupla_id = tupla_id + (tupla_datos[i],)
                 if i == 0 or i == 3 or i == 4:
                     self.tuplas_nombre = self.tuplas_nombre + (tupla_datos[i],)
 
-            
+            # obtener listado filtrado de UC
             self.lista_UC = self.controller_pnf.obtener_UC(tupla_id)
         else:
             self.lista_UC = self.controller_pnf.obtener_UC()
@@ -32,12 +35,16 @@ class ListarUC(ctk.CTkFrame):
         self.uc_por_pagina = 11
         self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
 
+        # lista de UC a mostrar en la página inicial
         self.paginas_mostrar = self.lista_UC[:self.uc_por_pagina]
         self.posicion_actual = len(self.paginas_mostrar)
+
+        # variables para manejar botones dinámicos de cada fila
         self.button_uc = None
         self.frame_uc = None
 
         if not tupla_datos:
+            # si  no se pasó un filtro, mostrar el frame de búsqueda
             self.busqueda_frame = FiltradoPNFFrame(self, self.controller, user_role, username)
             self.busqueda_frame.grid(row=0, column=0, columnspan=5, padx=15, pady=(10, 0), sticky="ew")
 
@@ -46,6 +53,7 @@ class ListarUC(ctk.CTkFrame):
         # Encabezados de la tabla
         headers = ["Código", "Nombre", "Credito","Horas", "Acciones"]
         for col, header in enumerate(headers):
+            # cada encabezado está dentro de un CTkFrame con fondo gris
             celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)
             celda.grid(row=1, column=col, padx=1, pady=1, sticky="nsew")
             label = ctk.CTkLabel(celda, text=header, font=ctk.CTkFont(weight="bold"), text_color="#222")
@@ -61,6 +69,7 @@ class ListarUC(ctk.CTkFrame):
         self.frame_paginacion.grid_columnconfigure(2, weight=0)
         self.frame_paginacion.grid_columnconfigure(3, weight=0)
         self.frame_paginacion.grid_columnconfigure(4, weight=1)
+        # mostrar o esconder paginación según cantidad de UC
         if len(self.lista_UC) <= self.uc_por_pagina:
             self.frame_paginacion.grid_remove()
         else:

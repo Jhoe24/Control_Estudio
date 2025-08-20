@@ -6,15 +6,15 @@ import tkinter.messagebox as messagebox
 import tkinter as tk
 
 class FiltradoPNFFrame(SectionFrameBase):
-    def __init__(self, master, controllers, user_name = None, rol_user = None):
+    def __init__(self, master, controllers, rol_user = None,user_name = None):
         super().__init__(master, header_text="Filtrar Unidades Curriculares por PNF")
+        # controladores principales
         self.controlador = controllers['PNF']
         self.controlador_docente = controllers['Docentes']
         self.controlador_user = controllers['Usuario']
 
-       
-
         # --- Lista de PNF del controlador ---
+        # cada tupla tiene la forma: (id_pnf, código_pnf, nombre_pnf)
         self.lista_pnf = self.controlador.listado_pnf  # lista de tuplas (id_pnf, nombre_pnf, nombre_pnf)
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.lista_pnf}
         self.nombre_pnf = self.obtener_nombre_pnf()
@@ -29,27 +29,28 @@ class FiltradoPNFFrame(SectionFrameBase):
 
         # caso de coord_pnf
         valores_pnf = []
-        if rol_user and rol_user.lower() == "COORD_PNF" and user_name:
+        print(rol_user.lower())
+        if rol_user.lower() == "coord_pnf":
             persona_id = self.controlador_user.obtener_persona_id(user_name)
+            print(persona_id)
             docente_id = self.controlador_docente.obtener_id_docente(persona_id)
+            print(persona_id)
             pnf_id = self.controlador_docente.obtener_pnf_id(docente_id)
-
+            print(pnf_id)
             # Busca el nombre del PNF por id
-            #nombre_pnf = None
+
             nombre_pnf = next((tupla[2] for tupla in self.lista_pnf if tupla[0] == pnf_id), None)
-      
-            # for tupla in self.lista_pnf:
-            #     if tupla[0] == pnf_id:
-            #         nombre_pnf = tupla[2]
-            #         break
-            valores_pnf = [tupla[2] for tupla in self.lista_pnf]
+
             if nombre_pnf:
+                valores_pnf = [nombre_pnf]
                 self.pnf_var.set(nombre_pnf)
+                
             else:
+                valores_pnf = ["sin opciones"]
                 self.pnf_var.set("Seleccione un PNF")
         else:
+            # Caso general: listar todos los PNF
             valores_pnf = [tupla[2] for tupla in self.lista_pnf]
-            #self.deshabilitar_campos()
             self.pnf_var.set("Seleccione un PNF")
 
         # --- OptionMenu PNF ---
@@ -62,8 +63,10 @@ class FiltradoPNFFrame(SectionFrameBase):
         )
         self.option_menu_pnf.pack(side="left", padx=(0, 15))
 
-        if rol_user and rol_user.lower() == "coord_pnf":
+        # Si es coordinador, bloquear el menú de PNF
+        if rol_user and rol_user.lower() == "coord_pnf" and user_name:
             self.pnf_var.set(valores_pnf[0])    # selecciona el único valor
+            self.option_menu_pnf.configure(state="disabled")
 
         # --- OptionMenu Trayecto ---
         self.option_menu_trayecto = crear_option_menu(
@@ -167,6 +170,4 @@ class FiltradoPNFFrame(SectionFrameBase):
             for tupla in self.lista_pnf:
                 nombre_pnf.append(tupla[2])
         return nombre_pnf
-    
-    def deshabilitar_campos(self):
-        self.option_menu_pnf.configure(state="disabled")
+  

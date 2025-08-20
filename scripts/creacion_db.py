@@ -1,5 +1,7 @@
 # archivo newmodelo.py - Sistema Académico Mejorado
 # Control de Estudios - Universidad Politécnica Territorial "José Félix Ribas"
+# crear base de dato py .\scripts\creacion_db.py
+
 import sqlite3 as sql
 import os
 import datetime
@@ -500,6 +502,23 @@ class SistemaAcademicoDB:
             FOREIGN KEY (pnf_id) REFERENCES pnf(id)
         );'''
         self.ejecutar_consulta(instruccion4)
+        
+        instruccion5 = '''
+        CREATE TABLE IF NOT EXISTS docente_uc (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            docente_pnf_id INTEGER,
+            unidad_curricular_id INTEGER,
+            periodo_academico_id INTEGER,
+            sede_id INTEGER,
+            fecha_asignacion DATE,
+            activo BOOLEAN DEFAULT 1,
+            FOREIGN KEY (docente_pnf_id) REFERENCES docente_sede_pnf(id),
+            FOREIGN KEY (unidad_curricular_id) REFERENCES unidades_curriculares(id),
+            FOREIGN KEY (periodo_academico_id) REFERENCES periodos_academicos(id),
+            FOREIGN KEY (sede_id) REFERENCES sedes(id),
+            UNIQUE(docente_pnf_id, unidad_curricular_id, periodo_academico_id, sede_id)
+            );'''
+        self.ejecutar_consulta(instruccion5)
 
     def crear_tablas_operativas(self):
         """Tablas operativas del sistema académico"""

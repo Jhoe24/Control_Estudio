@@ -90,28 +90,32 @@ class DatosPersonalesFrame(SectionFrameBase):
 
         
 
-    def agregar_telefono(self):
+    def agregar_telefono(self, telefono=None):
         """
         Agrega una fila dinámica de teléfono (tipo + número + eliminar).
         """
         fila = ctk.CTkFrame(self.frame_telefonos, fg_color="transparent")
         fila.pack(fill="x", pady=2)
 
-        self.var_tipo = ctk.StringVar(value="movil")
+        var_tipo = ctk.StringVar(value="movil")
         tipo_menu = crear_option_menu(
             fila,
             values=['movil', 'casa', 'trabajo', 'otro'],
-            variable=self.var_tipo
+            variable=var_tipo
         )
         tipo_menu.pack(side="left", padx=(0, 5))
 
-        self.entry_num = crear_entry(
+        entry_num = crear_entry(
             fila,
             width=150,
             validate="key",
             validatecommand=(self.vcmd_num, "%S")
         )
-        self.entry_num.pack(side="left", padx=(0, 5))
+        entry_num.pack(side="left", padx=(0, 5))
+
+        if telefono:
+            var_tipo.set(telefono[0])
+            entry_num.insert(0, telefono[1])
 
         btn_eliminar = ctk.CTkButton(
             fila,
@@ -120,10 +124,8 @@ class DatosPersonalesFrame(SectionFrameBase):
             command=lambda: self.eliminar_telefono(fila)
         )
         btn_eliminar.pack(side="left", padx=(0, 5))
-        # Agregar teléfono a la lista
-        self.lista_telefonos.append((self.var_tipo.get(), self.entry_num.get()))
 
-        self.telefono_widgets.append((fila, self.var_tipo, tipo_menu, self.entry_num))
+        self.telefono_widgets.append((fila, var_tipo, tipo_menu, entry_num))
 
     def obtener_telefonos(self):
         telefonos = [
@@ -277,15 +279,13 @@ class DatosPersonalesFrame(SectionFrameBase):
         # --- Teléfonos dinámicos: mostrar todos los guardados ---
         self.limpiar_telefonos()
         telefonos = estudiante.get('telefonos', [])
-        print(telefonos)
-        for tipo, numero, p in telefonos:
-            self.agregar_telefono()
-            fila, var_tipo, tipo_menu, entry_num = self.telefono_widgets[-1]
-            var_tipo.set(tipo)
-            entry_num.insert(0, numero)
-            entry_num.configure(state="disabled")
+        for telefono in telefonos:
+            print(telefono)
+            self.agregar_telefono(telefono)
+            fila, _, tipo_menu, entry_num = self.telefono_widgets[-1]
             tipo_menu.configure(state="disabled")
-            # Deshabilitar botón eliminar
+            entry_num.configure(state="disabled")
+
             for widget in fila.winfo_children():
                 if isinstance(widget, ctk.CTkButton) and widget.cget("text") == "Eliminar":
                     widget.configure(state="disabled")

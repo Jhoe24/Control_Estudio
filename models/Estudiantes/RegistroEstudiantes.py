@@ -167,49 +167,20 @@ class ModelRegistroEstudiantes:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
 
-            #Estraer los datos de informacion personal
-            # cursor.execute('''
-            #                 SELECT * FROM informacion 
-            #                 WHERE tipo = 'estudiante'
-            #                 LIMIT 10
-            #                 OFFSET {registro_inicio}
-            #                ''')
-
-
-            #Extraer de la tabla informacion personal y esrudiantes
+            #Extraer de la tabla informacion personal y estudiantes
             cursor.execute('''
-                           SELECT ip.*, e.*
-                           FROM informacion_personal ip
-                           LEFT JOIN estudiantes e ON ip.id= e.persona_id
-                           WHERE ip.tipo='estudiante'
-                           LIMIT 11
-                           OFFSET ?
-                           ''',(registro_inicio,))
+                            SELECT ip.id AS persona_id, ip.*, e.*
+                            FROM informacion_personal ip
+                            LEFT JOIN estudiantes e ON ip.id = e.persona_id
+                            WHERE ip.tipo='estudiante'
+                            LIMIT 11
+                            OFFSET ?
+                            ''',(registro_inicio,))
             resultados = cursor.fetchall()
-                        
+                            
             nombres_columnas = [descripcion[0] for descripcion in cursor.description]
             
-            
             # Telefonos
-            
-            # cursor.execute('''
-            #                 SELECT persona_id, tipo_telefono, numero, principal
-            #                 FROM telefonos
-            #                 ''')
-            # telefonos = cursor.fetchall()
-            
-            # telefonos_dict = {}
-            # for persona_id, tipo_telefono, numero, principal in telefonos:
-            #     if persona_id not in telefonos_dict:
-            #         telefonos_dict[persona_id] = {}
-            #     if principal == 1:
-            #         telefonos_dict[persona_id]['telefono_principal'] = numero
-            #         telefonos_dict[persona_id]['tipo_telefono_p'] = tipo_telefono
-            #     else:
-            #         telefonos_dict[persona_id]['telefono_secundario'] = numero
-            #         telefonos_dict[persona_id]['tipo_telefono_s'] = tipo_telefono
-
-            # Después de obtener los teléfonos:
             cursor.execute('''
                 SELECT persona_id, tipo_telefono, numero, principal
                 FROM telefonos
@@ -261,13 +232,12 @@ class ModelRegistroEstudiantes:
                 
                 estudiante = dict(zip(nombres_columnas, resultado))
                 
-                persona_id = estudiante['persona_id']
+                # Asegurarse de que persona_id siempre sea el id de informacion_personal
+                persona_id = estudiante.get('persona_id')
+                estudiante['id'] = estudiante.get('id')
+                
 
                 tel_info = telefonos_dict.get(persona_id, {})
-                # estudiante['telefono_principal'] = tel_info.get('telefono_principal', '')
-                # estudiante['tipo_telefono_p'] = tel_info.get('tipo_telefono_p', '')
-                # estudiante['telefono_secundario'] = tel_info.get('telefono_secundario', '')
-                # estudiante['tipo_telefono_s'] = tel_info.get('tipo_telefono_s', '')
                 # Agrega todos los teléfonos como array de tuplas según el id_persona
                 estudiante['telefonos'] = [
                     (tipo_telefono, numero, principal)
@@ -290,10 +260,9 @@ class ModelRegistroEstudiantes:
 
             return informacion_estudiantes
             
-           
         except Exception as e:
-             print(f"Error al realizar la consulta: {e}") 
-             return False
+            print(f"Error al realizar la consulta: {e}") 
+            return False
         finally:
             if con is not None:
                 con.close()
@@ -454,7 +423,7 @@ class ModelRegistroEstudiantes:
                                datos_estudiantes['correo_electronico'],
                                id
                            ))
-            print(datos_estudiantes["codigo_sni"])
+            
             # Actualizar datos en la tabla estudiantes
             cursor.execute('''
                            UPDATE estudiantes
@@ -492,6 +461,7 @@ class ModelRegistroEstudiantes:
             #                 ))
 
             # Actualizar telefonos: eliminar los existentes y volver a insertar los nuevos
+            print(id)
             cursor.execute('DELETE FROM telefonos WHERE persona_id = ?', (id,))
             telefonos = datos_estudiantes.get('lista_telefonos', [])
             for idx, (tipo, numero) in enumerate(telefonos):
@@ -662,6 +632,24 @@ class ModelRegistroEstudiantes:
             return None
         finally:
             con.close()
+            
+    def obtener_id_por_nro_doc(self,nro_doc):
+        con = None
+        
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("SELECT id FROM informacion_personal WHERE documento_identidad = ?",(nro_doc,))
+            resultado = cursor.fetchone()
+            con.close()
+            return resultado[0]
+           
+            
+        except Exception as e:
+            print(f"Error al obtener el id: {e}") 
+            return False
+        finally:
+            if con is not None:
+                con.close()
+    
 
-#bd = ModelRegistroEstudiantes()
-#print(bd.lista_Estudiantes())

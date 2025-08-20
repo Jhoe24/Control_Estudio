@@ -211,5 +211,3 @@ class UserModel:
             if con is not None:
                 con.close()
 
-bd = UserModel()
-print(bd.obtener_datos_personales(22))

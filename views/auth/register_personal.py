@@ -87,17 +87,13 @@ class RegisterPersonalView(BaseAuthVisualView):
         else:
             
             if not self.controller["LoginAuth"].exists_personal(tipo_documento, documento): 
-                print("usuario aun no registrado")
-                self.campos_necesario()
                 self.entry_documento.configure(state="disabled")
                 self.radio_cedula.configure(state="disabled")
-                self.button_registrar.configure(text="Registrar", command=self.registrar_usuario)
+                self.button_registrar.configure(state="disabled")
                 self.button_volver.configure(text="Cancelar", command=self.controller["Mostrar_Ventanas"].mostrar_vista_login)
                 #Reposicionar los botones 10123456
-                self.button_registrar.pack_forget()
-                self.button_volver.pack_forget()
-                self.button_registrar.pack(fill=ctk.X, padx=20, pady=(15, 10))
-                self.button_volver.pack(fill=ctk.X, padx=20, pady=0)
+                messagebox.showwarning("Warning", "Esta persona no esta registrada")
+                return
             else:
                 if self.controller["LoginAuth"].exists_user(tipo_documento, documento):
                     messagebox.showerror("Error", "Esta persona ya posee un usuario.")

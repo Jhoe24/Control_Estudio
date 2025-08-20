@@ -136,7 +136,8 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
         if estudiante['persona_id']:
             estudiante_id = estudiante['persona_id']
         else:
-            estudiante_id = estudiante['id']
+            estudiante_id = self.controlador.modelo.obtener_id_por_nro_doc(estudiante["documento_identidad"])
+            
         self.btn_actualizar = ctk.CTkButton(
             botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_estudiante(estudiante_id,ventana,listado_estudiantes)  # Cambia el comando aquí
         )
@@ -160,9 +161,12 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
             self.datos_ubicacion_frame.habilitar_edicion()
 
     def actualizar_estudiante(self, id, ventana, listado_estudiantes):
-        # Obtener los datos de los frames para actualizarlos
+    
+        #Obtener los datos de los frames para actualizarlos
         datos = self.controlador.obtener_todos_los_datos(self)
+        
         if self.controlador.validar_campos_obligatorios(datos, self):
+            
             exito = self.controlador.cargar_estudiante_para_edicion(id, datos, self)
             if exito:
                 #self.controlador.master_controlador.estudiantes.limpiar_formulario_completo(self)
