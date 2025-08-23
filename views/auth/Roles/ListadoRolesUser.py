@@ -117,7 +117,6 @@ class FrameRoles(ctk.CTkFrame):
         """
         Muestra el listado de usuarios para asignar los roles a cada uno de ellos.
         """
-        print(f"Cargando {len(self.paginas_mostrar)} usuarios en la tabla")
         # Se limpia la tabla
         for fila in self.fila_datos:
             for widget in fila:
@@ -146,10 +145,10 @@ class FrameRoles(ctk.CTkFrame):
                 fila_widgets.append(self._crear_celda(fila,4,hay_rol))
                 if self.controller_user.the_user_is_blocked(dic_user['id']):
                     text_btn = "Desbloquear Usuario"
-                    command_ = lambda id = dic_user['id'], c = 0 : self.desbloquear_usuario(id,c)
+                    command_ = lambda id = dic_user['id']: self.desbloquear_usuario(id,0)
                 else:
                     text_btn = "Bloquear Usuario"
-                    command_ = lambda id = dic_user['id'], c = 1 : self.desbloquear_usuario(id,c)
+                    command_ = lambda id = dic_user['id']: self.desbloquear_usuario(id,1)
 
                 boton = ctk.CTkButton(
                 celda_btn, text=text_btn, 

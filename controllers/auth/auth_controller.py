@@ -43,3 +43,6 @@ class AuthController:
 
     def obtener_fecha_actual(self):
         return datetime.now().strftime("%Y-%m-%d")
+    
+    def is_blocked(self, user_id):
+        return self.user_model.the_user_is_blocked(user_id)

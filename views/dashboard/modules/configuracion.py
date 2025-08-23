@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 import tkinter.messagebox as messagebox
 import subprocess
+import threading
 import platform
 
 from views.dashboard.components.widget_utils import *
@@ -204,9 +205,6 @@ class Config_user(ctk.CTkScrollableFrame):
         if not self.controller["LoginAuth"].login(self.username, self.password_actual_entry.get()):
             messagebox.showerror("Error", "Contraseña actual incorrecta")
             return
-        
-        print(self.password_actual_entry.get())
-        print(self.cambiar_password_entry.get())
 
         if self.password_actual_entry.get() is not self.cambiar_password_entry.get():
 
@@ -281,7 +279,30 @@ class Config_user(ctk.CTkScrollableFrame):
         frame_roles = FrameRoles(self.contenido_frame, controller=self.controller)
         frame_roles.pack(fill="both", expand=True)
 
-        # Cargar los roles en el FrameRoles
-        frame_roles.cargar_datos()
+        # Mostrar un indicador de carga mientras se obtienen los datos
+        loading_label = ctk.CTkLabel(frame_roles, text="Cargando roles, por favor espere...", font=("Segoe UI", 16))
+        loading_label.pack(pady=50)
+        self.contenido_frame.update_idletasks() # Para asegurar que el label se muestre
+
+        def worker():
+            """Función que se ejecutará en el hilo secundario para cargar los datos."""
+            try:
+                # Esta es la operación que puede tardar.
+                # Asumimos que `cargar_datos` obtiene los datos y luego los usa para crear widgets.
+                frame_roles.cargar_datos()
+
+                # Una vez que los datos están cargados, ocultamos el indicador de carga.
+                # Esto debe hacerse en el hilo principal de la UI usando 'after'.
+                self.after(0, loading_label.destroy)
+
+            except Exception as e:
+                # Es una buena práctica manejar posibles errores durante la carga de datos.
+                self.after(0, lambda: messagebox.showerror("Error de Carga", f"Ocurrió un error al cargar los roles: {e}"))
+                self.after(0, loading_label.destroy)
+
+        # Creamos y iniciamos el hilo para ejecutar el worker.
+        thread = threading.Thread(target=worker)
+        thread.daemon = True  # Esto permite que la aplicación se cierre aunque el hilo esté corriendo.
+        thread.start()
 
     

@@ -11,7 +11,7 @@ class ListaAsignacionUC(ctk.CTkFrame):
 
         docente_id = self.docente.get("id")
         # Obtener el PNF asignado al docente
-        pnf_asignados = self.controller_pnf.modelo.obtener_nombre_pnf_asignado_docente(docente_id)
+        pnf_asignados = self.controller_pnf.obtener_nombre_pnf_asignado_docente(docente_id)
         if not pnf_asignados or len(pnf_asignados) == 0:
             label = ctk.CTkLabel(self, text="El docente no tiene PNF asignado.", text_color="black")
             label.pack(pady=20)

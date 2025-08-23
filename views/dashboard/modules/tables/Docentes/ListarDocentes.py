@@ -10,7 +10,7 @@ from views.dashboard.modules.forms.Docentes.listaAsignacionUC import ListaAsigna
 class ListDocenteView(ctk.CTkFrame):
     def __init__(self, master, controlador, controller_pnf, controlador_user, role_user, user_name):
         super().__init__(master, fg_color="white")
-        self.formulario_docente = FormularioDocenteView(master, controlador)
+        self.formulario_docente = FormularioDocenteView(master, controlador, role_user)
         self.master = master
         self.controlador = controlador
         self.controller_pnf = controller_pnf
@@ -86,26 +86,26 @@ class ListDocenteView(ctk.CTkFrame):
         self.boton_siguiente.configure(state="disabled" if self.pagina_actual == self.cantidad_total_paginas else "normal")
 
         if self.cantidad_docente != 0:
-            self.mostrar_pagina()
+            self.mostrar_pagina(role_user)
 
-    def mostrar_pagina(self):
+    def mostrar_pagina(self, role_user):
         """
         Muestra los docentes de la página actual y actualiza el estado de los botones.
         """
-        self.cargar_datos(self.docente)
+        self.cargar_datos(self.docente, role_user)
         self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
 
         # Actualizar estado de los botones de paginación
         self.boton_anterior.configure(state="disabled" if self.pagina_actual == 1 else "normal")
         self.boton_siguiente.configure(state="disabled" if self.pagina_actual == self.cantidad_total_paginas else "normal")
 
-    def mostrar_resultado_busqueda(self, lista_docentes):
+    def mostrar_resultado_busqueda(self, lista_docentes, role_user):
         """
         Muestra solo los docentes pasados en la lista (por ejemplo, el resultado de una búsqueda).
         Deshabilita la paginación y actualiza la tabla.
         """
         self.pagina_actual = 1  # <-- Reinicia la página actual
-        self.cargar_datos(lista_docentes)
+        self.cargar_datos(lista_docentes, role_user)
         self.boton_anterior.configure(state="disabled")
         #self.boton_siguiente.configure(state="disabled")
         self.label_pagina.configure(text="1 de 1")
@@ -153,7 +153,7 @@ class ListDocenteView(ctk.CTkFrame):
         threading.Thread(target=tarea).start()
 
 
-    def cargar_datos(self, datos):
+    def cargar_datos(self, datos, role_user):
         """
         Elimina las filas de datos anteriores y carga las nuevas filas.
         """
@@ -183,19 +183,28 @@ class ListDocenteView(ctk.CTkFrame):
             boton = ctk.CTkButton(
                 frame_botones, text="Ver datos", width=100,
                 text_color=COLOR_ENTRY_BG,
-                command=lambda est=docente: self.formulario_docente.ver_datos_completos(est)
+                command=lambda est=docente: self.formulario_docente.ver_datos_completos(est, role_user)
             )
 
             # averiguar si el docente tiene un PNF asignado
-            btn_pnf = ctk.CTkButton(
-                frame_botones, text="Gestion P.N.F", width=100,
-                text_color="#ffffff",
-                fg_color=COLOR_BOTON_FONDO,
-                hover_color=COLOR_BOTON_FONDO_HOVER,
-                command=lambda est=docente: self.cargar_pnf(est)
+            if role_user.lower() == "coord_pnf":
+                btn_pnf = ctk.CTkButton(
+                    frame_botones, text="Gestion U.C.", width=100,
+                    text_color="#ffffff",
+                    fg_color=COLOR_BOTON_FONDO,
+                    hover_color=COLOR_BOTON_FONDO_HOVER,
+                    command=lambda est=docente: self.cargar_uc(est)
 
-            )
+                )
+            else:
+                btn_pnf = ctk.CTkButton(
+                    frame_botones, text="Gestion P.N.F", width=100,
+                    text_color="#ffffff",
+                    fg_color=COLOR_BOTON_FONDO,
+                    hover_color=COLOR_BOTON_FONDO_HOVER,
+                    command=lambda est=docente: self.cargar_pnf(est)
 
+                )
             boton.pack(side="left", padx=(0, 4), pady=5)
             btn_pnf.pack(side="left", pady=5)
 
@@ -274,7 +283,6 @@ class ListDocenteView(ctk.CTkFrame):
         scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Crea el frame para asignar Unidades Curriculares
-        
-        lista_asignacion_uc = ListaAsignacionUC(scroll_frame, self.controller_pnf, docente)
+        lista_asignacion = ListaAsignacionUC(scroll_frame,self.controller_pnf,docente)
        
     

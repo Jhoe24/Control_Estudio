@@ -249,7 +249,7 @@ class ListarUC(ctk.CTkFrame):
         top.protocol("WM_DELETE_WINDOW", on_close)
 
         #Frame de los datos generales de UC
-        self.frame_uc = UnidadCurricular(content_frame, self.controller_pnf, mostrar_botones=False)
+        self.frame_uc = UnidadCurricular(content_frame, self.controller, self.controlador, mostrar_botones=False)
         self.frame_uc.set_datos(dic_datos)
         self.frame_uc.pack(fill="both", expand=True, padx=0, pady=0)
 

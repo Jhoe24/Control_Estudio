@@ -10,13 +10,14 @@ from views.dashboard.modules.forms.Docentes.FrameDocente import FrameDocente
 from config.app_config import AppConfig
 class FormularioDocenteView(ctk.CTkScrollableFrame):
 
-    def __init__(self, master, controlador):
+    def __init__(self, master, controlador, role_user):
         super().__init__(master, fg_color=COLOR_FONDO_FORMULARIO, label_text="")
         self.master = master
         self.controlador = controlador
         self.btn_actualizar = None
         self.datos_personales_frame = None
         self.datos_ubicacion_frame = None
+        self.role_user = role_user
         self.evento_mouse()
         #self.controlador.master_controlaor.docente.obtener_lista_docentes()
         # Registrar funciones de validación
@@ -84,7 +85,7 @@ class FormularioDocenteView(ctk.CTkScrollableFrame):
             self.controlador.limpiar_formulario_completo(self)
         
     # sFormulario de actualizacion
-    def ver_datos_completos(self, docente):
+    def ver_datos_completos(self, docente, role_user):
         """
         Muestra una ventana emergente con los datos completos de un docente, en formato similar al formulario.
         """
@@ -122,14 +123,16 @@ class FormularioDocenteView(ctk.CTkScrollableFrame):
 
         # Botón para actualizar datos
         docente_id = docente['persona_id']
-        self.btn_actualizar = ctk.CTkButton(
-            botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_docente(docente_id,ventana)  # Cambia el comando aquí
-        )
-        self.btn_actualizar.pack(side="left", padx=10)
-
-        # Botón para editar campos
-        ctk.CTkButton(botones_frame, text="Editar Campos", command=self._editar_datos).pack(side="left", padx=10)
-        ctk.CTkButton(botones_frame, text="Cerrar", command=ventana.destroy).pack(side="left", padx=10)
+        if role_user.lower() == "coord_pnf":
+            ctk.CTkButton(botones_frame, text="Cerrar", command=ventana.destroy).pack(side="left", padx=10)
+        else:
+            self.btn_actualizar = ctk.CTkButton(
+                botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_docente(docente_id,ventana)  # Cambia el comando aquí
+            )
+            self.btn_actualizar.pack(side="left", padx=10)
+            # Botón para editar campos
+            ctk.CTkButton(botones_frame, text="Editar Campos", command=self._editar_datos).pack(side="left", padx=10)
+            ctk.CTkButton(botones_frame, text="Cerrar", command=ventana.destroy).pack(side="left", padx=10)
 
     def _editar_datos(self):
         # Cambia el estado de los botones y habilita la edición de los campos

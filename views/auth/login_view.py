@@ -64,14 +64,22 @@ class LoginView(BaseAuthVisualView):
         
         user_id = self.controller["LoginAuth"].login(username, password)
         if user_id:
+
             # Si las credenciales son correctas, muestra un mensaje y procede al dashboard
             # self.mensaje_label.configure(text="Inicio de Sesión Exitoso!", text_color="green")
             # self.mensaje_label.pack_forget()
             # self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))
             #self.mostrar_mensaje("Éxito", "Inicio de Sesión Exitoso!", "info")
             rol = self.controller["LoginAuth"].obtener_rol(user_id)
-            if rol:    
-                self.controller['Mostrar_Ventanas'].mostrar_vista_dashboardd(username, rol)
+            if rol:   
+                is_blocked = self.controller["LoginAuth"].is_blocked(user_id)
+                if is_blocked == False:
+                    self.controller['Mostrar_Ventanas'].mostrar_vista_dashboardd(username, rol)
+                elif is_blocked == True:
+                    self.mensaje_label.configure(text="Usuario bloqueado.", text_color="red")
+                else:
+                    self.mensaje_label.configure(text="Error al iniciar sección", text_color="red")
+                
             else:
                 self.mensaje_label.configure(text="Rol no asignado al usuario.", text_color="red")
                 self.mensaje_label.pack(before=self.button_login, fill=ctk.X, padx=20, pady=(0, 5))

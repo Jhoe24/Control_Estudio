@@ -527,3 +527,6 @@ class ControllerPNF:
         """
         sentencia = "SELECT id, nombre FROM unidades_curriculares WHERE pnf_id = ?"
         return self.modelo.buscar_uc_por_pnf(sentencia, (pnf_id,), es_dic=True)
+    
+    def obtener_nombre_pnf_asignado_docente(self, docente_id):
+        return self.modelo.obtener_nombre_pnf_asignado_docente(docente_id)

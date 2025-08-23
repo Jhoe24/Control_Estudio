@@ -237,20 +237,20 @@ class UserModel:
             if con is not None:
                 con.close()
 
-    def the_user_is_blocked(self, id_persona):
+    def the_user_is_blocked(self, id_user):
         con = None
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
             cursor.execute(
                 """
-                    SELECT bloqueado FROM usuarios WHERE persona_id = ?
-                """,(id_persona,)
+                    SELECT bloqueado FROM usuarios WHERE id = ?
+                """,(id_user,)
                 )
-            if cursor.fetchone()[0] == 1:
-                return True
-            else:
-                return False
+            result = cursor.fetchone()
+            if result:
+                return result[0] == 1
+            return False
         except Exception as e:
             print(f"Error al verificar si el usuario esta bloqueado: {e}")
             return False
@@ -258,7 +258,7 @@ class UserModel:
             if con is not None:
                 con.close()
 
-    def block_user(self, id_persona, block):
+    def block_user(self, id_user, block):
         con = None
         try:
             con = sql.connect(self.db_ruta)      
@@ -266,19 +266,19 @@ class UserModel:
             #Verificar que ta exista un registro
             cursor.execute(
                 """
-                    SELECT id FROM usuarios WHERE persona_id = ?
-                """,(id_persona,)
+                    SELECT id FROM usuarios WHERE id = ?
+                """,(id_user,)
                 )
             if cursor.fetchone():
                 cursor.execute(
                     """
-                        UPDATE usuarios SET bloqueado = ? WHERE persona_id = ?
-                    """,(block, id_persona))
+                        UPDATE usuarios SET bloqueado = ? WHERE id = ?
+                    """,(block, id_user))
             else:
                 cursor.execute(
                     """
-                        INSERT INTO usuarios (persona_id, bloqueado) VALUES (?, ?)
-                    """,(id_persona, block))
+                        INSERT INTO usuarios (id, bloqueado) VALUES (?, ?)
+                    """,(id_user, block))
             con.commit()
             return True
         except Exception as e:
@@ -287,4 +287,4 @@ class UserModel:
             if con is not None:
                 con.close()
 
-
+#print(UserModel().the_user_is_blocked(3))
