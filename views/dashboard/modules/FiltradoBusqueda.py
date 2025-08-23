@@ -4,11 +4,14 @@ from views.dashboard.components.SectionFrameBase import SectionFrameBase
 
 # Clase para el filtrado y búsqueda de estudiantes
 class FiltradoBusquedaFrame(SectionFrameBase):
-    def __init__(self, master,controlador ,vcmd_num):
+    def __init__(self, master,controlador, controlador_user ,vcmd_num, role_user, user_name):
         super().__init__(master, header_text="Filtrado y Búsqueda")
         self.tipo_documento_var = ctk.StringVar(value="cedula")
         self.vcmd_num = vcmd_num
         self.controlador = controlador
+        self.controlador_user = controlador_user
+        self.role_user = role_user
+        self.user_name = user_name
         
         self.frame_tipo_numero_doc = ctk.CTkFrame(self, fg_color="transparent")
         self.frame_tipo_numero_doc.pack(fill="x", pady=PADY_FILA, padx=15)
@@ -36,13 +39,21 @@ class FiltradoBusquedaFrame(SectionFrameBase):
         self.boton_buscar.grid(row=0, column=4, padx=10)
 
     def ejecutar_busqueda(self):
-        
         tipo_documento = self.tipo_documento_var.get()
         nro_documento = self.nro_documento_entry.get()
+        self.id_pnf = None
         print(f"tipo de documeto {tipo_documento} : documento de identidad {nro_documento}")
-        dic_estudiante=self.controlador.buscar_estudiante(tipo_documento, nro_documento)
+
+        if self.role_user.lower() == "coord_pnf":
+            persona_id = self.controlador_user.obtener_persona_id(self.user_name) 
+            docente_id = self.controlador.obtener_id_docente(persona_id)
+            self.id_pnf = self.controlador.obtener_pnf_id(docente_id)
+        dic_estudiante=self.controlador.buscar_estudiante(tipo_documento, nro_documento, id_pnf=self.id_pnf)
+        
         if dic_estudiante:
             self.master.mostrar_resultado_busqueda([dic_estudiante])
+        
+        
         
             
 

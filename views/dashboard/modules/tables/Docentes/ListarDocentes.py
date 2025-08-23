@@ -8,18 +8,25 @@ from views.dashboard.modules.forms.Docentes.listaAsignacion import ListaAsignaci
 from views.dashboard.modules.forms.Docentes.listaAsignacionUC import ListaAsignacionUC
 
 class ListDocenteView(ctk.CTkFrame):
-    def __init__(self, master, controlador, controller_pnf):
+    def __init__(self, master, controlador, controller_pnf, controlador_user, role_user, user_name):
         super().__init__(master, fg_color="white")
         self.formulario_docente = FormularioDocenteView(master, controlador)
         self.master = master
         self.controlador = controlador
         self.controller_pnf = controller_pnf
+        self.controlador_user = controlador_user
         self.filas_datos = []
         self.cantidad_docente = self.controlador.modelo_docente.obtener_cantidad_docente()
         self.pagina_actual = 1
         self.primer_id_table = self.controlador.modelo_docente.obtener_primer_id()
+        self.pnf_id = None
 
-        self.docente = self.controlador.obtener_lista_docentes(0)
+        if role_user.lower() == "coord_pnf":
+            persona_id = self.controlador_user.obtener_persona_id(user_name) 
+            docente_id = self.controlador.obtener_id_docente(persona_id)
+            self.pnf_id = self.controlador.obtener_pnf_id(docente_id)
+            
+        self.docente = self.controlador.obtener_lista_docentes(0,pnf_id=self.pnf_id)
         self.registros_por_pagina = 13
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_docente // self.registros_por_pagina) + (1 if self.cantidad_docente % self.registros_por_pagina > 0 else 0)
@@ -40,7 +47,7 @@ class ListDocenteView(ctk.CTkFrame):
             self.vcmd_decimal_val = master.register(self.controlador._solo_decimal)
 
         # --- FILTRADO DE BÚSQUEDA (FILA 0) ---
-        self.busqueda_frame = FiltradoBusquedaFrame(self,self.controlador,self.vcmd_num_val)
+        self.busqueda_frame = FiltradoBusquedaFrame(self,self.controlador, self.controlador_user,self.vcmd_num_val, role_user, user_name)
         self.busqueda_frame.grid(row=0, column=0, columnspan=6, padx=15, pady=(10, 0), sticky="ew")
 
         # --- ENCABEZADOS (FILA 1) ---
@@ -136,7 +143,7 @@ class ListDocenteView(ctk.CTkFrame):
         
         def tarea():
             # Obtiene la lista de docentes usando el offset calculado
-            self.docente = self.controlador.obtener_lista_docentes(offset)
+            self.docente = self.controlador.obtener_lista_docentes(offset, pnf_id=self.pnf_id)
             # Actualiza la interfaz de usuario en el hilo principal
             self.after(0, self.mostrar_pagina)
             self.after(0, lambda: self.boton_anterior.configure(state="normal"))

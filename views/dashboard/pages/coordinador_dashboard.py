@@ -56,7 +56,7 @@ class CoordinadorDashboardView(BaseDashboardView):
         bienvenida = LabelBienvenida(self.cuerpo_principal)
         bienvenida.pack(fill="x", padx=10, pady=10)
         bienvenida.configurar(
-            titulo="¡Bienvenido al Panel de Control del Administrador!",
+            titulo="¡Bienvenido al Panel de Control del Coordinador General!",
             mensaje="Hay mucho por hacer 🚀\n\nLos datos indican que nuestra universidad está en constante crecimiento.\n¡Gracias por tu gestión!",
             icono_path=ruta,
             alineacion="center"

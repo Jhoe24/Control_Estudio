@@ -42,7 +42,7 @@ class CoordinadorPNFDashboardView(BaseDashboardView):
         bienvenida = LabelBienvenida(self.cuerpo_principal)
         bienvenida.pack(fill="x", padx=10, pady=10)
         bienvenida.configurar(
-            titulo="¡Bienvenido al Panel de Control del Administrador!",
+            titulo="¡Bienvenido al Panel de Control del Coordinador P.N.F.!",
             mensaje="Hay mucho por hacer 🚀\n\nLos datos indican que nuestra universidad está en constante crecimiento.\n¡Gracias por tu gestión!",
             icono_path=ruta,
             alineacion="center"
@@ -66,7 +66,7 @@ class CoordinadorPNFDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
         
-        list_docente = ListDocenteView(self.cuerpo_principal, self.controller['Docentes'],self.controller["PNF"])
+        list_docente = ListDocenteView(self.cuerpo_principal, self.controller['Docentes'],self.controller["PNF"], self.controller['Usuario'],self.user_role, self.username)
         list_docente.pack(fill="both", expand=True, padx=10, pady=10)
 
     def pnf(self):

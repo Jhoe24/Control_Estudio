@@ -16,7 +16,7 @@ class DocenteController:
             messagebox.showerror("Error de Registro", "No se pudo registrar el docente. Por favor, intente nuevamente.", parent=vista_formulario)
         print(dic_docentes)
         
-    def obtener_lista_docentes(self,desde=0):
+    def obtener_lista_docentes(self,desde=0, pnf_id=None):
         #Obtener 10 registro de docentes
         nmin = 0
         nmax = self.modelo_docente.obtener_id_ultimo()
@@ -24,7 +24,7 @@ class DocenteController:
             return []
         if desde < nmin : desde = nmin
         if desde > (nmax) : desde = nmax-1
-        resultado = self.modelo_docente.lista_Docentes(desde)
+        resultado = self.modelo_docente.lista_Docentes(desde, pnf_id)
         # print(resultado)
         return resultado
 
@@ -39,9 +39,9 @@ class DocenteController:
             return False
         #print(f"id: {id} '/n Datos: {datos}")
 
-    def buscar_estudiante(self, tipo_doc, nro_doc):
+    def buscar_estudiante(self, tipo_doc, nro_doc, id_pnf=None):
         
-        registro = self.modelo_docente.buscar_estudiante(tipo_doc, nro_doc)
+        registro = self.modelo_docente.buscar_estudiante(tipo_doc, nro_doc, id_pnf)
 
         if registro:
             return registro

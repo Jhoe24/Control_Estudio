@@ -60,6 +60,7 @@ class MainWindow(ctk.CTk):
             "LoginAuth": AuthController()
             }  # Aquí se inicializa el controlador de autenticación, osea lo del login, registro, etc.
         self.dashboard_controller = {
+            "LoginAuth": AuthController(),
             "Usuario": UserController(),
             "Estudiantes": EstudianteController(),
             "Docentes":  DocenteController(),

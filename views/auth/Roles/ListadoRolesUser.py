@@ -4,7 +4,7 @@ from views.dashboard.components.widget_utils import *
 
 
 class FrameRoles(ctk.CTkFrame):
-    def __init__(self, master, controller,id_rol = None):
+    def __init__(self, master, controller, modo_desbloqueo=None):
         super().__init__(master, fg_color="transparent")
         # Inicializa el controlador de usuario
         self.controller_user = controller["Usuario"]
@@ -17,6 +17,8 @@ class FrameRoles(ctk.CTkFrame):
         self.paginas_mostrar = self.usuarios_dato
         self.posicion_actual = len(self.paginas_mostrar)
         self.fila_datos = []
+        self.modo_desbloqueo = modo_desbloqueo
+
        
          # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_usuarios // self.registros_por_pagina) + (1 if self.cantidad_usuarios % self.registros_por_pagina > 0 else 0)
@@ -26,7 +28,10 @@ class FrameRoles(ctk.CTkFrame):
             self.cantidad_total_paginas = 1
 
         # headers de la tabla
-        headers = ["Doc. Identidad", "Nombres", "Apellidos", "Usuario", "Rol", "Gestión Rol"]
+        if self.modo_desbloqueo:
+            headers = ["Doc. Identidad", "Nombres", "Apellidos", "Usuario", "Rol", "Bloquera"]
+        else:   
+            headers = ["Doc. Identidad", "Nombres", "Apellidos", "Usuario", "Rol", "Gestión Rol"]
         for col, header in enumerate(headers):
             celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)
             celda.grid(row=1, column=col, padx=1, pady=1, sticky="nsew")
@@ -122,6 +127,8 @@ class FrameRoles(ctk.CTkFrame):
         self.fila_datos = []
         # se obtienen los datos y me devuelve el diccionario
         for fila, dic_user in enumerate(self.paginas_mostrar, start=2):
+            roles = self.controller_user.obtener_roles()
+            hay_rol = self.controller_user.obtener_rol(dic_user['id'])
             fila_widgets = [
                 self._crear_celda(fila, 0, dic_user['documento_identidad']),
                 self._crear_celda(fila, 1, dic_user['nombres']),
@@ -129,66 +136,85 @@ class FrameRoles(ctk.CTkFrame):
                 self._crear_celda(fila, 3, dic_user['nombre_usuario']),
                 #self._crear_celda(fila, 4, dic_user['rol_id']),
             ]
-            celda_optionmenu = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=6)
-            celda_optionmenu.grid(row=fila, column=4, padx=1, pady=6, sticky="nsew")
 
-            roles = self.controller_user.obtener_roles()
-            var_role = ctk.StringVar(value=roles[0] if roles else "")  
-            state_asignar = "normal"
-            state_actualizar = "disabled"
+            celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
+            celda_btn.grid(row=fila, column=5, padx=1, pady=1, sticky="nsew")
             
-            hay_rol = self.controller_user.obtener_rol(dic_user['id'])
-            if hay_rol:
-                state_asignar = "disabled"
-                state_actualizar = "normal"
-                var_role.set(hay_rol)
-
-            role_menu = ctk.CTkOptionMenu(
-                celda_optionmenu,
-                values=roles,
-                variable=var_role,
-                width=120,
-                state=state_asignar
-            )
-            role_menu.pack(padx=10, pady=5)
-            fila_widgets.append(celda_optionmenu)
-
-            celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=6)
-            celda_btn.grid(row=fila, column=5, padx=1, pady=6, sticky="nsew")
 
             # Frame interno para centrar los botones
-            frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
-            frame_botones.pack(expand=True)
+            if self.modo_desbloqueo:
+                fila_widgets.append(self._crear_celda(fila,4,hay_rol))
+                if self.controller_user.the_user_is_blocked(dic_user['id']):
+                    text_btn = "Desbloquear Usuario"
+                    command_ = lambda id = dic_user['id'], c = 0 : self.desbloquear_usuario(id,c)
+                else:
+                    text_btn = "Bloquear Usuario"
+                    command_ = lambda id = dic_user['id'], c = 1 : self.desbloquear_usuario(id,c)
 
-            # Botón para asignar rol
-            boton = ctk.CTkButton(
-                frame_botones,
-                text="Asignar Rol",
+                boton = ctk.CTkButton(
+                celda_btn, text=text_btn, 
                 width=120,
                 fg_color = "#23272f",
                 hover_color = "#31343c",
                 text_color = "#fff",
                 border_width = 2,
                 border_color =  "#444857",
-                command=lambda rol=var_role, user_id=dic_user['id']: self.asignar_rol(rol,user_id),
-                state=state_asignar 
+                command=command_
+                )
+                boton.pack(padx=10, pady=5)
                 
-            )
-            boton.pack(side="left", padx=10, pady=5)
-            # Boton para habilitar el boton de asignar rol
-            btn = ctk.CTkButton(
-                frame_botones, 
-                text="Habilitar Rol",
-                width=120,
-                fg_color = "#23272f",
-                hover_color = "#31343c",
-                text_color = "#fff",
-                border_width = 2,
-                border_color =  "#444857",
-                command=lambda boton=boton, role_menu=role_menu: self.habilitar_botones(boton, role_menu),
-                state=state_actualizar
-            )
-            btn.pack(side="left", padx=10, pady=5)
+            else:
+                celda_optionmenu = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=6)
+                celda_optionmenu.grid(row=fila, column=4, padx=1, pady=6, sticky="nsew")
+                frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
+                frame_botones.pack(expand=True)
+                var_role = ctk.StringVar(value=roles[0] if roles else "")  
+                state_asignar = "normal"
+                state_actualizar = "disabled"
+                if hay_rol:
+                    state_asignar = "disabled"
+                    state_actualizar = "normal"
+                    var_role.set(hay_rol)
+
+                role_menu = ctk.CTkOptionMenu(
+                    celda_optionmenu,
+                    values=roles,
+                    variable=var_role,
+                    width=120,
+                    state=state_asignar
+                )
+                role_menu.pack(padx=10, pady=5)
+                fila_widgets.append(celda_optionmenu)
+
+                # Botón para asignar rol
+                boton = ctk.CTkButton(
+                    frame_botones,
+                    text="Asignar Rol",
+                    width=120,
+                    fg_color = "#23272f",
+                    hover_color = "#31343c",
+                    text_color = "#fff",
+                    border_width = 2,
+                    border_color =  "#444857",
+                    command=lambda rol=var_role, user_id=dic_user['id']: self.asignar_rol(rol,user_id),
+                    state=state_asignar 
+                    
+                )
+                boton.pack(side="left", padx=10, pady=5)
+                # Boton para habilitar el boton de asignar rol
+                btn = ctk.CTkButton(
+                    frame_botones, 
+                    text="Habilitar Rol",
+                    width=120,
+                    fg_color = "#23272f",
+                    hover_color = "#31343c",
+                    text_color = "#fff",
+                    border_width = 2,
+                    border_color =  "#444857",
+                    command=lambda boton=boton, role_menu=role_menu: self.habilitar_botones(boton, role_menu),
+                    state=state_actualizar
+                )
+                btn.pack(side="left", padx=10, pady=5)
 
             fila_widgets.append(celda_btn)
             self.fila_datos.append(fila_widgets)
@@ -223,11 +249,16 @@ class FrameRoles(ctk.CTkFrame):
         boton.configure(state="normal")
         role_menu.configure(state="normal")
 
-    # def actualizar_pagina(self):
-    #     """
-    #     Actualiza la página actual y recarga los datos.
-    #     """
-    #     self.paginas_mostrar = self.usuarios_dato[(self.pagina_actual-1)*self.registros_por_pagina:self.pagina_actual*self.registros_por_pagina]
-    #     self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
-    #     self.mostrar_pagina()
-    
+    def desbloquear_usuario(self,user_id, is_to_block):
+        """
+        Desbloquea un usuario seleccionado.
+        """
+        mess = "Usuario desbloqueado correctamente," if is_to_block == 1 else "Usuario bloqueado correctamente."
+        messError = "No se pudo desbloquear el usuario." if is_to_block == 0 else "No se pudo bloquear el usuario."
+        
+        
+        if self.controller_user.block_user(user_id, is_to_block):
+            messagebox.showinfo("Éxito", mess)
+            self.mostrar_pagina()
+        else:
+            messagebox.showerror("Error", messError)

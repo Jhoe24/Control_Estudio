@@ -192,7 +192,6 @@ class EstudianteController:
             vista_formulario.datos_personales_frame.lugar_nac_entry,
             vista_formulario.datos_personales_frame.correo_electronico_entry,
             vista_formulario.informacion_academica_frame.institucion_entry,
-            vista_formulario.informacion_academica_frame.titulo_entry,
             vista_formulario.informacion_academica_frame.promedio_entry,
             vista_formulario.sistema_ingreso_frame.codigo_entry,
             vista_formulario.sistema_ingreso_frame.anio_entry,

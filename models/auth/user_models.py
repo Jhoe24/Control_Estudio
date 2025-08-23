@@ -210,4 +210,81 @@ class UserModel:
         finally:
             if con is not None:
                 con.close()
+    
+    def change_user_and_pass(self, id_persona, user, password):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            if password :
+                password_hash = hashlib.sha256(password.encode()).hexdigest()
+                cursor.execute(
+                    """
+                    UPDATE usuarios SET nombre_usuario = ?, password_hash = ?  WHERE persona_id = ?
+                    """,(user, password_hash, id_persona))
+            else:
+                cursor.execute(
+                    """
+                    UPDATE usuarios SET nombre_usuario = ?  WHERE persona_id = ?
+                    """,(user, id_persona)) 
+            con.commit()
+
+            return True
+        except Exception as e:
+            print(f"Error al cambiar credenciales: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+    def the_user_is_blocked(self, id_persona):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                    SELECT bloqueado FROM usuarios WHERE persona_id = ?
+                """,(id_persona,)
+                )
+            if cursor.fetchone()[0] == 1:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(f"Error al verificar si el usuario esta bloqueado: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+    def block_user(self, id_persona, block):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)      
+            cursor = con.cursor()
+            #Verificar que ta exista un registro
+            cursor.execute(
+                """
+                    SELECT id FROM usuarios WHERE persona_id = ?
+                """,(id_persona,)
+                )
+            if cursor.fetchone():
+                cursor.execute(
+                    """
+                        UPDATE usuarios SET bloqueado = ? WHERE persona_id = ?
+                    """,(block, id_persona))
+            else:
+                cursor.execute(
+                    """
+                        INSERT INTO usuarios (persona_id, bloqueado) VALUES (?, ?)
+                    """,(id_persona, block))
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al bloquear usuario: {e}")
+        finally:
+            if con is not None:
+                con.close()
+
 

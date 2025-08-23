@@ -17,6 +17,8 @@ class Config_user(ctk.CTkScrollableFrame):
         self.master = master
         self.username = username
         self.controller = controller
+        self.persona_id = self.controller["Usuario"].obtener_persona_id(self.username)
+
         ctk.CTkLabel(
             self,
             text="Gestión de Configuración de Usuario",
@@ -49,7 +51,7 @@ class Config_user(ctk.CTkScrollableFrame):
             self.btn_asignar_roles.pack(side="left", padx=15)
 
         self.btn_contrasena = ctk.CTkButton(
-            self.button_frame, text="   Cambio de Contraseña   ", 
+            self.button_frame, text="   Cambio de Credenciales   ", 
             command=self.mostrar_cambiar_contrasena,
             **card_btn_style
         )
@@ -91,17 +93,23 @@ class Config_user(ctk.CTkScrollableFrame):
         form_frame = ctk.CTkFrame(self.contenido_frame, fg_color="transparent")
         form_frame.pack(pady=30)
 
+        # Usuario actual
+        label_user = ctk.CTkLabel(form_frame, text="Usuario Nuevo:", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
+        label_user.grid(row=0, column=0, sticky="w", padx=10, pady=10)
+        self.user_entry = ctk.CTkEntry(form_frame, width=300, fg_color=COLOR_FONDO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL)
+        self.user_entry.grid(row=0, column=1, padx=10, pady=10)
+
         # Contraseña actual
         label_actual = ctk.CTkLabel(form_frame, text="Contraseña actual:", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
-        label_actual.grid(row=0, column=0, sticky="w", padx=10, pady=10)
+        label_actual.grid(row=1, column=0, sticky="w", padx=10, pady=10)
         self.password_actual_entry = ctk.CTkEntry(form_frame, width=300, show="*", fg_color=COLOR_FONDO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL)
-        self.password_actual_entry.grid(row=0, column=1, padx=10, pady=10)
+        self.password_actual_entry.grid(row=1, column=1, padx=10, pady=10)
 
         # Contraseña nueva
         label_nueva = ctk.CTkLabel(form_frame, text="Contraseña nueva:", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
-        label_nueva.grid(row=1, column=0, sticky="w", padx=10, pady=10)
+        label_nueva.grid(row=2, column=0, sticky="w", padx=10, pady=10)
         self.cambiar_password_entry = ctk.CTkEntry(form_frame, width=300, show="*", fg_color=COLOR_FONDO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL)
-        self.cambiar_password_entry.grid(row=1, column=1, padx=10, pady=10)
+        self.cambiar_password_entry.grid(row=2, column=1, padx=10, pady=10)
 
         btn_actualizar = ctk.CTkButton(
             self.contenido_frame, text="Actualizar Contraseña",
@@ -145,25 +153,16 @@ class Config_user(ctk.CTkScrollableFrame):
     def mostrar_desbloqueo_usuarios(self):
         self.limpiar_contenido_frame()
 
-        label = ctk.CTkLabel(
-            self.contenido_frame, text="Aquí se mostrarán los usuarios bloqueados para desbloquear.",
-            font=FUENTE_LABEL_CAMPO,
-            text_color=COLOR_TEXTO_PRINCIPAL
-        )
-        label.pack(pady=20)
+        # Crear instancia del FrameRoles
+        frame_roles = FrameRoles(self.contenido_frame, controller=self.controller,modo_desbloqueo=True)
+        frame_roles.pack(fill="both", expand=True)
 
-        btn_desbloquear = ctk.CTkButton(
-            self.contenido_frame, text="Desbloquear Usuario",
-            command=lambda: messagebox.showinfo("Éxito", "Usuario desbloqueado correctamente"),
-            font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT
-        )
-        btn_desbloquear.pack(pady=10)
+        # Cargar los roles en el FrameRoles
+        frame_roles.cargar_datos()
 
 
     def cambio_update_datos(self, new_value):
         self.limpiar_contenido_frame()
-        self.persona_id = self.controller["Usuario"].obtener_persona_id(self.username)
         datos = self.controller["Usuario"].obtener_datos_personales(self.persona_id)
         nro_doc = datos.get("documento_identidad")
         if new_value == "Cambiar datos personales":
@@ -197,19 +196,34 @@ class Config_user(ctk.CTkScrollableFrame):
 #======================================================================================================================================================================
 
     def actualizar_contrasena(self):
-        contrasena_actual = self.password_actual_entry.get()
-        contrasena_nueva = self.cambiar_password_entry.get()
 
-        if not contrasena_actual or not contrasena_nueva:
-            messagebox.showwarning("Advertencia", "Debes ingresar ambas contraseñas.")
+        # if not self.password_actual_entry.get() or not self.cambiar_password_entry.get():
+        #     messagebox.showwarning("Advertencia", "Debes ingresar ambas contraseñas.")
+        #     return
+        
+        if not self.controller["LoginAuth"].login(self.username, self.password_actual_entry.get()):
+            messagebox.showerror("Error", "Contraseña actual incorrecta")
+            return
+        
+        print(self.password_actual_entry.get())
+        print(self.cambiar_password_entry.get())
+
+        if self.password_actual_entry.get() is not self.cambiar_password_entry.get():
+
+            if not self.user_entry.get():
+                usuario_cambiar = self.username
+            else:
+                usuario_cambiar = self.user_entry.get()
+
+            if self.controller["Usuario"].user_model.change_user_and_pass(self.persona_id,usuario_cambiar, self.cambiar_password_entry.get()):
+                messagebox.showinfo("Éxito", "Credenciales actualizada correctamente")
+                self.username = usuario_cambiar
+            else:
+                messagebox.showerror("Error", "No se pudo actualizar las credenciales")
+        else:
+            messagebox.showwarning("Advertencia", "La nueva contraseña no puede ser igual a la actual.")
             return
 
-
-        # Guardar en la base de datos
-        print("Contraseña actual:", contrasena_actual)
-        print("Contraseña nueva:", contrasena_nueva)
-
-        messagebox.showinfo("Éxito", "Contraseña actualizada correctamente")
 
     def actualizar_datos_personales(self):
         

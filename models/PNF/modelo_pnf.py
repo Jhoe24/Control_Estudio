@@ -170,6 +170,26 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
+    def obtener_pnf_id(self, id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT id FROM pnf WHERE id = ?
+                """, (id,)
+            )
+            # El método fetchone() retorna la primera fila, que es una tupla
+            resultado = cursor.fetchone() 
+            return resultado[0] if resultado else None # Devuelve el primer elemento de la tupla (el ID) o None
+        except Exception as e:
+            print(f"Error al obtener la lista: {e}") 
+            return None
+        finally:
+            if con is not None:
+                con.close()
+
     def obtener_trayecto(self, id):
         con = None
         try:
@@ -859,19 +879,19 @@ class ModeloPNF:
             SELECT * FROM unidades_curriculares
             WHERE pnf_id = ? AND trayecto_id = ? AND tramo_id = ?
             """
-            respuesta = self.modelo.buscar_uc_por_pnf(sentencia_sql,(id_pnf, id_trayecto, id_tramo))
+            respuesta = self.buscar_uc_por_pnf(sentencia_sql,(id_pnf, id_trayecto, id_tramo))
         elif id_trayecto is not None:
             sentencia_sql = """
             SELECT * FROM unidades_curriculares
             WHERE pnf_id = ? AND trayecto_id = ?
             """
-            respuesta = self.modelo.buscar_uc_por_pnf(sentencia_sql, (id_pnf, id_trayecto))
+            respuesta = self.buscar_uc_por_pnf(sentencia_sql, (id_pnf, id_trayecto))
         else:
             sentencia_sql = """
             SELECT * FROM unidades_curriculares
             WHERE pnf_id = ?
             """
-            respuesta = self.modelo.buscar_uc_por_pnf(sentencia_sql, (id_pnf,))
+            respuesta = self.buscar_uc_por_pnf(sentencia_sql, (id_pnf,))
         return respuesta
 
 # bd = ModeloPNF()

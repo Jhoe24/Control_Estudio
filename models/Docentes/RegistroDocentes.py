@@ -120,7 +120,7 @@ class ModeloDocente:
             if con is not None:
                 con.close()
     
-    def lista_Docentes(self, registro_inicio = 0):
+    def lista_Docentes(self, registro_inicio = 0, pnf_id = None):
         
         try:
             con = sql.connect(self.db_ruta)
@@ -136,14 +136,25 @@ class ModeloDocente:
 
 
             #Extraer de la tabla informacion personal y esrudiantes
-            cursor.execute('''
-                           SELECT ip.*, e.*
-                           FROM informacion_personal ip
-                           JOIN docentes e ON ip.id = e.persona_id
-                           WHERE ip.tipo='docente'
-                           LIMIT 13
-                           OFFSET ?
-                           ''',(registro_inicio,))
+            if pnf_id:
+                cursor.execute('''
+                               SELECT ip.*, e.*
+                               FROM informacion_personal ip
+                               JOIN docentes e ON ip.id = e.persona_id
+                               JOIN docente_sede_pnf dsp ON e.id = dsp.docente_id
+                               WHERE ip.tipo='docente' AND dsp.pnf_id = ?
+                               LIMIT 13
+                               OFFSET ?
+                               ''',(pnf_id, registro_inicio))
+            else:   
+                cursor.execute('''
+                            SELECT ip.*, e.*
+                            FROM informacion_personal ip
+                            JOIN docentes e ON ip.id = e.persona_id
+                            WHERE ip.tipo='docente'
+                            LIMIT 13
+                            OFFSET ?
+                            ''',(registro_inicio,))
             resultados = cursor.fetchall()
                         
             nombres_columnas = [descripcion[0] for descripcion in cursor.description]
@@ -282,19 +293,31 @@ class ModeloDocente:
 
 
     
-    def buscar_estudiante(self, tipo_documento, nro_documento):
+    def buscar_estudiante(self, tipo_documento, nro_documento, id_pnf=None):
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
 
             # Buscar estudiante
-            cursor.execute('''
-                SELECT ip.*, e.*
-                FROM informacion_personal ip
-                JOIN docentes e ON ip.id= e.persona_id
-                WHERE ip.tipo='docente' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
-                LIMIT 1
-            ''', (tipo_documento, nro_documento))
+            if id_pnf:
+                cursor.execute('''
+                    SELECT ip.*, e.*, dsp.pnf_id
+                    FROM informacion_personal ip
+                    JOIN docentes e ON ip.id= e.persona_id
+                    JOIN docente_sede_pnf dsp ON e.id = dsp.docente_id
+                    WHERE ip.tipo='docente' AND ip.tipo_documento = ? AND ip.documento_identidad = ? AND dsp.pnf_id = ?
+                    LIMIT 1
+                ''', (tipo_documento, nro_documento, id_pnf))
+            else:
+
+                cursor.execute('''
+                    SELECT ip.*, e.*
+                    FROM informacion_personal ip
+                    JOIN docentes e ON ip.id= e.persona_id
+                    WHERE ip.tipo='docente' AND ip.tipo_documento = ? AND ip.documento_identidad = ?
+                    LIMIT 1
+                ''', (tipo_documento, nro_documento))
+
             resultado = cursor.fetchone()
             if not resultado:
                 con.close()
@@ -598,5 +621,3 @@ class ModeloDocente:
     #         return False
         
               
-# test = ModeloDocente()
-# pprint(test.obtener_nombres_docentes(1))

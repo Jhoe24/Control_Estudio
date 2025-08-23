@@ -38,7 +38,20 @@ class BaseDashboardView(BaseView):
         barra.pack(side="bottom", fill="x")
         
         # título
-        titulo = ctk.CTkLabel( barra, text=" Panel de Control - Administrador", image=logo, compound="left", font=("Roboto",18), text_color="white")
+        if self.user_role.lower() in ["admin", "administrador"]:
+            titulo = "Administrador"
+        elif self.user_role.lower() == "coord_general":
+            titulo = "Coordinador General"
+        elif self.user_role.lower() == "coord_pnf":
+            titulo = "Coordinador P.N.F"
+        elif self.user_role.lower() == "docente":
+            titulo = "Docente"
+        elif self.user_role.lower() == "estudiante":
+            titulo = "Estudiante"
+        else:
+            titulo = "Usuario"
+
+        titulo = ctk.CTkLabel( barra, text=f" Panel de Control - {titulo}", image=logo, compound="left", font=("Roboto",18), text_color="white")
         titulo.pack(side=ctk.LEFT, padx=10)
         
         # botón toggle

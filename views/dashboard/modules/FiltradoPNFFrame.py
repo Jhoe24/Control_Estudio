@@ -12,6 +12,7 @@ class FiltradoPNFFrame(SectionFrameBase):
         self.controlador = controllers['PNF']
         self.controlador_docente = controllers['Docentes']
         self.controlador_user = controllers['Usuario']
+        self.rol_user = rol_user
 
         # --- Lista de PNF del controlador ---
         # cada tupla tiene la forma: (id_pnf, código_pnf, nombre_pnf)
@@ -27,23 +28,38 @@ class FiltradoPNFFrame(SectionFrameBase):
         self.frame_filtro_pnf = ctk.CTkFrame(self, fg_color="transparent")
         self.frame_filtro_pnf.pack(fill="x", pady=PADY_FILA, padx=15)
 
+         # --- OptionMenu Trayecto ---
+        self.option_menu_trayecto = crear_option_menu(
+            self.frame_filtro_pnf,
+            values=["No seleccionado"],
+            variable=self.trayecto_var,
+            width=200,
+            command=self.actualizar_tramos_por_trayecto
+        )
+
+         # --- OptionMenu Tramo ---
+        self.option_menu_tramo = crear_option_menu(
+            self.frame_filtro_pnf,
+            values=["No seleccionado"],
+            variable=self.tramo_var,
+            width=200
+        )
         # caso de coord_pnf
         valores_pnf = []
-        print(rol_user.lower())
         if rol_user.lower() == "coord_pnf":
             persona_id = self.controlador_user.obtener_persona_id(user_name)
-            print(persona_id)
+         
             docente_id = self.controlador_docente.obtener_id_docente(persona_id)
-            print(persona_id)
+           
             pnf_id = self.controlador_docente.obtener_pnf_id(docente_id)
-            print(pnf_id)
-            # Busca el nombre del PNF por id
+          
 
             nombre_pnf = next((tupla[2] for tupla in self.lista_pnf if tupla[0] == pnf_id), None)
 
             if nombre_pnf:
                 valores_pnf = [nombre_pnf]
                 self.pnf_var.set(nombre_pnf)
+                self.actualizar_trayectos_por_pnf(None)
                 
             else:
                 valores_pnf = ["sin opciones"]
@@ -59,7 +75,7 @@ class FiltradoPNFFrame(SectionFrameBase):
             values=valores_pnf,
             variable=self.pnf_var,
             width=300,
-            command=self.actualizar_trayectos_por_pnf
+            command=lambda selected_pnf: self.actualizar_trayectos_por_pnf(self.rol_user)
         )
         self.option_menu_pnf.pack(side="left", padx=(0, 15))
 
@@ -68,23 +84,10 @@ class FiltradoPNFFrame(SectionFrameBase):
             self.pnf_var.set(valores_pnf[0])    # selecciona el único valor
             self.option_menu_pnf.configure(state="disabled")
 
-        # --- OptionMenu Trayecto ---
-        self.option_menu_trayecto = crear_option_menu(
-            self.frame_filtro_pnf,
-            values=["No seleccionado"],
-            variable=self.trayecto_var,
-            width=200,
-            command=self.actualizar_tramos_por_trayecto
-        )
+       
         self.option_menu_trayecto.pack(side="left", padx=(0, 15))
 
-        # --- OptionMenu Tramo ---
-        self.option_menu_tramo = crear_option_menu(
-            self.frame_filtro_pnf,
-            values=["No seleccionado"],
-            variable=self.tramo_var,
-            width=200
-        )
+       
         self.option_menu_tramo.pack(side="left", padx=(0, 15))
 
         # --- Botón de búsqueda ---
@@ -96,14 +99,17 @@ class FiltradoPNFFrame(SectionFrameBase):
         self.boton_buscar.pack(side="left")
 
     def actualizar_trayectos_por_pnf(self, *args):
+        """Actualiza los trayectos disponibles según el PNF seleccionado."""
+         # El valor del OptionMenu se puede obtener directamente de self.pnf_var.get()
+        # ya que *args contiene el valor seleccionado.
         nombre_pnf = self.pnf_var.get()
-        if nombre_pnf not in self.pnf_id_por_nombre:
+        if not hasattr(self, 'pnf_id_por_nombre') or nombre_pnf == "Seleccione un PNF" or nombre_pnf == "sin opciones":
             self.option_menu_trayecto.configure(values=["No seleccionado"])
             self.trayecto_var.set("No seleccionado")
             self.option_menu_tramo.configure(values=["No seleccionado"])
             self.tramo_var.set("No seleccionado")
             self.trayecto_id_por_nombre = {}
-            self.tramo_id_por_nombre = {}
+            self.tramo_id_por_nombre = {}                
             return
 
         pnf_id = self.pnf_id_por_nombre[nombre_pnf]

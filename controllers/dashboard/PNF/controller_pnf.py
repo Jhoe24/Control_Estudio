@@ -141,7 +141,8 @@ class ControllerPNF:
             dic_id['ids_trayectos'] = list_id_trayectos
         return dic_id
 
-
+    def obtener_id(self, id):
+        return self.modelo.obtener_pnf_id(id)
 
     def getTramos(self,vista_tramos):
         try:
@@ -460,7 +461,6 @@ class ControllerPNF:
     
     def buscar_uc_por_pnf_trayecto_tramo(self, id_pnf, id_trayecto=None, id_tramo=None):
         return self.modelo.buscar_uc_por_pnf_trayecto_tramo(id_pnf, id_trayecto, id_tramo)
-
 
     def obtener_nombres_pnf(self):
         nombres_pnf = []

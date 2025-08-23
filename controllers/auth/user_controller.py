@@ -74,6 +74,13 @@ class UserController:
                 messagebox.showerror("Error", "Hubo un error al actualizar la dirección.")
                 return False
 
+    def the_user_is_blocked(self, id_persona):
+        return self.user_model.the_user_is_blocked(id_persona)
+    
+    def block_user(self, id_persona, block):
+        return self.user_model.block_user(id_persona, block)
+
+
             
 
 
