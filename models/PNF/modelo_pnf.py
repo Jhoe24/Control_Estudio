@@ -130,17 +130,26 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
-    def obtner_lista_pnf(self):
+    def obtner_lista_pnf(self, docente_id=None):
         con = None
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
-            
-            cursor.execute(
-                """
-                SELECT id, codigo, nombre FROM pnf
-                """
-            )
+            if docente_id:
+                cursor.execute(
+                    """
+                    SELECT pnf.id, pnf.codigo, pnf.nombre FROM pnf
+                    JOIN docente_sede_pnf ON pnf.id = docente_sede_pnf.pnf_id
+                    WHERE docente_sede_pnf.docente_id = ?
+                    """, (docente_id,)
+                )
+            else:
+                
+                cursor.execute(
+                    """
+                    SELECT id, codigo, nombre FROM pnf
+                    """
+                )
 
             return cursor.fetchall()   
 

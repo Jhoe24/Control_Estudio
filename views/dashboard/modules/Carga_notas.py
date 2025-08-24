@@ -14,13 +14,19 @@ from config.app_config import AppConfig
 
 class CargaNotasView(ctk.CTkFrame):
 
-    def __init__(self, master, controladores):
+    def __init__(self, master, controladores, user = None, rol = None):
         super().__init__(master, fg_color=COLOR_FONDO_FORMULARIO)
         self.master = master
         self.controller_estudiantes = controladores["Periodos"]
         self.controller_pnf = controladores["PNF"]
         self.controller_estudiantes_inscritos = controladores["Estudiantes"]
         self.controladores = controladores
+        self.user = user
+        self.rol = rol
+        self.docente_id = None
+        if user:
+            persona_id = self.controladores["Usuario"].obtener_persona_id(self.user)
+            self.docente_id = self.controladores["Docentes"].obtener_id_docente(persona_id)
 
         self.titulo = ctk.CTkLabel(self, text="Gestión de Carga de Notas", font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL)
         self.titulo.pack(pady=(10, 20), padx=20, anchor="w")
@@ -33,7 +39,7 @@ class CargaNotasView(ctk.CTkFrame):
         
 
         # El orden correcto es: master, controller_periodos_academicos, controller_pnf, controller_secciones
-        self.datos_carga_notas = CargaNotasFrame(self.frame_contenedor_carga_notas, self.controller_estudiantes, self.controller_pnf, controladores["Secciones"])
+        self.datos_carga_notas = CargaNotasFrame(self.frame_contenedor_carga_notas, self.controller_estudiantes, self.controller_pnf, controladores["Secciones"],docente_id=self.docente_id, rol=self.rol)
         self.datos_carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Frame para los botones
@@ -72,8 +78,9 @@ class CargaNotasView(ctk.CTkFrame):
                                         width=self.winfo_width(), 
                                         height=350)
         self.frame_contenedor_carga_notas.pack(fill="x", pady=10)
-
-        self.titulo.configure(text = f"Gestión de Carga de Notas de {tuplas_datos[3]} {tuplas_datos[4]}")
+        if not self.docente_id:
+            self.titulo.configure(text = f"Gestión de Carga de Notas de {tuplas_datos[3]} {tuplas_datos[4]}")
+            
         listado_instancia = ListadosEstudiantesPNF(self.frame_contenedor_carga_notas,self.controladores,tuplas_datos)
         listado_instancia.pack(fill="both", expand=True, padx=10, pady=10)
         

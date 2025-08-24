@@ -16,19 +16,21 @@ class ListarUC(ctk.CTkFrame):
         self.docente_id = docente_id
 
         #preparación de filtros a partir de la tupla recibida
-        tupla_id = ()
-        self.tuplas_nombre = ()
-        # tupla_datos es para los datos relacionados con el filtro aplicado
-        if tupla_datos:
-            # se construyen dos tuplas: una con IDs y otra con nombres
-            for i in range(len(tupla_datos)):
-                if i == 0 or i == 1 or i == 2:
-                    tupla_id = tupla_id + (tupla_datos[i],)
-                if i == 0 or i == 3 or i == 4:
-                    self.tuplas_nombre = self.tuplas_nombre + (tupla_datos[i],)
+        if user_role.lower() != "docente":
+                
+            tupla_id = ()
+            self.tuplas_nombre = ()
+            # tupla_datos es para los datos relacionados con el filtro aplicado
+            if tupla_datos:
+                # se construyen dos tuplas: una con IDs y otra con nombres
+                for i in range(len(tupla_datos)):
+                    if i == 0 or i == 1 or i == 2:
+                        tupla_id = tupla_id + (tupla_datos[i],)
+                    if i == 0 or i == 3 or i == 4:
+                        self.tuplas_nombre = self.tuplas_nombre + (tupla_datos[i],)
 
-            # obtener listado filtrado de UC
-            self.lista_UC = self.controller_pnf.obtener_UC(tupla_id)
+                # obtener listado filtrado de UC
+                self.lista_UC = self.controller_pnf.obtener_UC(tupla_id)
         else:
             self.lista_UC = self.controller_pnf.obtener_UC()
 

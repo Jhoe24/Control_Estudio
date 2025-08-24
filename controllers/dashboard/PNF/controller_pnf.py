@@ -24,6 +24,10 @@ class ControllerPNF:
         else:
             self.listado_tramo = []
     
+
+    def obtener_pnf_asignado_docente(self, docente_id):
+        return self.modelo.obtner_lista_pnf(docente_id=docente_id)
+    
     def obtener_pnf(self,id):
         dic_datos = self.modelo.obtener_pnf(id)
         dic_datos["lista_trayectos"] = self.modelo.obtener_trayecto(id)
