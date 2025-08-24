@@ -51,7 +51,7 @@ class FiltradoBusquedaFrame(SectionFrameBase):
         dic_estudiante=self.controlador.buscar_estudiante(tipo_documento, nro_documento, id_pnf=self.id_pnf)
         
         if dic_estudiante:
-            self.master.mostrar_resultado_busqueda([dic_estudiante])
+            self.master.mostrar_resultado_busqueda([dic_estudiante], role_user=self.role_user)
         
         
         

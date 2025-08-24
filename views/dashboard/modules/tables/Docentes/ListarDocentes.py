@@ -5,16 +5,20 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame
 from views.dashboard.modules.RegistrarDocentes import FormularioDocenteView
 from views.dashboard.modules.forms.Docentes.listaAsignacion import ListaAsignacionPNF
+from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
 from views.dashboard.modules.forms.Docentes.listaAsignacionUC import ListaAsignacionUC
 
 class ListDocenteView(ctk.CTkFrame):
-    def __init__(self, master, controlador, controller_pnf, controlador_user, role_user, user_name):
+    def __init__(self, master, controllers, role_user, user_name):
         super().__init__(master, fg_color="white")
-        self.formulario_docente = FormularioDocenteView(master, controlador, role_user)
+        self.formulario_docente = FormularioDocenteView(master, controllers['Docentes'], role_user)
         self.master = master
-        self.controlador = controlador
-        self.controller_pnf = controller_pnf
-        self.controlador_user = controlador_user
+        self.controlador = controllers['Docentes']
+        self.controller_pnf = controllers['PNF']
+        self.controlador_user = controllers['Usuario']
+        self.controllers = controllers
+        self.role_user = role_user
+        self.user_name = user_name
         self.filas_datos = []
         self.cantidad_docente = self.controlador.modelo_docente.obtener_cantidad_docente()
         self.pagina_actual = 1
@@ -193,7 +197,7 @@ class ListDocenteView(ctk.CTkFrame):
                     text_color="#ffffff",
                     fg_color=COLOR_BOTON_FONDO,
                     hover_color=COLOR_BOTON_FONDO_HOVER,
-                    command=lambda est=docente: self.cargar_uc(est)
+                    command=lambda est=role_user: self.cargar_uc(est)
 
                 )
             else:
@@ -202,7 +206,7 @@ class ListDocenteView(ctk.CTkFrame):
                     text_color="#ffffff",
                     fg_color=COLOR_BOTON_FONDO,
                     hover_color=COLOR_BOTON_FONDO_HOVER,
-                    command=lambda est=docente: self.cargar_pnf(est)
+                    command=lambda est=role_user: self.cargar_pnf(est)
 
                 )
             boton.pack(side="left", padx=(0, 4), pady=5)
@@ -257,15 +261,15 @@ class ListDocenteView(ctk.CTkFrame):
         # Crea el frame para asignar PNF
         lista_asignacion = ListaAsignacionPNF(scroll_frame,self.controller_pnf,docente)
 
-    def cargar_uc(self, docente):
+    def cargar_uc(self, role_user):
         """
         Abre el formulario para asignar Unidades Curriculares al docente seleccionado.
         """
         top = ctk.CTkToplevel(self, fg_color="White")
         top.title("Asignar Unidades Curriculares")
         
-        ancho = 900
-        alto = 500
+        ancho = 1100
+        alto = 700
 
         # Centrar ventana
         top.update_idletasks()
@@ -279,10 +283,13 @@ class ListDocenteView(ctk.CTkFrame):
         top.grab_set()
 
         # Scroll principal del modal
-        scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
+        scroll_frame = ctk.CTkFrame(top, fg_color="White")
         scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Crea el frame para asignar Unidades Curriculares
-        lista_asignacion = ListaAsignacionUC(scroll_frame,self.controller_pnf,docente)
+        print(self.user_name, self.role_user)
+        lista_asignacion = ListarUC(scroll_frame, self.controllers, user_role=role_user, username=self.user_name)
+        lista_asignacion.pack(fill="both", expand=True, padx=10, pady=10)
+
        
     

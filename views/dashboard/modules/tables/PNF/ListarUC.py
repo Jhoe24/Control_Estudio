@@ -6,13 +6,14 @@ from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
 
 
 class ListarUC(ctk.CTkFrame):
-    def __init__(self, master, controller,tupla_datos = None, user_role=None, username=None):
+    def __init__(self, master, controller,tupla_datos = None, user_role=None, username=None, docente_id=None):
         super().__init__(master, fg_color="white")
         #diccionario de controladores disponible
         self.controller = controller
         self.controller_pnf = controller["PNF"]
         self.user_role = user_role
         self.username = username
+        self.docente_id = docente_id
 
         #preparación de filtros a partir de la tupla recibida
         tupla_id = ()
@@ -125,9 +126,10 @@ class ListarUC(ctk.CTkFrame):
                 ]
                 celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
                 celda_btn.grid(row=fila, column=4, padx=1, pady=1, sticky="nsew")
+
                 boton = ctk.CTkButton(
                     celda_btn, text="Ver datos", width=100,
-                    text_color="#222",
+                    text_color="#ffffff",
                     command=lambda uc=tupla_uc: self.ver_datos_completos(uc)
                 )
                 boton.pack(padx=10, pady=5)
@@ -249,7 +251,7 @@ class ListarUC(ctk.CTkFrame):
         top.protocol("WM_DELETE_WINDOW", on_close)
 
         #Frame de los datos generales de UC
-        self.frame_uc = UnidadCurricular(content_frame, self.controller, self.controlador, mostrar_botones=False)
+        self.frame_uc = UnidadCurricular(content_frame, None, self.controller, mostrar_botones=False, user_name=self.username, rol_user=self.user_role)
         self.frame_uc.set_datos(dic_datos)
         self.frame_uc.pack(fill="both", expand=True, padx=0, pady=0)
 
@@ -348,5 +350,7 @@ class ListarUC(ctk.CTkFrame):
             self.boton_anterior.configure(state="normal" if self.pagina_actual > 1 else "disabled")
             self.boton_siguiente.configure(state="normal" if self.pagina_actual < self.total_paginas else "disabled")
 
+    def asignar_uc(uc):
+        pass
 
 
