@@ -28,7 +28,7 @@ class CoordinadorPNFDashboardView(BaseDashboardView):
         self.controller = controller
         self.username = username
         self.user_role = user_role
-        
+        self.datos_pnf = self.obtener_pnf()
         self.inicio()
     
     def inicio(self):
@@ -74,6 +74,7 @@ class CoordinadorPNFDashboardView(BaseDashboardView):
             widget.pack_forget()
 
         pnf = FormularioPNFPensumView(self.cuerpo_principal, self.controller['PNF'])
+        pnf.set_dato(self.datos_pnf)
         pnf.pack(fill="both", expand=True, padx=10, pady=10)
     
     def unid_Curr(self):
@@ -104,4 +105,10 @@ class CoordinadorPNFDashboardView(BaseDashboardView):
         configuracion = Config_system(self.cuerpo_principal)
         configuracion.pack(fill="both", expand=True, padx=10, pady=10)
         
+    def obtener_pnf(self):
+        persona_id = self.controller["Usuario"].obtener_persona_id(self.username)
+        docente_id = self.controller["Docentes"].obtener_id_docente(persona_id)
+        pnf_id = self.controller["Docentes"].obtener_pnf_id(docente_id)
+        return self.controller["PNF"].obtener_pnf(pnf_id)
     
+        

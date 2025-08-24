@@ -893,6 +893,20 @@ class ModeloPNF:
             """
             respuesta = self.buscar_uc_por_pnf(sentencia_sql, (id_pnf,))
         return respuesta
+    
+    def verificar_uc_docente(self, uc_id, docente_id):
+        """Devuelve True si la UC está asignada al docente"""
+        pass
+
+    def asignar_uc_docente(self, uc_id, docente_id):
+        """Asigna la UC al docente"""
+        #docente pnfid, unidad curricular id, periodoacademicoid, sedeid
+        pass
+
+    def desasignar_uc_docente(self, uc_id, docente_id):
+        """Desasigna la UC del docente"""
+        pass
+    
 
 # bd = ModeloPNF()
 # print(bd.obtener_nombres_por_id("trayectos",1))

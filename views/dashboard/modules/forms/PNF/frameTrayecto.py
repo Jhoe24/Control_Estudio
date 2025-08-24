@@ -164,8 +164,6 @@ class FrameTrayecto(SectionFrameBase):
                     "estado"              # Estado
                 ]
                 
-                print("Cargando datos del tramo:", datos)
-                
                 for entry, campo in zip(tramo.entries_a_validar, campos):
                     valor = datos.get(campo, "")
                     

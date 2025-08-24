@@ -168,6 +168,7 @@ class Config_user(ctk.CTkScrollableFrame):
         nro_doc = datos.get("documento_identidad")
         if new_value == "Cambiar datos personales":
             self.frame_datos_personales = DatosPersonalesFrame(self.contenido_frame,None,None)
+            self.frame_datos_personales.pack(fill="both", expand=True)
             self.frame_datos_personales.set_datos(datos,nro_doc)
             self.frame_datos_personales.nro_documento_entry.configure(state="normal")
             self.frame_datos_personales.nro_documento_entry.insert(0,nro_doc)
@@ -182,6 +183,7 @@ class Config_user(ctk.CTkScrollableFrame):
 
         elif new_value == "Cambiar Direccion":
             self.frame_datos_ubicacion = DatosUbicacionFrame(self.contenido_frame,None)
+            self.frame_datos_ubicacion.pack(fill="both", expand=True)
             self.frame_datos_ubicacion.set_datos(datos)
             self.frame_datos_ubicacion.habilitar_edicion()
             command = self.actualizar_direccion

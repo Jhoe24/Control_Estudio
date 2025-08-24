@@ -29,12 +29,13 @@ class ListDocenteView(ctk.CTkFrame):
             persona_id = self.controlador_user.obtener_persona_id(user_name) 
             docente_id = self.controlador.obtener_id_docente(persona_id)
             self.pnf_id = self.controlador.obtener_pnf_id(docente_id)
-            
+            self.docente_id = docente_id
+
         self.docente = self.controlador.obtener_lista_docentes(0,pnf_id=self.pnf_id)
         self.registros_por_pagina = 13
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_docente // self.registros_por_pagina) + (1 if self.cantidad_docente % self.registros_por_pagina > 0 else 0)
-       
+        
         # Si no hay docentes, la cantidad total de páginas es 1 para mostrar la interfaz vacía
         if self.cantidad_docente == 0:
             self.cantidad_total_paginas = 1
@@ -206,7 +207,7 @@ class ListDocenteView(ctk.CTkFrame):
                     text_color="#ffffff",
                     fg_color=COLOR_BOTON_FONDO,
                     hover_color=COLOR_BOTON_FONDO_HOVER,
-                    command=lambda est=role_user: self.cargar_pnf(est)
+                    command=lambda est=docente: self.cargar_pnf(est)
 
                 )
             boton.pack(side="left", padx=(0, 4), pady=5)
@@ -287,9 +288,8 @@ class ListDocenteView(ctk.CTkFrame):
         scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Crea el frame para asignar Unidades Curriculares
-        print(self.user_name, self.role_user)
-        lista_asignacion = ListarUC(scroll_frame, self.controllers, user_role=role_user, username=self.user_name)
+        lista_asignacion = ListarUC(scroll_frame, self.controllers, user_role=role_user, username=self.user_name, docente_id=self.docente_id)
         lista_asignacion.pack(fill="both", expand=True, padx=10, pady=10)
 
-       
+        
     

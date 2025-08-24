@@ -141,7 +141,7 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
                 
-        carga_notas = CargaNotasView(self.cuerpo_principal, self.controller['Periodos'], self.controller['PNF'], self.controller['Secciones'], self.controller["Estudiantes"],)
+        carga_notas = CargaNotasView(self.cuerpo_principal, self.controller)
         carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
     
     def periodo(self):

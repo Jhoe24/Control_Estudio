@@ -6,10 +6,12 @@ from views.dashboard.modules.forms.Carga_notas.form_nota_estudiante import Frame
 from pprint import pprint
 
 class ListadosEstudiantesPNF(ListarUC):
-    def __init__(self, master,controller_estudinates, controller_pnf, tuplas_datos, controller_estudiantes_inscritos):
-        super().__init__(master=master,controller=controller_pnf,tupla_datos=tuplas_datos)
-        self.controller_estudiante = controller_estudinates
-        self.controller_estudiantes_inscritos = controller_estudiantes_inscritos
+    def __init__(self, master,controlladores, tuplas_datos):
+        super().__init__(master=master,controller=controlladores,tupla_datos=tuplas_datos)
+
+        self.controller_estudiante = controlladores["Periodos"]
+        self.controller_estudiantes_inscritos = controlladores["Estudiantes"]
+
         self.tuplas_datos = tuplas_datos
         
     def mostrar_listado(self):

@@ -127,12 +127,27 @@ class ListarUC(ctk.CTkFrame):
                 celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
                 celda_btn.grid(row=fila, column=4, padx=1, pady=1, sticky="nsew")
 
-                boton = ctk.CTkButton(
-                    celda_btn, text="Ver datos", width=100,
-                    text_color="#ffffff",
-                    command=lambda uc=tupla_uc: self.ver_datos_completos(uc)
-                )
-                boton.pack(padx=10, pady=5)
+                if self.docente_id:  
+                   # Verificamos si ya está asignada
+                    #asignada = self.uc_asignada_a_docente(tupla_uc[0])
+
+                    var_check = ctk.BooleanVar(value=False)
+
+                    check = ctk.CTkCheckBox(
+                        celda_btn,
+                        #text="Asignada" if asignada else "No asignada",
+                        variable=var_check,
+                        
+                        command=lambda uc=tupla_uc, v=var_check: self.toggle_asignacion(uc, v)
+                    )
+                    check.pack(side="left", padx=5, pady=5)
+                else:
+                    boton = ctk.CTkButton(
+                        celda_btn, text="Ver datos", width=100,
+                        text_color="#ffffff",
+                        command=lambda uc=tupla_uc: self.ver_datos_completos(uc)
+                    )
+                    boton.pack(padx=10, pady=5)
                 fila_widgets.append(celda_btn)
                 self.fila_datos.append(fila_widgets)
         else:
@@ -350,7 +365,7 @@ class ListarUC(ctk.CTkFrame):
             self.boton_anterior.configure(state="normal" if self.pagina_actual > 1 else "disabled")
             self.boton_siguiente.configure(state="normal" if self.pagina_actual < self.total_paginas else "disabled")
 
-    def asignar_uc(uc):
+    def toggle_asignacion(self, uc, var_check):
         pass
 
 

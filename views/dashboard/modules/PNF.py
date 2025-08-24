@@ -214,4 +214,18 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
             self.btn_guardar.configure(state="disabled")
         self.datos_pnf.limpiar_fomulario()
         self._parent_canvas.yview_moveto("0.0")
-           
+
+    def set_dato(self, datos):
+        self.datos_pnf.set_datos(datos)
+
+        if datos["lista_trayectos"]:
+            self.datos_cantidad_trayecto = len(datos["lista_trayectos"])
+            i = 0
+            for trayecto in datos["lista_trayectos"]:
+                self.listado_trayectos.append(FrameTrayecto(self,self.controlador, self.vcmd_num_val, self.vcmd_fecha_val, titulo=f"Trayecto #{i+1}"))
+                self.listado_trayectos[i].set_datos(trayecto)
+               # self.listado_trayectos[i].pack(fill="x", padx=10, pady=(10, 0)) 
+                i += 1
+                
+        self.button_frame.pack_forget()
+        

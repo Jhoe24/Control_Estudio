@@ -23,7 +23,14 @@ class ControllerPNF:
             self.listado_tramo = self.modelo.obtener_lista_tramo(primer_trayecto_id)
         else:
             self.listado_tramo = []
-
+    
+    def obtener_pnf(self,id):
+        dic_datos = self.modelo.obtener_pnf(id)
+        dic_datos["lista_trayectos"] = self.modelo.obtener_trayecto(id)
+        for trayecto in dic_datos["lista_trayectos"]:
+            trayecto["lista_tramos"] = self.modelo.obtener_tramo(trayecto["id"])
+        return dic_datos
+    
     def registrar_pnf(self, dic_pnf, vista_formulario=None):
         try:
             fecha_actual = self.obtener_fecha_actual()
@@ -530,3 +537,9 @@ class ControllerPNF:
     
     def obtener_nombre_pnf_asignado_docente(self, docente_id):
         return self.modelo.obtener_nombre_pnf_asignado_docente(docente_id)
+    
+    def verificar_uc_docente(self, uc_id, docente_id):
+        return self.modelo.verificar_uc_docente(uc_id, docente_id)
+
+    def asignar_uc_docente(self, uc_id, docente_id):
+        return self.modelo.asignar_uc_docente(uc_id, docente_id)
