@@ -14,15 +14,23 @@ class ListarUC(ctk.CTkFrame):
         self.user_role = user_role
         self.username = username
         self.docente_id = docente_id
+        """
+        Preparación de filtros a partir de la tupla recibida
+        self.lista_UC = self.controller_pnf.obtener_UC(tupla_id) se necesita que se ejecuete si es admin o cordinado general y si es de carga de notas
 
-        #preparación de filtros a partir de la tupla recibida
-        if user_role.lower() != "docente":
-                
+        self.lista_UC = self.controller_pnf.obtener_UC() se necesita si admin o coordinador general para listar las uc
+
+        self.lista_UC = self.lista_UC = self.controller_pnf.obtener_UC(tupla_datos[1], tupla_datos[2]) 
+        donde tupla_datos[1] es el periodo_id y tupla_datos[2] es docente_sede_pnf_id
+        y se necesita si es el docente en la carga de notas
+        """
+        if user_role and user_role.lower() != "docente":
             tupla_id = ()
             self.tuplas_nombre = ()
             # tupla_datos es para los datos relacionados con el filtro aplicado
             if tupla_datos:
                 # se construyen dos tuplas: una con IDs y otra con nombres
+                print("entro vista admin carga notas")
                 for i in range(len(tupla_datos)):
                     if i == 0 or i == 1 or i == 2:
                         tupla_id = tupla_id + (tupla_datos[i],)
@@ -30,10 +38,14 @@ class ListarUC(ctk.CTkFrame):
                         self.tuplas_nombre = self.tuplas_nombre + (tupla_datos[i],)
 
                 # obtener listado filtrado de UC
-                self.lista_UC = self.controller_pnf.obtener_UC(tupla_id)
+                self.lista_UC = self.controller_pnf.obtener_UC(tupla_datos = tupla_id)
+            else:
+                print("no entro admin carga notas")
+                self.lista_UC = self.controller_pnf.obtener_UC()
         else:
-            self.lista_UC = self.controller_pnf.obtener_UC()
-
+            print("todo lo contrario")
+            self.lista_UC = self.controller_pnf.obtener_UC(periodo_id=tupla_datos[1], docente_pnf_id=tupla_datos[2])
+            
         self.pagina_actual = 1
         self.uc_por_pagina = 11
         self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
@@ -130,16 +142,19 @@ class ListarUC(ctk.CTkFrame):
                 celda_btn.grid(row=fila, column=4, padx=1, pady=1, sticky="nsew")
 
                 if self.docente_id:  
-                   # Verificamos si ya está asignada
-                    #asignada = self.uc_asignada_a_docente(tupla_uc[0])
-
-                    var_check = ctk.BooleanVar(value=False)
+                   # Determinar si la UC ya está asignada
+                    asignada = self.controller_pnf.uc_asignada_a_docente(
+                        self.docente_id,
+                        tupla_uc[0],                # UC id
+                        self.controller_pnf.obtener_periodo_id_actual()
+                    )
+                    var_check = ctk.BooleanVar(value=asignada)
 
                     check = ctk.CTkCheckBox(
                         celda_btn,
-                        #text="Asignada" if asignada else "No asignada",
+                        text="Asignada" if asignada else "No asignada",
+                        text_color=COLOR_TEXTO_PRINCIPAL,
                         variable=var_check,
-                        
                         command=lambda uc=tupla_uc, v=var_check: self.toggle_asignacion(uc, v)
                     )
                     check.pack(side="left", padx=5, pady=5)
@@ -368,6 +383,22 @@ class ListarUC(ctk.CTkFrame):
             self.boton_siguiente.configure(state="normal" if self.pagina_actual < self.total_paginas else "disabled")
 
     def toggle_asignacion(self, uc, var_check):
-        pass
+        """
+        Asigna o desasigna una UC al docente según el estado del checkbox.
+        """
+        periodo_id = self.controller_pnf.obtener_periodo_id_actual()
+
+        if var_check.get():  # Marcado 
+            print("si funka")
+            exito = self.controller_pnf.asignar_uc_a_docente(self.docente_id, uc[0], periodo_id)
+            if not exito:
+                print("nofunka")
+                var_check.set(False)  # revertir si hubo error
+        else:  # Desmarcado 
+            exito = self.controller_pnf.desasignar_uc_de_docente(self.docente_id, uc[0], periodo_id)
+            if not exito:
+                var_check.set(True)  # revertir si hubo error
+
+        self.actualizar_pagina()
 
 

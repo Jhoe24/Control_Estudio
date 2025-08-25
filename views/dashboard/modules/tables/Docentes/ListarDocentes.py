@@ -198,7 +198,7 @@ class ListDocenteView(ctk.CTkFrame):
                     text_color="#ffffff",
                     fg_color=COLOR_BOTON_FONDO,
                     hover_color=COLOR_BOTON_FONDO_HOVER,
-                    command=lambda est=role_user: self.cargar_uc(est)
+                    command=lambda est=docente: self.cargar_uc(est)
 
                 )
             else:
@@ -262,7 +262,7 @@ class ListDocenteView(ctk.CTkFrame):
         # Crea el frame para asignar PNF
         lista_asignacion = ListaAsignacionPNF(scroll_frame,self.controller_pnf,docente)
 
-    def cargar_uc(self, role_user):
+    def cargar_uc(self, docente):
         """
         Abre el formulario para asignar Unidades Curriculares al docente seleccionado.
         """
@@ -287,8 +287,11 @@ class ListDocenteView(ctk.CTkFrame):
         scroll_frame = ctk.CTkFrame(top, fg_color="White")
         scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
+        # Obtener id del docente PNF
+        docente_pnf = (self.controller_pnf.modelo.obtener_pnf_asignado_docente(docente["id"]))[0]
+
         # Crea el frame para asignar Unidades Curriculares
-        lista_asignacion = ListarUC(scroll_frame, self.controllers, user_role=role_user, username=self.user_name, docente_id=self.docente_id)
+        lista_asignacion = ListarUC(scroll_frame, self.controllers, user_role=self.role_user, username=self.user_name, docente_id=docente_pnf["id"])
         lista_asignacion.pack(fill="both", expand=True, padx=10, pady=10)
 
         

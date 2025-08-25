@@ -1,5 +1,6 @@
 import sqlite3 as sql
 import os
+from datetime import date
 from pprint import pprint
 
 class ModeloPNF:
@@ -151,7 +152,7 @@ class ModeloPNF:
                     """
                 )
 
-            return cursor.fetchall()   
+            return cursor.fetchall()    
 
         except Exception as e:
             print(f"Error al obtener la lista: {e}") 
@@ -903,19 +904,108 @@ class ModeloPNF:
             respuesta = self.buscar_uc_por_pnf(sentencia_sql, (id_pnf,))
         return respuesta
     
-    def verificar_uc_docente(self, uc_id, docente_id):
-        """Devuelve True si la UC está asignada al docente"""
-        pass
+    #=============================================================================================================================
+    
+    def uc_asignada_a_docente(self, docente_pnf_id, uc_id, periodo_id):
+        """
+        Verifica si una Unidad Curricular (UC) ya está asignada a un docente en un período académico.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("""
+                SELECT * 
+                FROM docente_uc
+                WHERE docente_pnf_id = ? 
+                AND unidad_curricular_id = ? 
+                AND periodo_academico_id = ? 
+                AND activo = 1
+            """, (docente_pnf_id, uc_id, periodo_id))
 
-    def asignar_uc_docente(self, uc_id, docente_id):
-        """Asigna la UC al docente"""
-        #docente pnfid, unidad curricular id, periodoacademicoid, sedeid
-        pass
+            return cursor.fetchone() is not None
 
-    def desasignar_uc_docente(self, uc_id, docente_id):
-        """Desasigna la UC del docente"""
-        pass
+        except Exception as e:
+            print(f"Error al verificar asignación de UC: {e}")
+            return False
+
+        finally:
+            if con is not None:
+                con.close()
+
+    def asignar_uc_a_docente(self, docente_pnf_id, uc_id, periodo_id):
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+
+            # Insertar o reemplazar directamente la asignación
+            cursor.execute("""
+                INSERT OR REPLACE INTO docente_uc (id, docente_pnf_id, unidad_curricular_id, periodo_academico_id, fecha_asignacion, activo)
+                VALUES (
+                    (SELECT id FROM docente_uc 
+                    WHERE docente_pnf_id = ? AND unidad_curricular_id = ? AND periodo_academico_id = ?),
+                    ?, ?, ?, DATE('now'), 1
+                )
+            """, (docente_pnf_id, uc_id, periodo_id, docente_pnf_id, uc_id, periodo_id))
+
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al asignar UC a docente: {e}")
+            return False
+        finally:
+            if con:
+                con.close()
+
+    def desasignar_uc_de_docente(self, docente_pnf_id, uc_id, periodo_id):
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            
+            cursor.execute("""
+                UPDATE docente_uc
+                SET activo = 0
+                WHERE docente_pnf_id = ? AND unidad_curricular_id = ? AND periodo_academico_id = ?
+            """, (docente_pnf_id, uc_id, periodo_id))
+
+            con.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error al desasignar UC de docente: {e}")
+            return False
+        finally:
+            if con:
+                con.close()
+        
+    def obtener_periodo_id_actual(self):
+        """
+        Devuelve el ID del periodo académico actual.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+
+            cursor.execute("""
+                SELECT id, nombre, estado FROM periodos_academicos
+                WHERE estado IN ('planificacion','en_curso', 'inscripcion')
+                ORDER BY fecha_inicio DESC
+                LIMIT 1
+            """)
+            resultado = cursor.fetchone()
+
+            if con is not None:
+                con.close()
+            if resultado:
+                return resultado[0]  # Devuelve el ID
+            else:
+                return None
+        except Exception as e:
+            print("Error al obtener periodo actual:", e)
+            return None
+
+
     
 
 # bd = ModeloPNF()
-# print(bd.obtener_nombres_por_id("trayectos",1))
+# print(bd.obtener_pnf_asignado_docente(2))

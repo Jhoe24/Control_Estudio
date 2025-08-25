@@ -21,10 +21,9 @@ class CargaNotasFrame(SectionFrameBase):
         
         if docente_id:
             self.tuple_pnf = self.controller_pnf.obtener_pnf_asignado_docente(docente_id)
-
         else:
             self.tuple_pnf = self.controller_pnf.listado_pnf
-
+        
         self.nombres_pnf = self.controller_pnf.obtener_nombres_pnf()
         self.var_pnf = ctk.StringVar(value=self.nombres_pnf[0] if self.nombres_pnf else "")
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.tuple_pnf}  # nombre: id
@@ -59,10 +58,11 @@ class CargaNotasFrame(SectionFrameBase):
            """En caso tal de que docente_id sea diferente de None necesito 
            obtener todas el id pnf y el id del periodo academico"""
            sql = """
-                SELECT id FROM docente_sede_pnf WHERE docente_id = ? AND pnd_id = ?
+                SELECT id FROM docente_sede_pnf WHERE docente_id = ? AND pnf_id = ?
             """
            datos = self.controller_secciones.modelo.ejecutar_consulta_armada(sql, (self.docente_id, pnf_id,), True)
-           return (pnf_id, periodo_id,datos.get('id'))#retorna pnf_id, periodo_id, docente_pnf_id
+         
+           return (pnf_id, periodo_id, datos.get('id'))#retorna pnf_id, periodo_id, docente_pnf_id
         else: 
             seccion_id = self.controller_secciones.obtener_id_por_nombre(self.var_seccion.get())
             sql = """

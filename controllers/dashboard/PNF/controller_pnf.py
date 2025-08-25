@@ -450,15 +450,29 @@ class ControllerPNF:
     def obtener_tramos_por_trayecto(self, id_trayecto):
         return self.modelo.obtener_lista_tramo(id_trayecto)
     
-    def obtener_UC(self,tupla_datos = None):
-        if not tupla_datos:
+    def obtener_UC(self,tupla_datos = None, periodo_id = None, docente_pnf_id = None):
+        if tupla_datos == None and periodo_id == None and docente_pnf_id == None:
+            #print("vista admin")
             return self.modelo.obtener_UC()
-        else:
+        
+        elif tupla_datos != None and periodo_id == None and docente_pnf_id == None:
+            #print("vista admin carga notas")
             sentencia_sql = """
             SELECT * FROM unidades_curriculares
             WHERE pnf_id = ? AND trayecto_id = ? AND tramo_id = ?
             """
             return self.modelo.buscar_uc_por_pnf(sentencia_sql,tupla_datos,True)
+
+        elif not tupla_datos and periodo_id and docente_pnf_id:
+            #print(f"id docente = {docente_pnf_id} y id periodo = {periodo_id}")
+            sentencia_sql = """
+            SELECT uc.* 
+            FROM unidades_curriculares uc
+            JOIN docente_uc duc ON uc.id = duc.unidad_curricular_id
+            WHERE duc.docente_pnf_id = ? AND duc.periodo_academico_id = ? AND duc.activo = 1
+            """
+
+            return self.modelo.buscar_uc_por_pnf(sentencia_sql,(docente_pnf_id,periodo_id),True)
     
     
     def obtener_datos_completos_uc(self, id_uc):
@@ -542,8 +556,32 @@ class ControllerPNF:
     def obtener_nombre_pnf_asignado_docente(self, docente_id):
         return self.modelo.obtener_nombre_pnf_asignado_docente(docente_id)
     
-    def verificar_uc_docente(self, uc_id, docente_id):
-        return self.modelo.verificar_uc_docente(uc_id, docente_id)
+#========================================================================================================================
+    
+    def uc_asignada_a_docente(self, docente_pnf_id, uc_id, periodo_id):
+        """
+        Verifica si una UC está asignada a un docente en un período específico.
+        Se usa al cargar la tabla para marcar el checkbox.
+        """
+        return self.modelo.uc_asignada_a_docente(docente_pnf_id, uc_id, periodo_id)
 
-    def asignar_uc_docente(self, uc_id, docente_id):
-        return self.modelo.asignar_uc_docente(uc_id, docente_id)
+    def asignar_uc_a_docente(self, docente_pnf_id, uc_id, periodo_id):
+        """
+        Asigna una UC a un docente en un período académico.
+        Se llama cuando el usuario marca el checkbox.
+        """
+        return self.modelo.asignar_uc_a_docente(docente_pnf_id, uc_id, periodo_id)
+
+    def desasignar_uc_de_docente(self, docente_pnf_id, uc_id, periodo_id):
+        """
+        Desasigna (desactiva) una UC de un docente en un período académico.
+        Se llama cuando el usuario desmarca el checkbox.
+        """
+        return self.modelo.desasignar_uc_de_docente(docente_pnf_id, uc_id, periodo_id)
+    
+    def obtener_periodo_id_actual(self):
+        return self.modelo.obtener_periodo_id_actual()
+    
+    # def obtener_pnf_asignado_docentes(self, docente_id):
+    #     return self.modelo.obtener_pnf_asignado_docente(docente_id)
+

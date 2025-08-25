@@ -68,6 +68,7 @@ class CargaNotasView(ctk.CTkFrame):
 
     def mostrar_listado(self):
         tuplas_datos = self.datos_carga_notas.obtener_filtros_seleccionados()
+      
         self.datos_carga_notas.destroy()
         self.btn_frame.destroy()
         self.frame_contenedor_carga_notas.destroy()  # <-- destruye el contenedor
@@ -78,10 +79,10 @@ class CargaNotasView(ctk.CTkFrame):
                                         width=self.winfo_width(), 
                                         height=350)
         self.frame_contenedor_carga_notas.pack(fill="x", pady=10)
-        if not self.docente_id:
+        if self.rol and self.rol.lower() != "docente":
             self.titulo.configure(text = f"Gestión de Carga de Notas de {tuplas_datos[3]} {tuplas_datos[4]}")
             
-        listado_instancia = ListadosEstudiantesPNF(self.frame_contenedor_carga_notas,self.controladores,tuplas_datos)
+        listado_instancia = ListadosEstudiantesPNF(self.frame_contenedor_carga_notas,self.controladores,tuplas_datos,user = self.user, rol = self.rol)
         listado_instancia.pack(fill="both", expand=True, padx=10, pady=10)
         
         # self.btn_siguiente = ctk.CTkButton(
