@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
+import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
@@ -60,13 +61,16 @@ class ListarUC(ctk.CTkFrame):
 
         if not tupla_datos:
             # si  no se pasó un filtro, mostrar el frame de búsqueda
-            self.busqueda_frame = FiltradoPNFFrame(self, self.controller, user_role, username)
+            self.busqueda_frame = FiltradoPNFFrame(self, self.controller, user_role, username, docente_id)
             self.busqueda_frame.grid(row=0, column=0, columnspan=5, padx=15, pady=(10, 0), sticky="ew")
 
         self.fila_datos = []
 
         # Encabezados de la tabla
-        headers = ["Código", "Nombre", "Credito","Horas", "Acciones"]
+        if user_role and user_role.lower() != "docente":
+            headers = ["Código", "Nombre", "Credito","Horas", "Acciones"]
+        else:
+            headers = ["Código", "Nombre", "Trayecto","Tramo", "Acciones"]
         for col, header in enumerate(headers):
             # cada encabezado está dentro de un CTkFrame con fondo gris
             celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)
@@ -123,6 +127,7 @@ class ListarUC(ctk.CTkFrame):
             self.label_pagina.configure(text="0 de 0")
             self.boton_anterior.configure(state="disabled")
             self.boton_siguiente.configure(state="disabled")
+
         # Si hay un PNF seleccionado, filtra la lista de UC de acuerdo al PNF
         if self.busqueda_frame.pnf_var.get() != "Seleccione un PNF":    
             # Limpia las filas anteriores
@@ -136,17 +141,21 @@ class ListarUC(ctk.CTkFrame):
                     self._crear_celda(fila, 0, tupla_uc[1]),  # Código
                     self._crear_celda(fila, 1, tupla_uc[2]),  # Nombre
                     self._crear_celda(fila, 2, tupla_uc[15]),  # Crédito
-                    self._crear_celda(fila, 3, tupla_uc[14]),  # Horas
+                    self._crear_celda(fila, 3, tupla_uc[14]),  # Horas Totales
                 ]
                 celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
                 celda_btn.grid(row=fila, column=4, padx=1, pady=1, sticky="nsew")
 
                 if self.docente_id:  
-                   # Determinar si la UC ya está asignada
+                   # Obtener periodo seleccionado
+                    periodo_nombre = self.busqueda_frame.periodo_var.get()
+                    periodo_id = self.controller_pnf.obtener_periodo_id_por_nombre(periodo_nombre)
+
+                   # Determinar si la UC ya está asignada   
                     asignada = self.controller_pnf.uc_asignada_a_docente(
                         self.docente_id,
                         tupla_uc[0],                # UC id
-                        self.controller_pnf.obtener_periodo_id_actual()
+                        periodo_id                  # Periodo id
                     )
                     var_check = ctk.BooleanVar(value=asignada)
 
@@ -386,7 +395,13 @@ class ListarUC(ctk.CTkFrame):
         """
         Asigna o desasigna una UC al docente según el estado del checkbox.
         """
-        periodo_id = self.controller_pnf.obtener_periodo_id_actual()
+        periodo_nombre = self.busqueda_frame.periodo_var.get()
+        periodo_id = self.controller_pnf.obtener_periodo_id_por_nombre(periodo_nombre)
+
+        if not periodo_id:
+            messagebox.showerror("Error", "Debe seleccionar un periodo académico válido.")
+            var_check.set(False)
+            return
 
         if var_check.get():  # Marcado 
             print("si funka")

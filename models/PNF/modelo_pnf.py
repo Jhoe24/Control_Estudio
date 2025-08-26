@@ -977,9 +977,9 @@ class ModeloPNF:
             if con:
                 con.close()
         
-    def obtener_periodo_id_actual(self):
+    def obtener_periodos_disponibles(self):
         """
-        Devuelve el ID del periodo académico actual.
+        Devuelve una lista de tuplas (id, nombre) de los periodos académicos activos.
         """
         con = None
         try:
@@ -987,25 +987,46 @@ class ModeloPNF:
             cursor = con.cursor()
 
             cursor.execute("""
-                SELECT id, nombre, estado FROM periodos_academicos
+                SELECT id, nombre 
+                FROM periodos_academicos
                 WHERE estado IN ('planificacion','en_curso', 'inscripcion')
-                ORDER BY fecha_inicio DESC
-                LIMIT 1
+                ORDER BY fecha_inicio
             """)
+            resultados = cursor.fetchall()
+
+            if con is not None:
+                con.close()
+            return resultados if resultados else []
+        except Exception as e:
+            print("Error al obtener periodos académicos:", e)
+            return []
+
+    def obtener_periodo_id_por_nombre(self, nombre_periodo):
+        """
+        Devuelve el ID de un periodo a partir de su nombre.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+
+            cursor.execute("""
+                SELECT id 
+                FROM periodos_academicos
+                WHERE nombre = ?
+            """, (nombre_periodo,))
             resultado = cursor.fetchone()
 
             if con is not None:
                 con.close()
-            if resultado:
-                return resultado[0]  # Devuelve el ID
-            else:
-                return None
+            return resultado[0] if resultado else None
         except Exception as e:
-            print("Error al obtener periodo actual:", e)
+            print("Error al obtener ID del periodo por nombre:", e)
             return None
 
 
-    
 
+    
 # bd = ModeloPNF()
-# print(bd.obtener_pnf_asignado_docente(2))
+# print(bd.obtener_periodos_disponibles())
+# print(bd.obtener_periodo_id_por_nombre("Segundo Semestre 2025"))

@@ -27,13 +27,13 @@ class ListadosEstudiantesPNF(ListarUC):
         
         self.fila_datos = []
         # se obtienen los datos y me devuelve el diccionario
-        #pprint(self.paginas_mostrar)
+        #print(self.paginas_mostrar)
         for fila, dic_uc in enumerate(self.paginas_mostrar, start=2):
             fila_widgets = [
                 self._crear_celda(fila, 0, dic_uc['codigo']),
                 self._crear_celda(fila, 1, dic_uc['nombre']),
-                self._crear_celda(fila, 2, dic_uc['unidades_credito']),
-                self._crear_celda(fila, 3, dic_uc['horas_totales']),
+                self._crear_celda(fila, 2, dic_uc['trayecto_id']),
+                self._crear_celda(fila, 3, dic_uc['tramo_id']),
             ]
             celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=6)
             celda_btn.grid(row=fila, column=4, padx=1, pady=6, sticky="nsew")

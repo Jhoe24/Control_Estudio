@@ -6,13 +6,14 @@ import tkinter.messagebox as messagebox
 import tkinter as tk
 
 class FiltradoPNFFrame(SectionFrameBase):
-    def __init__(self, master, controllers, rol_user = None,user_name = None):
+    def __init__(self, master, controllers, rol_user = None,user_name = None, docente_id = None):
         super().__init__(master, header_text="Filtrar Unidades Curriculares por PNF")
         # controladores principales
         self.controlador = controllers['PNF']
         self.controlador_docente = controllers['Docentes']
         self.controlador_user = controllers['Usuario']
         self.rol_user = rol_user
+        self.docente_id = docente_id
 
         # --- Lista de PNF del controlador ---
         # cada tupla tiene la forma: (id_pnf, código_pnf, nombre_pnf)
@@ -24,6 +25,7 @@ class FiltradoPNFFrame(SectionFrameBase):
         self.pnf_var = ctk.StringVar(value="Seleccione un PNF")
         self.trayecto_var = ctk.StringVar(value="No seleccionado")
         self.tramo_var = ctk.StringVar(value="No seleccionado")
+        self.periodo_var = ctk.StringVar(value="Seleccione un periodo académico")
 
         self.frame_filtro_pnf = ctk.CTkFrame(self, fg_color="transparent")
         self.frame_filtro_pnf.pack(fill="x", pady=PADY_FILA, padx=15)
@@ -90,13 +92,40 @@ class FiltradoPNFFrame(SectionFrameBase):
        
         self.option_menu_tramo.pack(side="left", padx=(0, 15))
 
-        # --- Botón de búsqueda ---
-        self.boton_buscar = ctk.CTkButton(
-            self.frame_filtro_pnf,
-            text="Buscar",
-            command=self.ejecutar_busqueda
-        )
-        self.boton_buscar.pack(side="left")
+        if self.docente_id:
+            print("si docente id")
+            # --- Botón de búsqueda ---
+            self.boton_buscar = ctk.CTkButton(
+                self.frame_filtro_pnf,
+                text="Buscar",
+                command=self.ejecutar_busqueda
+            )
+            self.boton_buscar.pack(side="left")
+
+            # --- OptionMenu Periodo ---
+            lista_periodos = self.controlador.obtener_periodos_disponibles()
+            self.periodo_nombre_por_id = {tupla[1]: tupla[0] for tupla in lista_periodos}
+            valores_periodos = [tupla[1] for tupla in lista_periodos] or ["Sin periodos disponibles"]
+            self.periodo_optionmenu = ctk.CTkOptionMenu(
+                self.frame_filtro_pnf,
+                values=valores_periodos,
+                variable=self.periodo_var,
+                width=200,
+                command=lambda _: self.master.mostrar_listado()
+            )
+            self.periodo_optionmenu.pack(side="right", padx=(0, 15))
+
+            if valores_periodos and valores_periodos[0] != "Sin periodos disponibles":
+                self.periodo_var.set(valores_periodos[0])
+        else:
+            # --- Botón de búsqueda ---
+            print("no docente id")
+            self.boton_buscar = ctk.CTkButton(
+                self.frame_filtro_pnf,
+                text="Buscar",
+                command=self.ejecutar_busqueda
+            )
+            self.boton_buscar.pack(side="left")
 
     def actualizar_trayectos_por_pnf(self, *args):
         """Actualiza los trayectos disponibles según el PNF seleccionado."""

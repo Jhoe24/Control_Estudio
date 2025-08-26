@@ -269,8 +269,8 @@ class ListDocenteView(ctk.CTkFrame):
         top = ctk.CTkToplevel(self, fg_color="White")
         top.title("Asignar Unidades Curriculares")
         
-        ancho = 1100
-        alto = 700
+        ancho = 1300
+        alto = 750
 
         # Centrar ventana
         top.update_idletasks()

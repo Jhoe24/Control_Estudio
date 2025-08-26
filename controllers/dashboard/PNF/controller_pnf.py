@@ -579,9 +579,8 @@ class ControllerPNF:
         """
         return self.modelo.desasignar_uc_de_docente(docente_pnf_id, uc_id, periodo_id)
     
-    def obtener_periodo_id_actual(self):
-        return self.modelo.obtener_periodo_id_actual()
+    def obtener_periodos_disponibles(self):
+        return self.modelo.obtener_periodos_disponibles()
     
-    # def obtener_pnf_asignado_docentes(self, docente_id):
-    #     return self.modelo.obtener_pnf_asignado_docente(docente_id)
-
+    def obtener_periodo_id_por_nombre(self, nombre_periodo):
+        return self.modelo.obtener_periodo_id_por_nombre(nombre_periodo)
