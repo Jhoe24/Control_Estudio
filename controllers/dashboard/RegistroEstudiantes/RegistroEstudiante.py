@@ -245,8 +245,14 @@ class EstudianteController:
     def obtener_inscripcion_id(self, estudiante_id, seccion_id):
         return self.modelo.obtener_inscripcion_id(estudiante_id, seccion_id)
     
+#===================================================================================================================================================================   
+    
     def obtener_nota(self, inscripcion_id, unidad_curricular_id):
         """
         Obtiene la nota de un estudiante para una unidad curricular específica.
         """
         return self.modelo.obtener_nota(inscripcion_id, unidad_curricular_id)
+
+    def obtener_seccion_id_por_pnf_periodoAcademico_y_docente(self, tupla): #tupla =(pnf, periodo_academico, docente_id)
+        
+        return self.modelo.obtener_seccion_id_por_pnf_periodoAcademico_y_docente(tupla)

@@ -5,12 +5,17 @@ from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from ..DatosPersonales import DatosPersonalesFrame
 
 class FrameNotaEstudiante(SectionFrameBase):
-    def __init__(self, master, controller_estudiante, tupla, unidad_curricular_id, solo_lectura=False):
+    def __init__(self, master, controller_estudiante, tupla, unidad_curricular_id, solo_lectura=False, user_role=None):
         super().__init__(master, header_text="Gestión de Notas de Estudiantes", fg_color_label=COLOR_HEADER_SECCION_BG_2)
         self.controller_estudiante = controller_estudiante
         self.unidad_curricular_id = unidad_curricular_id
         self.solo_lectura = solo_lectura
-        self.seccion_id = tupla[5]  # id de la sección que esta en la posicion de la tupla nuemero 5 
+        if user_role and user_role.lower() != "docente":
+            self.seccion_id = tupla[5]  # id de la sección que esta en la posicion de la tupla nuemero 5
+        else:
+            self.seccion_id = self.controller_estudiante.obtener_seccion_id_por_pnf_periodoAcademico_y_docente(tupla)
+            print(self.seccion_id)
+            #self.seccion_id = tupla[1]  # id de la sección que esta en la posicion de la tupla nuemero 5 
         #print("\n\n=========================================================")
         #print(f'tupla es :{tupla}')
         #print(f"seccion_id recibido: {self.seccion_id}")

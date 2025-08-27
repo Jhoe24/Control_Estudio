@@ -8,13 +8,15 @@ from views.dashboard.modules.forms.Estudiantes.asignar_pnf import AsignarPNFFram
 
 
 class ListEstudiantesView(ctk.CTkFrame):
-    def __init__(self, master, controlador,controller_secciones,controller_pnf = None,):
+    def __init__(self, master, controlador,controller_secciones,controller_pnf = None, role_user=None, user_name=None):
         super().__init__(master, fg_color="white")
         self.furmulario_estudiante = FormularioEstudianteView(master, controlador)
         self.master = master
         self.controlador = controlador
         self.controller_pnf = controller_pnf
         self.controller_secciones = controller_secciones
+        self.role_user = role_user
+        self.user_name = user_name
         
         self.filas_datos = []
         self.cantidad_estudiantes = self.controlador.modelo.obtener_cantidad_estudiantes()
@@ -42,7 +44,7 @@ class ListEstudiantesView(ctk.CTkFrame):
             self.vcmd_decimal_val = master.register(self.controlador._solo_decimal)
 
         # --- FILTRADO DE BÚSQUEDA (FILA 0) ---
-        self.busqueda_frame = FiltradoBusquedaFrame(self,self.controlador,self.vcmd_num_val)
+        self.busqueda_frame = FiltradoBusquedaFrame(self,self.controlador,self.vcmd_num_val, None, self.role_user, self.user_name)
         self.busqueda_frame.grid(row=0, column=0, columnspan=6, padx=15, pady=(10, 0), sticky="ew")
 
         # --- ENCABEZADOS (FILA 1) ---
@@ -97,7 +99,7 @@ class ListEstudiantesView(ctk.CTkFrame):
         self.boton_anterior.configure(state="disabled" if self.pagina_actual == 1 else "normal")
         self.boton_siguiente.configure(state="disabled" if self.pagina_actual == self.cantidad_total_paginas else "normal")
 
-    def mostrar_resultado_busqueda(self, lista_estudiantes):
+    def mostrar_resultado_busqueda(self, lista_estudiantes, role_user):
         """
         Muestra solo los estudiantes pasados en la lista (por ejemplo, el resultado de una búsqueda).
         Deshabilita la paginación y actualiza la tabla.

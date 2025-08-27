@@ -8,12 +8,9 @@ from time import sleep
 
 from views.dashboard.components.widget_utils import *
 
-
 from config.app_config import AppConfig
 
-
 class CargaNotasView(ctk.CTkFrame):
-
     def __init__(self, master, controladores, user = None, rol = None):
         super().__init__(master, fg_color=COLOR_FONDO_FORMULARIO)
         self.master = master

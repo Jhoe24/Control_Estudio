@@ -652,4 +652,23 @@ class ModelRegistroEstudiantes:
             if con is not None:
                 con.close()
     
-
+    def obtener_seccion_id_por_pnf_periodoAcademico_y_docente(self, tupla):  #tupla =(pnf, periodo_academico, docente_id)
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute('''
+                            SELECT id FROM secciones
+                            WHERE pnf_id = ? AND periodo_academico_id = ?
+                            ''',(tupla[0], tupla[1]))
+            
+            resultado = cursor.fetchone()
+            con.close()
+            return resultado[0] if resultado else None
+        except Exception as e:
+            print(f"Error al obtener el id de la seccion: {e}") 
+            return 
+        finally:
+            if con:
+                con.close()
+        

@@ -283,7 +283,7 @@ class Config_user(ctk.CTkScrollableFrame):
 
         # Mostrar un indicador de carga mientras se obtienen los datos
         loading_label = ctk.CTkLabel(frame_roles, text="Cargando roles, por favor espere...", font=("Segoe UI", 16))
-        loading_label.pack(pady=50)
+        loading_label.pack(pady=50) # verificar esto
         self.contenido_frame.update_idletasks() # Para asegurar que el label se muestre
 
         def worker():

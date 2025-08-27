@@ -12,6 +12,8 @@ class ListadosEstudiantesPNF(ListarUC):
         self.controller_estudiante = controlladores["Periodos"]
         self.controller_estudiantes_inscritos = controlladores["Estudiantes"]
 
+        self.user_role
+
         self.tuplas_datos = tuplas_datos
         
     def mostrar_listado(self):
@@ -42,7 +44,6 @@ class ListadosEstudiantesPNF(ListarUC):
             frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
             frame_botones.pack(expand=True)
 
-            
             button = ctk.CTkButton(
                 frame_botones,
                 text="Gestionar Notas",
@@ -131,7 +132,8 @@ class ListadosEstudiantesPNF(ListarUC):
             self.controller_estudiantes_inscritos,
             self.tuplas_datos,
             unidad_curricular_id,
-            solo_lectura=False
+            solo_lectura=False,
+            user_role=self.user_role
         )
         carga_noras_estudiantes.pack(fill="x", padx=10, pady=10)
 

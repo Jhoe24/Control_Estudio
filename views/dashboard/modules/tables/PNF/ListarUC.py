@@ -9,12 +9,13 @@ from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
 class ListarUC(ctk.CTkFrame):
     def __init__(self, master, controller,tupla_datos = None, user_role=None, username=None, docente_id=None):
         super().__init__(master, fg_color="white")
-        #diccionario de controladores disponible
+        # Diccionario de controladores disponibles
         self.controller = controller
         self.controller_pnf = controller["PNF"]
         self.user_role = user_role
         self.username = username
         self.docente_id = docente_id
+        # Tupla_datos es una tupla que contiene los datos de pnf, periodo academico y id del docente
         """
         Preparación de filtros a partir de la tupla recibida
         self.lista_UC = self.controller_pnf.obtener_UC(tupla_id) se necesita que se ejecuete si es admin o cordinado general y si es de carga de notas
@@ -45,6 +46,7 @@ class ListarUC(ctk.CTkFrame):
                 self.lista_UC = self.controller_pnf.obtener_UC()
         else:
             print("todo lo contrario")
+            print(tupla_datos)
             self.lista_UC = self.controller_pnf.obtener_UC(periodo_id=tupla_datos[1], docente_pnf_id=tupla_datos[2])
             
         self.pagina_actual = 1

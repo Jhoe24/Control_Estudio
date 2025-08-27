@@ -44,17 +44,18 @@ class FiltradoBusquedaFrame(SectionFrameBase):
         self.id_pnf = None
         print(f"tipo de documeto {tipo_documento} : documento de identidad {nro_documento}")
 
-        if self.role_user.lower() == "coord_pnf":
-            persona_id = self.controlador_user.obtener_persona_id(self.user_name) 
+        if self.role_user and self.role_user.lower() == "coord_pnf":
+            persona_id = self.controlador_user.obtener_persona_id(self.user_name)
             docente_id = self.controlador.obtener_id_docente(persona_id)
             self.id_pnf = self.controlador.obtener_pnf_id(docente_id)
-        dic_estudiante=self.controlador.buscar_estudiante(tipo_documento, nro_documento, id_pnf=self.id_pnf)
+        dic_estudiante=self.controlador.buscar_estudiante(tipo_documento, nro_documento) # Evaluar si es necesario el id_pnf
         
         if dic_estudiante:
-            self.master.mostrar_resultado_busqueda([dic_estudiante], role_user=self.role_user)
-        
-        
-        
+            if self.role_user and self.role_user.lower() == "admin":
+                self.master.mostrar_resultado_busqueda([dic_estudiante], role_user=self.role_user) # Evaluar si es necesario el role_user=self.role_user
+            else:
+                self.master.mostrar_resultado_busqueda([dic_estudiante], role_user=self.role_user)
+
             
 
     # def ver_datos_completos(self, estudiante):
