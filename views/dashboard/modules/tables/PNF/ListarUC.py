@@ -12,6 +12,8 @@ class ListarUC(ctk.CTkFrame):
         # Diccionario de controladores disponibles
         self.controller = controller
         self.controller_pnf = controller["PNF"]
+        self.controller_user = controller["Usuario"]
+        
         self.user_role = user_role
         self.username = username
         self.docente_id = docente_id
@@ -69,10 +71,13 @@ class ListarUC(ctk.CTkFrame):
         self.fila_datos = []
 
         # Encabezados de la tabla
-        if user_role and user_role.lower() != "docente":
-            headers = ["Código", "Nombre", "Credito","Horas", "Acciones"]
-        else:
+        if user_role and user_role.lower() == "estudiante":
+            headers = ["Código", "Nombre", "Trayecto","Tramo", "Notas"]
+        elif user_role and user_role.lower() == "docente":
+            
             headers = ["Código", "Nombre", "Trayecto","Tramo", "Acciones"]
+        else:
+            headers = ["Código", "Nombre", "Credito","Horas", "Acciones"]
         for col, header in enumerate(headers):
             # cada encabezado está dentro de un CTkFrame con fondo gris
             celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)

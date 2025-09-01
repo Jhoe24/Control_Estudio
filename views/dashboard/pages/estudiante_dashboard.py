@@ -14,8 +14,6 @@ from views.dashboard.modules.configuracion_sistema import Config_system
 
 
 
-
-
 class EstudianteDashboardView(BaseDashboardView):
     
     def __init__(self, master, controller, username, user_role, **kwargs):
@@ -62,7 +60,7 @@ class EstudianteDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
                 
-        carga_notas = CargaNotasView(self.cuerpo_principal, self.controller['Periodos'], self.controller['PNF'], self.controller['Secciones'], self.controller["Estudiantes"],)
+        carga_notas = CargaNotasView(self.cuerpo_principal, self.controller, user=self.username, rol=self.user_role)
         carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
 
     def configuracion_usuarios(self):

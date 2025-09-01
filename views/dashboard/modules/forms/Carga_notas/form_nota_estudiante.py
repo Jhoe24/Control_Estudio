@@ -41,7 +41,7 @@ class FrameNotaEstudiante(SectionFrameBase):
         self.frame_tabla.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Encabezado (fila 0)
-        headers = ["Documento", "Nombres", "Nota", "Acción"]
+        headers = ["Documento", "Nombres", "Sección","Nota", "Acción"]
         for col, header in enumerate(headers):
             celda = ctk.CTkFrame(self.frame_tabla, fg_color="#e0e0e0", corner_radius=4)
             celda.grid(row=0, column=col, padx=1, pady=1, sticky="nsew")
@@ -59,10 +59,13 @@ class FrameNotaEstudiante(SectionFrameBase):
             fila_widgets.append(self._crear_celda_tabla(i, 0, estudiante['documento_identidad']))
             # Nombres
             fila_widgets.append(self._crear_celda_tabla(i, 1, estudiante['nombres']))
+            # Seccion ID
+            fila_widgets.append(self._crear_celda_tabla(i, 2, self.seccion_id))
+
 
             # Nota (Entry en celda)
             celda_nota = ctk.CTkFrame(self.frame_tabla, fg_color="#f5f5f5", corner_radius=4)
-            celda_nota.grid(row=i, column=2, padx=1, pady=1, sticky="nsew")
+            celda_nota.grid(row=i, column=3, padx=1, pady=1, sticky="nsew")
 
             vcmd = self.register(solo_decimal)
             entry_nota = ctk.CTkEntry(
@@ -94,7 +97,7 @@ class FrameNotaEstudiante(SectionFrameBase):
 
             # Acción (botón)
             celda_btn = ctk.CTkFrame(self.frame_tabla, fg_color="#f5f5f5", corner_radius=4)
-            celda_btn.grid(row=i, column=3, padx=1, pady=1, sticky="nsew")
+            celda_btn.grid(row=i, column=4, padx=1, pady=1, sticky="nsew")
             # Frame interno para centrar los botones
             frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
             frame_botones.pack(expand=True)

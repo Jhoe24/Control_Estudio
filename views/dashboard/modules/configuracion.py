@@ -260,7 +260,7 @@ class Config_user(ctk.CTkScrollableFrame):
             "sector":self.frame_datos_ubicacion.sector_entry.get(),
             "calle":self.frame_datos_ubicacion.calle_entry.get(),
             "nro_casa":self.frame_datos_ubicacion.casa_apart_entry.get(),
-            "tipo_recidencia":self.frame_datos_ubicacion.var_opcion.get(),   
+            "tipo_residencia":self.frame_datos_ubicacion.var_opcion.get(),   
         }
 
         # campos_a_actualizar = {k: v for k, v in datos.items() if v}
