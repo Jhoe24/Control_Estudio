@@ -52,27 +52,17 @@ class ListadosEstudiantesPNF(ListarUC):
             frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
             frame_botones.pack(expand=True)
 
-            if self.user_role and self.user_role.lower() == "estudiante":
-                    print("simon")
-            else:
-                button = ctk.CTkButton(
-                    frame_botones,
-                    text="Gestionar Notas",
-                    width=100,
-                    text_color="#ffffff",
-                    fg_color=COLOR_BOTON_FONDO,
-                    hover_color=COLOR_BOTON_FONDO_HOVER,
-                    command=lambda uc_id = dic_uc["id"]: self.cargar_nota_uc(uc_id)
-                )
+            button = ctk.CTkButton(
+                frame_botones,
+                text="Gestionar Notas",
+                width=100,
+                text_color="#ffffff",
+                fg_color=COLOR_BOTON_FONDO,
+                hover_color=COLOR_BOTON_FONDO_HOVER,
+               command=lambda uc_id = dic_uc["id"]: self.cargar_nota_uc(uc_id)
+            )
 
-            # button_ver_notas = ctk.CTkButton(
-            #     frame_botones, text="Ver Notas", width=100,
-            #     text_color="#ffffff",
-            #     fg_color=COLOR_BOTON_FONDO,
-            #     hover_color=COLOR_BOTON_FONDO_HOVER,
-            #     command=lambda uc_id = dic_uc["id"]: self.ver_notas_uc(uc_id)
-            # )
-                button.pack(side="left", padx=(0,4), pady=5)
+            button.pack(side="left", padx=(0,4), pady=5)
             #button_ver_notas.pack(side="left", pady=5)
 
             fila_widgets.append(celda_btn)
