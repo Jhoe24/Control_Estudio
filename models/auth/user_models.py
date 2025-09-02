@@ -39,7 +39,7 @@ class UserModel:
             cursor = con.cursor()
             cursor.execute(
                 """
-                SELECT ip.documento_identidad, ip.nombres, ip.apellidos,u.id, u.nombre_usuario
+                SELECT ip.documento_identidad, ip.nombres, ip.apellidos, u.id, u.persona_id, u.nombre_usuario
                 from informacion_personal ip
                 JOIN usuarios u ON ip.id = u.persona_id
 
@@ -287,4 +287,24 @@ class UserModel:
             if con is not None:
                 con.close()
 
+    def user_is_coord(self, docente_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            # Verifica si el docente es coordinador en cualquier PNF
+            cursor.execute(
+                """
+                    SELECT 1 FROM docente_sede_pnf 
+                    WHERE docente_id = ? AND coordinador = 1 AND activo = 1
+                """, (docente_id,)
+            )
+            result = cursor.fetchone()
+            return result is not None
+        except Exception as e:
+            print(f"Error al verificar coordinador: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
 #print(UserModel().the_user_is_blocked(3))

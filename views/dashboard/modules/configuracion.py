@@ -277,32 +277,35 @@ class Config_user(ctk.CTkScrollableFrame):
     def asignar_roles(self):
         self.limpiar_contenido_frame()
 
-        # Crear instancia del FrameRoles
-        frame_roles = FrameRoles(self.contenido_frame, controller=self.controller)
-        frame_roles.pack(fill="both", expand=True)
-
-        # Mostrar un indicador de carga mientras se obtienen los datos
-        loading_label = ctk.CTkLabel(frame_roles, text="Cargando roles, por favor espere...", font=("Segoe UI", 16))
-        loading_label.pack(pady=50) # verificar esto
+        # 1. Mostrar un indicador de carga en el frame principal de contenido.
+        #    Usamos .place() para centrarlo sin afectar a otros widgets que se añadirán con .pack()
+        loading_label = ctk.CTkLabel(self.contenido_frame, text="Cargando roles, por favor espere...", font=("Segoe UI", 16))
+        loading_label.place(relx=0.5, rely=0.5, anchor="center")
         self.contenido_frame.update_idletasks() # Para asegurar que el label se muestre
 
         def worker():
-            """Función que se ejecutará en el hilo secundario para cargar los datos."""
+            """Función que se ejecutará en el hilo secundario para crear y cargar el frame de roles."""
             try:
-                # Esta es la operación que puede tardar.
-                # Asumimos que `cargar_datos` obtiene los datos y luego los usa para crear widgets.
+                # 2. Crear la instancia del FrameRoles pero NO mostrarla todavía.
+                #    Se crea como hijo del contenido_frame para que herede estilos, etc.
+                frame_roles = FrameRoles(self.contenido_frame, controller=self.controller)
+                
+                # 3. Cargar los datos. Esta es la operación que puede tardar.
                 frame_roles.cargar_datos()
 
-                # Una vez que los datos están cargados, ocultamos el indicador de carga.
-                # Esto debe hacerse en el hilo principal de la UI usando 'after'.
-                self.after(0, loading_label.destroy)
+                # 4. Una vez que los datos están cargados, actualizar la UI en el hilo principal.
+                def update_ui():
+                    loading_label.destroy() # Ocultar el indicador de carga
+                    frame_roles.pack(fill="both", expand=True) # Mostrar el frame ya cargado
+
+                self.after(0, update_ui)
 
             except Exception as e:
                 # Es una buena práctica manejar posibles errores durante la carga de datos.
                 self.after(0, lambda: messagebox.showerror("Error de Carga", f"Ocurrió un error al cargar los roles: {e}"))
                 self.after(0, loading_label.destroy)
 
-        # Creamos y iniciamos el hilo para ejecutar el worker.
+        # Creamos e iniciamos el hilo para ejecutar el worker.
         thread = threading.Thread(target=worker)
         thread.daemon = True  # Esto permite que la aplicación se cierre aunque el hilo esté corriendo.
         thread.start()

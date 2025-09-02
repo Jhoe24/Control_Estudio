@@ -1023,6 +1023,26 @@ class ModeloPNF:
         except Exception as e:
             print("Error al obtener ID del periodo por nombre:", e)
             return None
+        
+    def existe_coordinador(self, pnf_id):
+        """Verifica si ya existe un coordinador asignado para un PNF específico.""" 
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                SELECT * FROM docente_sede_pnf WHERE pnf_id = ? AND coordinador = 1 AND activo = 1
+                """, (pnf_id,)
+            )
+            row = cursor.fetchone()
+            return row is not None  # Retorna True si existe, False si no
+        except Exception as e:
+            print(f"Error al verificar si existe coordinador para el PNF: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
 
 
 

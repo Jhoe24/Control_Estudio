@@ -20,6 +20,8 @@ class AsignarDocentePNFFrame(SectionFrameBase):
 
         self.para_edicion = para_edicion
         self.id_asignacion = None
+        self.pnf_id_original = None
+        self.es_coordinador_original = False
 
         self.uc_frame = None
 
@@ -47,7 +49,7 @@ class AsignarDocentePNFFrame(SectionFrameBase):
 
                 # Widgets
                 self._crear_fila_widgets([
-                    ("Seleccione un P.N.F:", crear_option_menu, {"values": self.nombres_pnf, "variable": self.var_pnf}, 1, self, 'pnf_menu'),
+                    ("Seleccione un P.N.F:", crear_option_menu, {"values": self.nombres_pnf, "variable": self.var_pnf, "command": self.validar_coordinador}, 1, self, 'pnf_menu'),
                 ])
 
                 # Fechas
@@ -62,8 +64,10 @@ class AsignarDocentePNFFrame(SectionFrameBase):
                 # Coordinador y Activo
                 frame_checks = ctk.CTkFrame(self, fg_color="transparent")
                 frame_checks.pack(fill="x", pady=(10, 0), padx=10)
+
                 self.check_coordinador = ctk.CTkCheckBox(frame_checks,text_color=COLOR_TEXTO_PRINCIPAL, text="Coordinador", variable=self.var_coordinador)
                 self.check_coordinador.pack(side="left", padx=10)
+
                 self.check_activo = ctk.CTkCheckBox(frame_checks,text_color=COLOR_TEXTO_PRINCIPAL, text="Activo", variable=self.var_activo)
                 self.check_activo.pack(side="left", padx=10)
 
@@ -89,6 +93,9 @@ class AsignarDocentePNFFrame(SectionFrameBase):
                     self.observaciones_entry,
                     self.btn_uc,
                 ]
+
+                if not self.para_edicion:
+                    self.validar_coordinador()
             else:
                 self.master.no_pnf_disponibles()
                 self.destroy()
@@ -154,6 +161,27 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             self.fecha_desasignacion = fecha
             self.fecha_desasignacion_label.configure(text=f"Fecha de Desasignación: {self.fecha_desasignacion}")
 
+    def validar_coordinador(self, *args):
+        id_pnf = self.pnf_id_por_nombre.get(self.var_pnf.get())
+        if not id_pnf:
+            self.check_coordinador.configure(state="disabled")
+            return
+
+        existe_coordinador = self.controller_pnf.modelo.existe_coordinador(id_pnf)
+
+        if not existe_coordinador:
+            self.check_coordinador.configure(state="normal")
+            return
+
+        # Si existe un coordinador, solo se habilita el checkbox si estamos
+        # editando al docente que es precisamente ese coordinador.
+        if self.para_edicion and id_pnf == self.pnf_id_original and self.es_coordinador_original:
+            self.check_coordinador.configure(state="normal")
+            return
+
+        self.check_coordinador.configure(state="disabled")
+        self.var_coordinador.set(False)
+
     def guardar_datos(self):
         datos = {
             "docente_id": self.id_docente,
@@ -194,7 +222,7 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             widget.configure(state="normal")
         self.btn_fecha_asignacion.configure(state="normal")
         self.btn_fecha_desasignacion.configure(state="normal")
-        #self.btn_guardar.configure(state="normal")
+        self.validar_coordinador()
 
     def limpiar_campos(self):
         for widget in self.instancias_widgets:
@@ -229,6 +257,7 @@ class AsignarDocentePNFFrame(SectionFrameBase):
 
         if datos_pnf:
             # PNF
+            self.pnf_id_original = datos_pnf["pnf_id"]
             self.id_asignacion= datos_pnf["id"]
             nombre_pnf = next((nombre for nombre, id_ in self.pnf_id_por_nombre.items() if id_ == datos_pnf["pnf_id"]), None)
             if nombre_pnf:
@@ -248,7 +277,8 @@ class AsignarDocentePNFFrame(SectionFrameBase):
             self.btn_fecha_desasignacion.configure(state="disabled")
 
             # Coordinador y Activo
-            self.var_coordinador.set(bool(datos_pnf.get("coordinador", 0)))
+            self.es_coordinador_original = bool(datos_pnf.get("coordinador", 0))
+            self.var_coordinador.set(self.es_coordinador_original)
             self.check_coordinador.configure(state="disabled")
             self.var_activo.set(bool(datos_pnf.get("activo", 1)))
             self.check_activo.configure(state="disabled")
@@ -275,6 +305,9 @@ class AsignarDocentePNFFrame(SectionFrameBase):
         if hasattr(self, 'uc_frame') and self.uc_frame:
             return [uc for uc, var in self.uc_frame.uc_vars if var.get()]
         return []
+    
+    def existe_coordinador(self):
+        return self.controller_pnf.modelo.existe_coordinador(self.pnf_id_por_nombre[self.var_pnf.get()])
         
     
     

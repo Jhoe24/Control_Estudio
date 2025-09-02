@@ -8,6 +8,7 @@ class FrameRoles(ctk.CTkFrame):
         super().__init__(master, fg_color="transparent")
         # Inicializa el controlador de usuario
         self.controller_user = controller["Usuario"]
+        self.controller_docente = controller["Docentes"]
     
         self.usuarios_dato = self.controller_user.obtener_lista_usuarios()
         self.cantidad_usuarios = len(self.usuarios_dato)
@@ -195,7 +196,7 @@ class FrameRoles(ctk.CTkFrame):
                     text_color = "#fff",
                     border_width = 2,
                     border_color =  "#444857",
-                    command=lambda rol=var_role, user_id=dic_user['id']: self.asignar_rol(rol,user_id),
+                    command=lambda rol=var_role, user_id=dic_user: self.asignar_rol(rol,user_id),
                     state=state_asignar 
                     
                 )
@@ -233,12 +234,27 @@ class FrameRoles(ctk.CTkFrame):
         label.pack(padx=10, pady=5)
         return celda
     
-    def asignar_rol(self,var_role, user_id):
+    def asignar_rol(self,var_role, user):
         """
         Asigna un rol a un usuario seleccionado.
         """
-        
-        if self.controller_user.register_rol(var_role.get(), user_id):
+        rol_a_asignar = var_role.get()
+
+        if rol_a_asignar.lower() == "coord_pnf":
+            id_docente = self.controller_docente.modelo_docente.obtener_id_docente(user["persona_id"])
+            if not id_docente:
+                messagebox.showerror("Error de Asignación", "Este usuario no es un docente, por lo tanto no puede ser coordinador.")
+                return
+
+            es_coordinador = self.controller_user.user_model.user_is_coord(id_docente)
+            print(es_coordinador)
+            print(id_docente)
+            print(user)
+            if not es_coordinador:
+                messagebox.showerror("Error de Asignación", "El docente no está registrado como coordinador de ningún P.N.F.")
+                return
+
+        if self.controller_user.register_rol(rol_a_asignar, user["id"]):
             messagebox.showinfo("Éxito", "Rol asignado correctamente.")
             self.mostrar_pagina()
         else:
