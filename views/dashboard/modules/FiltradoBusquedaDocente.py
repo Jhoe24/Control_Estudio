@@ -39,7 +39,6 @@ class FiltradoBusquedaFrame(SectionFrameBase):
         
         tipo_documento = self.tipo_documento_var.get()
         nro_documento = self.nro_documento_entry.get()
-        print(f"tipo de documeto {tipo_documento} : documento de identidad {nro_documento}")
         dic_docente=self.controlador.buscar_estudiante(tipo_documento, nro_documento)
         if dic_docente:
             self.master.mostrar_resultado_busqueda([dic_docente])

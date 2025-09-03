@@ -192,7 +192,6 @@ class EstudianteController:
             vista_formulario.datos_personales_frame.lugar_nac_entry,
             vista_formulario.datos_personales_frame.correo_electronico_entry,
             vista_formulario.informacion_academica_frame.institucion_entry,
-            vista_formulario.informacion_academica_frame.promedio_entry,
             vista_formulario.sistema_ingreso_frame.codigo_entry,
             vista_formulario.sistema_ingreso_frame.anio_entry,
             vista_formulario.datos_ubicacion_frame.estado_entry,
@@ -256,3 +255,6 @@ class EstudianteController:
     def obtener_seccion_id_por_pnf_periodoAcademico_y_docente(self, tupla): #tupla =(pnf, periodo_academico, docente_id)
         
         return self.modelo.obtener_seccion_id_por_pnf_periodoAcademico_y_docente(tupla)
+    
+    def obtener_listado_notas_estudiantes(self, estudiante_id):
+        return self.modelo.obtener_listado_notas_estudiantes(estudiante_id)

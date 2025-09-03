@@ -1,21 +1,87 @@
 import customtkinter as ctk
 import tkinter as tk
 from views.dashboard.components.widget_utils import *
-from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
+from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from views.dashboard.modules.forms.Carga_notas.form_nota_estudiante import FrameNotaEstudiante
 from pprint import pprint
 
-class ListadosEstudiantesPNF(ListarUC):
-    def __init__(self, master,controlladores,tuplas_datos, user = None, rol = None):
-        super().__init__(master=master,controller=controlladores,tupla_datos=tuplas_datos,username=user,user_role=rol)
-
-        self.controller_estudiante = controlladores["Periodos"]
-        self.controller_estudiantes_inscritos = controlladores["Estudiantes"]
-
-        self.user_role
-
-        self.tuplas_datos = tuplas_datos
+# UC   Profesor   Periodo Academico   Nota 
+class ListadosEstudiantesNotas(ctk.CTkFrame):
+    def __init__(self, master, controllers, user):
+        super().__init__(master, fg_color=COLOR_FONDO_FORMULARIO)
+        ctk.CTkLabel(self, text="Consulta de Notas", font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).grid(row=0, column=0, pady= 0, padx=0, columnspan=5, sticky="ew")
+        self.controller_user = controllers["Usuario"]
+        self.controller_estudiantes = controllers["Estudiantes"]
+        persona_id = self.controller_user.obtener_persona_id(user)
         
+        if persona_id:
+            self.estudiante_id = self.controller_estudiantes.modelo.obtener_estudiante_id(persona_id)
+            if self.estudiante_id:
+                self.listado_notas = self.controller_estudiantes.obtener_listado_notas_estudiantes(self.estudiante_id)
+
+                self.pagina_actual = 1
+                self.uc_por_pagina = 11
+                self.total_paginas = (len(self.listado_notas) + self.uc_por_pagina - 1) // self.uc_por_pagina
+
+                # lista de UC a mostrar en la página inicial
+                self.paginas_mostrar = self.listado_notas[:self.uc_por_pagina]
+                self.posicion_actual = len(self.paginas_mostrar)
+
+                # variables para manejar botones dinámicos de cada fila
+                self.button_uc = None
+                self.frame_uc = None
+
+                self.fila_datos = []
+
+                headers = ["Unidad Curricular", "Trayecto","Profesor", "Periodo Académico", "Nota"]
+                for col, header in enumerate(headers):
+                    # cada encabezado está dentro de un CTkFrame con fondo gris
+                    celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)
+                    celda.grid(row=1, column=col, padx=1, pady=1, sticky="nsew")
+                    label = ctk.CTkLabel(celda, text=header, font=ctk.CTkFont(weight="bold"), text_color="#222")
+                    label.pack(padx=10, pady=5)
+                for i in range(len(headers)):
+                    self.grid_columnconfigure(i, weight=1)
+
+
+                # Frame de paginación
+                self.frame_paginacion = ctk.CTkFrame(self, fg_color="transparent")
+                self.frame_paginacion.grid_columnconfigure(0, weight=1)
+                self.frame_paginacion.grid_columnconfigure(1, weight=0)
+                self.frame_paginacion.grid_columnconfigure(2, weight=0)
+                self.frame_paginacion.grid_columnconfigure(3, weight=0)
+                self.frame_paginacion.grid_columnconfigure(4, weight=1)
+                # mostrar o esconder paginación según cantidad de UC
+                if len(self.listado_notas) <= self.uc_por_pagina:
+                    self.frame_paginacion.grid_remove()
+                else:
+                    self.frame_paginacion.grid()
+            
+                # Botones de paginación
+                self.boton_anterior = ctk.CTkButton(self.frame_paginacion, text="Anterior", command=self.anterior_pagina)
+                self.label_pagina = ctk.CTkLabel(self.frame_paginacion, text=f"{self.pagina_actual} de {self.total_paginas}", text_color="#222")
+                self.boton_siguiente = ctk.CTkButton(self.frame_paginacion, text="Siguiente", command=self.siguiente_pagina)
+
+                self.boton_anterior.grid(row=0, column=1, padx=(0, 5))
+                self.label_pagina.grid(row=0, column=2, padx=5)
+                self.boton_siguiente.grid(row=0, column=3, padx=(5, 0))
+
+                # Coloca el frame de paginación al final de la tabla
+                fila_paginacion = len(self.paginas_mostrar) + 2
+                self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=5, pady=15, sticky="ew")
+
+                if len(self.listado_notas) <= self.uc_por_pagina:
+                    self.frame_paginacion.grid_remove()
+                else:
+                    self.frame_paginacion.grid()
+
+                # Lista para almacenar las filas de datos
+                self.mostrar_listado()
+            else:
+                ctk.CTkLabel(self, text="No es posible cargar las Notas", font=("Roboto", 16, "bold"), text_color=COLOR_BOTON_FONDO).pack(pady=(10, 20), padx=20, anchor="center")
+        else:
+            ctk.CTkLabel(self, text="No es posible cargar las Notas", font=("Roboto", 16, "bold"), text_color=COLOR_BOTON_FONDO).pack(pady=(10, 20), padx=20, anchor="center")
+            
     def mostrar_listado(self):
         """
         Muestra la lista de UC en la tabla sin tener nada que ver con el filtrado 
@@ -30,29 +96,30 @@ class ListadosEstudiantesPNF(ListarUC):
         self.fila_datos = []
         # se obtienen los datos y me devuelve el diccionario
         #print(self.paginas_mostrar)
-        for fila, dic_uc in enumerate(self.paginas_mostrar, start=2):
+        for fila, dic_notas in enumerate(self.paginas_mostrar, start=2):
             fila_widgets = [
-                self._crear_celda(fila, 0, dic_uc['codigo']),
-                self._crear_celda(fila, 1, dic_uc['nombre']),
-                self._crear_celda(fila, 2, dic_uc['trayecto_id']),
-                self._crear_celda(fila, 3, dic_uc['tramo_id']),
+                self._crear_celda(fila, 0, dic_notas['nombre_unidad_curricular']),
+                self._crear_celda(fila, 1, dic_notas['nombre_trayecto']),
+                self._crear_celda(fila, 2, dic_notas['nombre_docente']),
+                self._crear_celda(fila, 3, dic_notas['periodo_academico']),
+                self._crear_celda(fila, 4, dic_notas['nota']),
             ]
-            celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=6)
-            celda_btn.grid(row=fila, column=4, padx=1, pady=6, sticky="nsew")
+            # celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=6)
+            # celda_btn.grid(row=fila, column=4, padx=1, pady=6, sticky="nsew")
 
-            # Frame interno para centrar los botones
-            frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
-            frame_botones.pack(expand=True)
+            # # Frame interno para centrar los botones
+            # frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
+            # frame_botones.pack(expand=True)
 
-            button = ctk.CTkButton(
-                frame_botones,
-                text="Gestionar Notas",
-                width=100,
-                text_color="#ffffff",
-                fg_color=COLOR_BOTON_FONDO,
-                hover_color=COLOR_BOTON_FONDO_HOVER,
-                command=lambda uc_id = dic_uc["id"]: self.cargar_nota_uc(uc_id)
-            )
+            # button = ctk.CTkButton(
+            #     frame_botones,
+            #     text="Gestionar Notas",
+            #     width=100,
+            #     text_color="#ffffff",
+            #     fg_color=COLOR_BOTON_FONDO,
+            #     hover_color=COLOR_BOTON_FONDO_HOVER,
+            #     command=lambda uc_id = dic_uc["id"]: self.cargar_nota_uc(uc_id)
+            # )
 
             # button_ver_notas = ctk.CTkButton(
             #     frame_botones, text="Ver Notas", width=100,
@@ -61,10 +128,10 @@ class ListadosEstudiantesPNF(ListarUC):
             #     hover_color=COLOR_BOTON_FONDO_HOVER,
             #     command=lambda uc_id = dic_uc["id"]: self.ver_notas_uc(uc_id)
             # )
-            button.pack(side="left", padx=(0,4), pady=5)
+            #button.pack(side="left", padx=(0,4), pady=5)
             #button_ver_notas.pack(side="left", pady=5)
 
-            fila_widgets.append(celda_btn)
+            #fila_widgets.append(celda_btn)
             self.fila_datos.append(fila_widgets)
 
 
@@ -76,7 +143,7 @@ class ListadosEstudiantesPNF(ListarUC):
             self.pagina_actual -= 1
             nuevo_inicio = (self.pagina_actual - 1) * self.uc_por_pagina
             nuevo_fin = nuevo_inicio + self.uc_por_pagina
-            self.paginas_mostrar = self.lista_UC[nuevo_inicio:nuevo_fin]
+            self.paginas_mostrar = self.listado_notas[nuevo_inicio:nuevo_fin]
             self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
             self.mostrar_listado()
         
@@ -88,96 +155,18 @@ class ListadosEstudiantesPNF(ListarUC):
         nuevo_fin = nuevo_inicio + self.uc_por_pagina
         if self.pagina_actual < self.total_paginas:
             self.pagina_actual += 1
-            self.paginas_mostrar = self.lista_UC[nuevo_inicio:nuevo_fin]
+            self.paginas_mostrar = self.listado_notas[nuevo_inicio:nuevo_fin]
             self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
             self.mostrar_listado()
 
         # Se actualiza la tabla
 
-    def cargar_nota_uc(self, unidad_curricular_id):
+    def _crear_celda(self, row, col, texto):
         """
-            Crear una ventana modal para mostrar los datos.
+        Crea una celda de la tabla con el texto dado.
         """
-        top = ctk.CTkToplevel(self, fg_color="White")
-        top.title("Notas de la Unidad Curricular")
-        ancho = 1000
-        alto = 700
-
-        # Centrar ventana
-        top.update_idletasks()
-        screen_width = top.winfo_screenwidth()
-        screen_height = top.winfo_screenheight()
-        x = (screen_width // 2) - (ancho // 2) + 100
-        y = (screen_height // 2) - (alto // 2)
-        top.geometry(f"{ancho}x{alto}+{x}+{y}")
-        top.lift()
-        top.focus_force()
-        top.grab_set()
-        # Configurar el layout de la ventana modal para que el contenido principal se expanda
-        # La primera fila (donde estará el scroll_frame) debe expandirse
-        top.grid_rowconfigure(0, weight=1)
-        # La segunda fila (donde estará el botón) no se expandirá
-        top.grid_rowconfigure(1, weight=0)
-        # La única columna se expandirá para centrar el contenido
-        top.grid_columnconfigure(0, weight=1)
-
-        # Scroll principal del modal
-        scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
-        scroll_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=(10, 0)) # pady(top, bottom)
-
-        
-        #print(unidad_curricular_id)
-        carga_noras_estudiantes = FrameNotaEstudiante(
-            scroll_frame,
-            self.controller_estudiantes_inscritos,
-            self.tuplas_datos,
-            unidad_curricular_id,
-            solo_lectura=False,
-            user_role=self.user_role
-        )
-        carga_noras_estudiantes.pack(fill="x", padx=10, pady=10)
-
-        btn_cerrar = ctk.CTkButton(
-            top,
-            fg_color=COLOR_BOTON_FONDO,
-            hover_color=COLOR_BOTON_FONDO_HOVER,
-            text="Cerrar",
-            width=150,
-            height=40,
-            command=top.destroy
-        )
-        btn_cerrar.grid(row=1, column=0, pady=(10, 20), sticky="s")
-
-    def ver_notas_uc(self, unidad_curricular_id):
-        """
-        Crear una ventana modal para mostrar las notas de los estudiantes en modo solo lectura.
-        """
-        top = ctk.CTkToplevel(self, fg_color="White")
-        top.title("Ver Notas de la Unidad Curricular")
-        ancho = 1000
-        alto = 700
-
-        # Centrar ventana
-        top.update_idletasks()
-        screen_width = top.winfo_screenwidth()
-        screen_height = top.winfo_screenheight()
-        x = (screen_width // 2) - (ancho // 2) + 100
-        y = (screen_height // 2) - (alto // 2)
-        top.geometry(f"{ancho}x{alto}+{x}+{y}")
-        top.lift()
-        top.focus_force()
-        top.grab_set()
-
-        # Scroll principal del modal
-        scroll_frame = ctk.CTkScrollableFrame(top, fg_color="White")
-        scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
-    
-        notas_estudiantes = FrameNotaEstudiante(
-            scroll_frame,
-            self.controller_estudiantes_inscritos,
-            self.tuplas_datos,
-            unidad_curricular_id,
-            solo_lectura=True
-        )
-        notas_estudiantes.pack(fill="x", padx=10, pady=10)
-
+        celda = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
+        celda.grid(row=row, column=col, padx=1, pady=1, sticky="nsew")
+        label = ctk.CTkLabel(celda, text=texto, text_color="#222")
+        label.pack(padx=10, pady=5)
+        return celda

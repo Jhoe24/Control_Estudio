@@ -144,7 +144,6 @@ class BaseDashboardView(BaseView):
         elif self.user_role.lower() == "estudiante":
             menu_items = [
                 ("Inicio", "home_icon", self.inicio, False),
-                ("Mi Perfil", "estudiantes_icon", self.perfil, False),
                 ("Mis Notas", "carga_notas_icon", self.carga_notas, False),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
                 ("Configuración", "configuracion_icon", self.configuracion, True),

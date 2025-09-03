@@ -3,6 +3,7 @@ import os
 from pprint import pprint
 
 class ModelRegistroEstudiantes:
+
     def guardar_nota(self, inscripcion_id, unidad_curricular_id, valor):
         """
         Guarda o actualiza la nota de un estudiante para una unidad curricular específica.
@@ -107,31 +108,6 @@ class ModelRegistroEstudiantes:
                     numero,
                     1 if idx == 0 else 0  # El primero es principal, los demás secundarios
                 ))
-            
-            # cursor.execute('''
-            #                 INSERT INTO telefonos
-            #                 (persona_id, tipo_telefono, numero, principal)
-            #                 VALUES (?,?,?,?)
-            #                 ''',(
-            #                     persona_id,
-            #                     datos_estudiantes['tipo_telefono_p'],
-            #                     datos_estudiantes['telefono_principal'],
-            #                     1 # true
-            #                 ))
-            
-
-            # cursor.execute('''
-            #                 INSERT INTO telefonos
-            #                 (persona_id, tipo_telefono, numero, principal)
-            #                 VALUES (?,?,?,?)
-            #                 ''',(
-            #                     persona_id,
-            #                     datos_estudiantes['tipo_telefono_s'],
-            #                     datos_estudiantes['telefono_secundario'],
-            #                     0 # false
-            #                 ))
-            
-            # Insertar datos en la tabla de direcciones
 
             cursor.execute('''
                             INSERT INTO direcciones
@@ -461,7 +437,6 @@ class ModelRegistroEstudiantes:
             #                 ))
 
             # Actualizar telefonos: eliminar los existentes y volver a insertar los nuevos
-            print(id)
             cursor.execute('DELETE FROM telefonos WHERE persona_id = ?', (id,))
             telefonos = datos_estudiantes.get('lista_telefonos', [])
             for idx, (tipo, numero) in enumerate(telefonos):
@@ -475,7 +450,6 @@ class ModelRegistroEstudiantes:
                     1 if idx == 0 else 0  # El primero es principal, los demás secundarios
                 ))
 
-            print("id:", id)
             # Actualizar direcciones
             cursor.execute('''
                            UPDATE direcciones
@@ -671,4 +645,112 @@ class ModelRegistroEstudiantes:
         finally:
             if con:
                 con.close()
+
+    def obtener_estudiante_id(self, persona_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+
+            cursor.execute('''
+                            SELECT id FROM estudiantes 
+                            WHERE persona_id = ?
+                            ''',(persona_id,))
+            resultado = cursor.fetchone()
+            if con is not None:
+                con.close()
+            if resultado:
+                return resultado[0]
+            else:
+                return None
         
+        except Exception as e:
+            if con is not None:
+                con.close()
+            print(f"Error al realizar la consulta: {e}") 
+            return False
+
+    def obtener_listado_notas_estudiantes(self, estudiante_id):
+        """Se necesita extraer el nombre de la unidad curriculas, Nombre del docente que dio la unidad curricular,
+        periodo academico en que se curso la unidad curricular y el valor de la nota
+        Tablas a consultar
+
+        1-incripciones: Para obtener el id por medio del estudiante_id
+        2-notas: Obtener unidad_curricular_id y valor por medio de incripcion_id
+        3-docente_uc: Obtener docente_pnf_id y periodo_academico_id por medio de la unidad curricular id
+        4-unidades_curriculares: Obtener el nombre de la uc por medio de la unidad_curricular_id
+        5-docente_sede_pnf: Obtener docente_id por medio de docente_pnf_id
+        6-docentes: Obtener persona_id por medio de docente_id
+        7-informacion personal: Nombre del docente por medio del persona_id
+
+                Obtener todo esto es una lista de diccionarios 
+        """
+    
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = sql.Row  # Para que los resultados se puedan acceder como diccionarios
+            cursor = con.cursor()
+
+            # Nota: Esta consulta sigue la lógica del comentario, pero la refina para
+            # asegurar que se obtenga el docente correcto para la inscripción específica
+            # del estudiante. La lógica es la siguiente:
+            # 1. Se parte de la inscripción del estudiante para saber en qué sección (y por tanto, periodo) cursó.
+            # 2. Se une con las notas de esa inscripción.
+            # 3. Se usa el periodo académico de la sección y la unidad curricular de la nota
+            #    para encontrar la asignación correcta en 'docente_uc'.
+            # 4. A partir de ahí, se obtiene la información del docente.
+            # Esto evita el problema de obtener múltiples docentes si una misma UC
+            # fue impartida por diferentes personas en diferentes periodos.
+
+            query = """
+                SELECT
+                    uc.nombre AS nombre_unidad_curricular, t.nombre AS nombre_trayecto,
+                    ip_docente.nombres || ' ' || ip_docente.apellidos AS nombre_docente,
+                    pa.nombre AS periodo_academico,
+                    n.valor AS nota
+                FROM
+                    inscripciones i
+                JOIN
+                    secciones s ON i.seccion_id = s.id
+                JOIN
+                    periodos_academicos pa ON s.periodo_academico_id = pa.id
+                JOIN
+                    notas n ON i.id = n.inscripcion_id
+                JOIN
+                    unidades_curriculares uc ON n.unidad_curricular_id = uc.id
+                JOIN
+                    trayectos t ON uc.trayecto_id = t.id
+                JOIN
+                    docente_uc duc ON uc.id = duc.unidad_curricular_id AND pa.id = duc.periodo_academico_id
+                JOIN
+                    docente_sede_pnf dsp ON duc.docente_pnf_id = dsp.id
+                JOIN
+                    docentes d ON dsp.docente_id = d.id
+                JOIN
+                    informacion_personal ip_docente ON d.persona_id = ip_docente.id
+                
+                WHERE
+                    i.estudiante_id = ?
+                ORDER BY
+                    pa.id, uc.nombre;
+            """
+            
+            cursor.execute(query, (estudiante_id,))
+            
+            resultados = cursor.fetchall()
+            
+            # Convertir las filas (Row objects) a una lista de diccionarios
+            lista_notas = [dict(fila) for fila in resultados]
+            
+            return lista_notas
+
+        except sql.Error as e:
+            print(f"Error de base de datos al obtener las notas del estudiante: {e}")
+            return [] # Devolver lista vacía en caso de error
+        finally:
+            if con:
+                con.close()
+
+# bd = ModelRegistroEstudiantes()
+# print(bd.obtener_estudiante_id(21))

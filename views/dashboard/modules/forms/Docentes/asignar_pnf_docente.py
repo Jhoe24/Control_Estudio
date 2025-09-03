@@ -76,14 +76,6 @@ class AsignarDocentePNFFrame(SectionFrameBase):
                     ("Observaciones:", crear_entry, {"width":300, "placeholder_text":"Ingrese observaciones", "textvariable": self.var_observaciones}, 1, self, 'observaciones_entry'),
                 ])
 
-                # --- Botón para mostrar UC ---
-                self.btn_uc = ctk.CTkButton(
-                    self,
-                    text="Asignar Unidades Curriculares",
-                    command=self.mostrar_uc_frame
-                )
-                self.btn_uc.pack(pady=(10, 0), padx=10, anchor="w")
-
                 self.instancias_widgets = [
                     self.pnf_menu,
                     self.btn_fecha_asignacion,
@@ -91,7 +83,6 @@ class AsignarDocentePNFFrame(SectionFrameBase):
                     self.check_coordinador,
                     self.check_activo,
                     self.observaciones_entry,
-                    self.btn_uc,
                 ]
 
                 if not self.para_edicion:

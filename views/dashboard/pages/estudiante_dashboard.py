@@ -7,12 +7,12 @@ from views.dashboard.components.label_Bienvenida import LabelBienvenida
 from views.dashboard.components.card import Card, CardDisplay
 
 from views.dashboard.modules.Carga_notas import CargaNotasView
+from views.dashboard.modules.tables.Carga_notas.List_estudiantes_notas import ListadosEstudiantesNotas
+
 #from views.dashboard.modules.Sedes import ListSedesView
 
 from views.dashboard.modules.configuracion import Config_user
 from views.dashboard.modules.configuracion_sistema import Config_system
-
-
 
 class EstudianteDashboardView(BaseDashboardView):
     
@@ -60,7 +60,7 @@ class EstudianteDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
                 
-        carga_notas = CargaNotasView(self.cuerpo_principal, self.controller, user=self.username, rol=self.user_role)
+        carga_notas = ListadosEstudiantesNotas(self.cuerpo_principal, self.controller, user=self.username)
         carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
 
     def configuracion_usuarios(self):
