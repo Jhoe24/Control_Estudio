@@ -80,7 +80,10 @@ class FrameDocente(SectionFrameBase):
         self.dedicacion_menu.configure(state="disabled")
 
         # Configurar estado del docente
-        self.estado_doc_menu.set("Activo" if docente.get('estado_docente') == "Activo" else "Inactivo")
+        from pprint import pprint
+
+        #pprint(docente)
+        self.estado_doc_menu.set("Activo" if docente.get('estado') == "Activo" else "Inactivo")
         self.estado_doc_menu.configure(state="disabled")
 
     # Método para habilitar la edición de los campos sin eliminar el contenido

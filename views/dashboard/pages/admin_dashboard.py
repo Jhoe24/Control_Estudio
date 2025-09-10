@@ -54,20 +54,24 @@ class AdminDashboardView(BaseDashboardView):
             
         ruta = Settings().rutas_iconos.get("faces_icon")
 
+        docentes_activos = self.controller['Docentes'].modelo_docente.contar_docentes_activos()
+        estudiantes_activos = self.controller['Estudiantes'].modelo.contar_estudiantes_activos()
+        pnfs_activos = self.controller['PNF'].modelo.contar_pnf()
+
         # Mostrar bienvenida usando el componente LabelBienvenida
         bienvenida = LabelBienvenida(self.cuerpo_principal)
         bienvenida.pack(fill="x", padx=10, pady=10)
         bienvenida.configurar(
-            titulo="¡Bienvenido al Panel de Control del Administrador!",
-            mensaje="Hay mucho por hacer 🚀\n\nLos datos indican que nuestra universidad está en constante crecimiento.\n¡Gracias por tu gestión!",
+            titulo="Panel de Control del Administrador",
+            mensaje="Desde aquí puedes supervisar y gestionar todos los aspectos del sistema. Los indicadores clave muestran un crecimiento constante. ¡Tu labor es fundamental para el éxito de nuestra institución!",
             icono_path=ruta,
             alineacion="center"
         )
             # Información de las tarjetas
         cards_info1 = [
-            ("Estudiantes Activos", 3241, Settings().rutas_iconos.get("estudiantes_icon", "resources/icons/estudiantes.png")),
-            ("Docentes Activos", 1048, Settings().rutas_iconos.get("docentes_icon", "resources/icons/docentes.png")),
-            ("Cursos Disponibles", 45, None),
+            ("Estudiantes Activos", estudiantes_activos, Settings().rutas_iconos.get("estudiantes_icon", "resources/icons/estudiantes.png")),
+            ("Docentes Activos", docentes_activos, Settings().rutas_iconos.get("docentes_icon", "resources/icons/docentes.png")),
+            ("Cursos Disponibles", pnfs_activos, None),
         ]
         # Crear una CardDisplay
         card_display_frame = ctk.CTkFrame(self.cuerpo_principal, fg_color="transparent")

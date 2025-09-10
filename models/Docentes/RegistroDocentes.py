@@ -138,14 +138,14 @@ class ModeloDocente:
             #Extraer de la tabla informacion personal y esrudiantes
             if pnf_id:
                 cursor.execute('''
-                               SELECT ip.*, e.*
+                               SELECT ip.*, e.id as docente_id, e.persona_id, e.abreviatura_titulo, e.especialidad, e.fecha_ingreso, e.fecha_ingreso_uptrjf, e.tipo_contrato, e.categoria, e.auxiliar, e.dedicacion, e.estado as estado_docente
                                FROM informacion_personal ip
                                JOIN docentes e ON ip.id = e.persona_id
                                JOIN docente_sede_pnf dsp ON e.id = dsp.docente_id
                                WHERE ip.tipo='docente' AND dsp.pnf_id = ?
                                LIMIT 13
                                OFFSET ?
-                               ''',(pnf_id, registro_inicio))
+                               ''', (pnf_id, registro_inicio))
             else:   
                 cursor.execute('''
                             SELECT ip.*, e.*
@@ -247,12 +247,12 @@ class ModeloDocente:
                 ]
                 
                 direccion_info = direcciones_dict.get(persona_id, {})
-                estudiante['estado'] = direccion_info.get('estado', '')
+                estudiante['estado_direccion'] = direccion_info.get('estado', '')
                 estudiante['municipio'] = direccion_info.get('municipio', '')
                 estudiante['parroquia'] = direccion_info.get('parroquia', '')
                 estudiante['sector'] = direccion_info.get('sector', '')
                 estudiante['calle'] = direccion_info.get('calle', '')
-                estudiante['casa_apart'] = direccion_info.get('casa_edificio', '')
+                estudiante['casa_apart'] = direccion_info.get('casa_edificio', '') # Aquí estaba el error
                 estudiante['tipo_direccion'] = direccion_info.get('tipo_direccion', '')
                     
                 
@@ -301,7 +301,7 @@ class ModeloDocente:
             # Buscar estudiante
             if id_pnf:
                 cursor.execute('''
-                    SELECT ip.*, e.*, dsp.pnf_id
+                    SELECT ip.*, e.id as docente_id, e.persona_id, e.abreviatura_titulo, e.especialidad, e.fecha_ingreso, e.fecha_ingreso_uptrjf, e.tipo_contrato, e.categoria, e.auxiliar, e.dedicacion, e.estado as estado_docente, dsp.pnf_id
                     FROM informacion_personal ip
                     JOIN docentes e ON ip.id= e.persona_id
                     JOIN docente_sede_pnf dsp ON e.id = dsp.docente_id
@@ -346,7 +346,7 @@ class ModeloDocente:
             dir_row = cursor.fetchone()
 
             if dir_row:
-                docentes['estado'] = dir_row[0]
+                docentes['estado_direccion'] = dir_row[0]
                 docentes['municipio'] = dir_row[1]
                 docentes['parroquia'] = dir_row[2]
                 docentes['sector'] = dir_row[3]
@@ -354,7 +354,7 @@ class ModeloDocente:
                 docentes['casa_apart'] = dir_row[5]
                 docentes['tipo_direccion'] = dir_row[6]
             else:
-                docentes['estado'] = ''
+                docentes['estado_direccion'] = ''
                 docentes['municipio'] = ''
                 docentes['parroquia'] = ''
                 docentes['sector'] = ''
@@ -474,6 +474,7 @@ class ModeloDocente:
                            ))
 
             # Actualizar datos en la tabla estudiantes
+            print( datos_docentes['estado_doc'])
             cursor.execute('''
                            UPDATE docentes
                            SET abreviatura_titulo = ?, especialidad = ?, fecha_ingreso = ?, tipo_contrato = ?, categoria = ?, auxiliar = ?, dedicacion = ?, estado = ?
@@ -481,7 +482,7 @@ class ModeloDocente:
                            ''', (
                             datos_docentes['abreviatura_titulo'],
                             datos_docentes['especialidad'],
-                            datos_docentes['fecha_ingreso'],
+                            datos_docentes['fecha_ingreso_uptrjf'],
                             datos_docentes['tipo_contrato'],
                             datos_docentes['categoria'],
                             datos_docentes['auxiliar'],
@@ -600,6 +601,30 @@ class ModeloDocente:
                 con.close()
             print(f"Error al realizar la consulta: {e}") 
             return False
+        
+    def contar_docentes_activos(self):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+
+            cursor.execute('''
+                            SELECT COUNT(*) FROM docentes 
+                            WHERE estado = 'Activo'
+                            ''')
+            resultado = cursor.fetchone()
+            if con is not None:
+                con.close()
+            if resultado and resultado[0] is not None:
+                return resultado[0]
+            else:
+                return 0
+        except Exception as e:
+            print(f"Error al realizar la consulta: {e}") 
+            return 0
+        finally:
+            if con is not None:
+                con.close()
         
                            
     # def obtener_campo(self, table, columna, value):

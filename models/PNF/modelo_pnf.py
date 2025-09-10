@@ -1043,6 +1043,21 @@ class ModeloPNF:
         finally:
             if con is not None:
                 con.close()
+    
+    def contar_pnf(self):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("SELECT COUNT(*) FROM pnf")
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else 0
+        except Exception as e:
+            print(f"Error al contar los PNF: {e}")
+            return 0
+        finally:
+            if con is not None:
+                con.close()
 
 
 

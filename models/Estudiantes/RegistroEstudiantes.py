@@ -223,7 +223,7 @@ class ModelRegistroEstudiantes:
                 ]
                 
                 direccion_info = direcciones_dict.get(persona_id, {})
-                estudiante['estado'] = direccion_info.get('estado', '')
+                estudiante['estado_direccion'] = direccion_info.get('estado', '')
                 estudiante['municipio'] = direccion_info.get('municipio', '')
                 estudiante['parroquia'] = direccion_info.get('parroquia', '')
                 estudiante['sector'] = direccion_info.get('sector', '')
@@ -284,7 +284,7 @@ class ModelRegistroEstudiantes:
             ''', (persona_id,))
             dir_row = cursor.fetchone()
             if dir_row:
-                estudiante['estado'] = dir_row[0]
+                estudiante['estado_direccion'] = dir_row[0]
                 estudiante['municipio'] = dir_row[1]
                 estudiante['parroquia'] = dir_row[2]
                 estudiante['sector'] = dir_row[3]
@@ -292,7 +292,7 @@ class ModelRegistroEstudiantes:
                 estudiante['casa_apart'] = dir_row[5]
                 estudiante['tipo_direccion'] = dir_row[6]
             else:
-                estudiante['estado'] = ''
+                estudiante['estado_direccion'] = ''
                 estudiante['municipio'] = ''
                 estudiante['parroquia'] = ''
                 estudiante['sector'] = ''
@@ -752,5 +752,24 @@ class ModelRegistroEstudiantes:
             if con:
                 con.close()
 
+        
+    def contar_estudiantes_activos(self):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute('''
+                            SELECT COUNT(*) FROM estudiantes
+                            WHERE situacion_academica = 'Activo'
+                            ''')
+            resultado = cursor.fetchone()
+            con.close()
+            return resultado[0]
+        except Exception as e:
+            print(f"Error al realizar la consulta: {e}") 
+            return 0
+        finally:
+            if con is not None:
+                con.close()
 # bd = ModelRegistroEstudiantes()
 # print(bd.obtener_estudiante_id(21))

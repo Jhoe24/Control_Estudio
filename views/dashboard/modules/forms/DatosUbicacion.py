@@ -36,8 +36,8 @@ class DatosUbicacionFrame(SectionFrameBase):
 
         #configuaracion de estado
         self.estado_entry.delete(0,ctk.END)
-        if estudiante.get("estado") != "" and estudiante.get("estado") != None:
-            self.estado_entry.insert(0,estudiante.get("estado"))
+        if estudiante.get("estado_direccion") != "" and estudiante.get("estado_direccion") != None:
+            self.estado_entry.insert(0,estudiante.get("estado_direccion"))
         self.estado_entry.configure(state="disabled")
 
         self.municipio_entry.delete(0,ctk.END)

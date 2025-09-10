@@ -144,7 +144,7 @@ class DocenteController:
 
             "abreviatura_titulo": vista_formulario.datos_docente_frame.abreviatura_menu.get(),
             "especialidad": vista_formulario.datos_docente_frame.especialidad_entry.get(),
-            "fecha_ingreso_uptrjf": vista_formulario.datos_docente_frame.fecha_ingreso_entry.get(), #comentarle de esto a andy
+            "fecha_ingreso_uptrjf": vista_formulario.datos_docente_frame.fecha_ingreso_uptrjf.get_date(), #comentarle de esto a andy
             "tipo_contrato": vista_formulario.datos_docente_frame.tipo_contrato_menu.get(),
             "categoria": vista_formulario.datos_docente_frame.categoria_entry.get(),
             "auxiliar": vista_formulario.datos_docente_frame.auxiliar_menu.get(),
