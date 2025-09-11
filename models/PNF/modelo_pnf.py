@@ -862,7 +862,7 @@ class ModeloPNF:
                 con.close()
 
 
-    def obtener_nombres_por_id(self, tabla, id):
+    def obtener_nombres_por_id(self, tabla, id ):
         con = None
         try:
             con = sql.connect(self.db_ruta)
@@ -1059,9 +1059,48 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
+    def contar_uc_por_pnf(self, pnf_id):
+        """Cuenta el número de unidades curriculares para un PNF específico."""
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("SELECT COUNT(*) FROM unidades_curriculares WHERE pnf_id = ?", (pnf_id,))
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else 0
+        except Exception as e:
+            print(f"Error al contar las Unidades Curriculares por PNF: {e}")
+            return 0
+        finally:
+            if con is not None:
+                con.close()
+
+    def obtener_id_por_nombre_y_pnf(self, tabla, nombre, pnf_id):
+        """
+        Obtiene el ID de un registro en una tabla (ej. trayectos, tramos)
+        filtrando por su nombre y el pnf_id asociado.
+        """
+        con = None
+        # Lista blanca de tablas permitidas para evitar inyección SQL
+        tablas_permitidas = ["trayectos", "tramos"]
+        if tabla not in tablas_permitidas:
+            print(f"Error: La tabla '{tabla}' no está permitida para esta consulta.")
+            return None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(f"SELECT id FROM {tabla} WHERE nombre = ? AND pnf_id = ?", (nombre, pnf_id))
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else None
+        except Exception as e:
+            print(f"Error al obtener ID por nombre y PNF: {e}")
+            return None
+        finally:
+            if con:
+                con.close()
 
 
     
-# bd = ModeloPNF()
-# print(bd.obtener_periodos_disponibles())
+bd = ModeloPNF()
+print(bd.obtener_pnf_asignado(11))
 # print(bd.obtener_periodo_id_por_nombre("Segundo Semestre 2025"))

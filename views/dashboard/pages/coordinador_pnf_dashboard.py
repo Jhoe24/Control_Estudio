@@ -41,17 +41,30 @@ class CoordinadorPNFDashboardView(BaseDashboardView):
         # Mostrar bienvenida usando el componente LabelBienvenida
         bienvenida = LabelBienvenida(self.cuerpo_principal)
         bienvenida.pack(fill="x", padx=10, pady=10)
+        
+        pnf_nombre = self.datos_pnf.get("nombre", "PNF") if self.datos_pnf else "PNF"
+
         bienvenida.configurar(
-            titulo="¡Bienvenido al Panel de Control del Coordinador P.N.F.!",
-            mensaje="Hay mucho por hacer 🚀\n\nLos datos indican que nuestra universidad está en constante crecimiento.\n¡Gracias por tu gestión!",
+            titulo=f"Panel de Control del Coordinador de {pnf_nombre}",
+            mensaje=f"¡Tu labor es fundamental para el éxito de nuestros estudiantes!",
             icono_path=ruta,
             alineacion="center"
         )
-            # Información de las tarjetas
+        
+        # --- Obtener datos dinámicos para las tarjetas ---
+        pnf_id = self.datos_pnf.get("id") if self.datos_pnf else None
+        if pnf_id:
+            # NOTA: Estos métodos deben ser creados en sus respectivos modelos/controladores
+            estudiantes_activos = self.controller['Estudiantes'].modelo.contar_estudiantes_activos(pnf_id)
+            docentes_activos = self.controller['Docentes'].modelo_docente.contar_docentes_activos(pnf_id)
+            uc_disponibles = self.controller['PNF'].modelo.contar_uc_por_pnf(pnf_id)
+        else:
+            estudiantes_activos, docentes_activos, uc_disponibles = 0, 0, 0
+
         cards_info1 = [
-            ("Estudiantes Activos", 3241, Settings().rutas_iconos.get("estudiantes_icon", "resources/icons/estudiantes.png")),
-            ("Docentes Activos", 1048, Settings().rutas_iconos.get("docentes_icon", "resources/icons/docentes.png")),
-            ("Cursos Disponibles", 45, None),
+            (f"Estudiantes en {self.datos_pnf.get('nombre_corto', 'PNF')}", estudiantes_activos, Settings().rutas_iconos.get("estudiantes_icon")),
+            (f"Docentes en {self.datos_pnf.get('nombre_corto', 'PNF')}", docentes_activos, Settings().rutas_iconos.get("docentes_icon")),
+            (f"UCs en {self.datos_pnf.get('nombre_corto', 'PNF')}", uc_disponibles, Settings().rutas_iconos.get("uc_icon")),
         ]
         # Crear una CardDisplay
         card_display_frame = ctk.CTkFrame(self.cuerpo_principal, fg_color="transparent")

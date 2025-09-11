@@ -19,6 +19,10 @@ class DocenteDashboardView(BaseDashboardView):
         self.controller = controller
         self.username = username
         self.user_role = user_role
+        
+        # Obtener datos del docente para personalizar el dashboard
+        self.datos_docente = self.controller["Usuario"].obtener_datos_completos_usuario(self.username)
+
         self.inicio()
     
     def inicio(self):
@@ -28,20 +32,30 @@ class DocenteDashboardView(BaseDashboardView):
             
         ruta = Settings().rutas_iconos.get("faces_icon")
 
+        # --- Personalizar bienvenida y obtener datos para las tarjetas ---
+        nombre_docente = self.datos_docente.get("nombres", "") if self.datos_docente else ""
+        docente_id = self.datos_docente.get("docente_id") if self.datos_docente else None
+
+        if docente_id:
+            # NOTA: Estos métodos deben ser creados en sus respectivos modelos
+            uc_asignadas = self.controller['Docentes'].modelo_docente.contar_uc_asignadas_a_docente(docente_id)
+            estudiantes_a_cargo = self.controller['Docentes'].modelo_docente.contar_estudiantes_a_cargo_docente(docente_id)
+        else:
+            uc_asignadas, estudiantes_a_cargo = 0, 0
+
         # Mostrar bienvenida usando el componente LabelBienvenida
         bienvenida = LabelBienvenida(self.cuerpo_principal)
         bienvenida.pack(fill="x", padx=10, pady=10)
         bienvenida.configurar(
-            titulo="¡Bienvenido al Panel de Control del Docente!",
-            mensaje="Hay mucho por hacer 🚀\n\nLos datos indican que nuestra universidad está en constante crecimiento.\n¡Gracias por tu gestión!",
+            titulo=f"¡Bienvenido, Prof. {nombre_docente}!",
+            mensaje="Desde aquí puedes gestionar tus unidades curriculares y cargar las notas de tus estudiantes. ¡Tu labor es esencial para su formación!",
             icono_path=ruta,
             alineacion="center"
         )
             # Información de las tarjetas
         cards_info1 = [
-            ("Estudiantes Activos", 3241, Settings().rutas_iconos.get("estudiantes_icon", "resources/icons/estudiantes.png")),
-            ("Docentes Activos", 1048, Settings().rutas_iconos.get("docentes_icon", "resources/icons/docentes.png")),
-            ("Cursos Disponibles", 45, None),
+            ("UC Asignadas (Periodo Actual)", uc_asignadas, Settings().rutas_iconos.get("uc_icon")),
+            ("Estudiantes a Cargo", estudiantes_a_cargo, Settings().rutas_iconos.get("estudiantes_icon")),
         ]
         # Crear una CardDisplay
         card_display_frame = ctk.CTkFrame(self.cuerpo_principal, fg_color="transparent")

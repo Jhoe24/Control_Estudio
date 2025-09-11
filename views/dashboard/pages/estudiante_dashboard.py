@@ -8,6 +8,7 @@ from views.dashboard.components.card import Card, CardDisplay
 
 from views.dashboard.modules.Carga_notas import CargaNotasView
 from views.dashboard.modules.tables.Carga_notas.List_estudiantes_notas import ListadosEstudiantesNotas
+from views.dashboard.modules.tables.Estudiantes.ListarEstudiantes import ListEstudiantesView
 
 #from views.dashboard.modules.Sedes import ListSedesView
 
@@ -22,40 +23,64 @@ class EstudianteDashboardView(BaseDashboardView):
         self.controller = controller
         self.username = username
         self.user_role = user_role
-        
+
+        # Obtener datos completos del usuario/estudiante
+        self.datos_estudiante = self.controller["Usuario"].obtener_datos_completos_usuario(self.username)
+
         self.inicio()
     
     def inicio(self):
         # Limpiar el cuerpo principal
         for widget in self.cuerpo_principal.winfo_children():
             widget.destroy()
-            
+
         ruta = Settings().rutas_iconos.get("faces_icon")
+
+        # --- Personalizar bienvenida y obtener datos para las tarjetas ---
+        nombre_estudiante = self.datos_estudiante.get("nombres", "") if self.datos_estudiante else ""
+        estudiante_id = self.datos_estudiante.get("estudiante_id") if self.datos_estudiante else None
+
+        if estudiante_id:
+            # Obtener datos de las tarjetas            
+            datos_pnf_asignado = self.controller['PNF'].modelo.obtener_pnf_asignado(estudiante_id)
+
+            promedio = datos_pnf_asignado.get("promedio_general", 0.0) if datos_pnf_asignado else 0.0
+            # Obtener el nombre del trayecto directamente, ya que se guarda como texto
+            nombre_trayecto = datos_pnf_asignado.get("trayecto_actual", "N/A") if datos_pnf_asignado else "N/A"
+            
+            # Obtener el ID del trayecto usando el nombre y el pnf_id
+            pnf_id = datos_pnf_asignado.get("pnf_id") if datos_pnf_asignado else None
+            trayecto_id = self.controller['PNF'].modelo.obtener_id_por_nombre_y_pnf("trayectos", nombre_trayecto, pnf_id) if pnf_id else None
+
+            # Llamar al método corregido que ahora sabe cómo manejar el nombre del trayecto
+            uc_inscritas = self.controller['Estudiantes'].modelo.contar_uc_inscritas_estudiante(trayecto_id) if trayecto_id else 0
+        else:
+            uc_inscritas, promedio, nombre_trayecto = 0, 0.0, "N/A"
 
         # Mostrar bienvenida usando el componente LabelBienvenida
         bienvenida = LabelBienvenida(self.cuerpo_principal)
         bienvenida.pack(fill="x", padx=10, pady=10)
         bienvenida.configurar(
-            titulo="¡Bienvenido al Panel de Control del Estudiante!",
-            mensaje="Hay mucho por hacer 🚀\n\nLos datos indican que nuestra universidad está en constante crecimiento.\n¡Gracias por tu gestión!",
+            titulo=f"¡Bienvenido, {nombre_estudiante}!",
+            mensaje="Aquí puedes consultar tus notas, ver tu progreso académico y mantenerte al día con tus estudios. ¡Sigue adelante!",
             icono_path=ruta,
             alineacion="center"
         )
             # Información de las tarjetas
         cards_info1 = [
-            ("Estudiantes Activos", 3241, Settings().rutas_iconos.get("estudiantes_icon", "resources/icons/estudiantes.png")),
-            ("Docentes Activos", 1048, Settings().rutas_iconos.get("docentes_icon", "resources/icons/docentes.png")),
-            ("Cursos Disponibles", 45, None),
+            ("UCs Inscritas (Periodo Actual)", uc_inscritas, Settings().rutas_iconos.get("uc_icon")),
+            ("Promedio General", f"{promedio:.2f}", Settings().rutas_iconos.get("notas_icon")),
+            ("Trayecto Actual", nombre_trayecto, Settings().rutas_iconos.get("pnf_icon")),
         ]
         # Crear una CardDisplay
         card_display_frame = ctk.CTkFrame(self.cuerpo_principal, fg_color="transparent")
         card_display_frame.pack(side=ctk.TOP, fill="x", expand=True, pady=20, padx=20)
-        
+
         card_display_frame.grid_columnconfigure(0, weight=1) # Centrar el CardDisplay
 
         card_display = CardDisplay(card_display_frame, cards_info1)
         card_display.grid(row=0, column=0, sticky="nsew")
-    
+
     def carga_notas(self): 
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()

@@ -5,7 +5,10 @@ class UserController:
     def __init__(self):
         self.user_model = UserModel()
         self.rol_model = RolUserModel()
-
+    
+    def obtener_datos_completos_usuario(self, username):
+        return self.user_model.obtener_datos_completos_usuario(username)
+        
     def obtener_rol(self, user_id):
         return self.rol_model.obtener_rol(user_id)
 

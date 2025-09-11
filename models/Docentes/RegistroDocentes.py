@@ -602,16 +602,23 @@ class ModeloDocente:
             print(f"Error al realizar la consulta: {e}") 
             return False
         
-    def contar_docentes_activos(self):
+    def contar_docentes_activos(self, id_pnf = None):
         con = None
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
-
-            cursor.execute('''
-                            SELECT COUNT(*) FROM docentes 
-                            WHERE estado = 'Activo'
-                            ''')
+            if id_pnf:
+                cursor.execute('''
+                                SELECT COUNT(*) 
+                                FROM docentes d
+                                JOIN docente_sede_pnf dsp ON d.id = dsp.docente_id
+                                WHERE d.estado = 'Activo' AND dsp.pnf_id = ? AND dsp.activo = 1
+                               ''',(id_pnf,))
+            else:
+                cursor.execute('''
+                                SELECT COUNT(*) FROM docentes 
+                                WHERE estado = 'Activo'
+                                ''')
             resultado = cursor.fetchone()
             if con is not None:
                 con.close()
@@ -626,6 +633,68 @@ class ModeloDocente:
             if con is not None:
                 con.close()
         
+    def contar_uc_asignadas_a_docente(self, docente_id):
+        """
+        Cuenta las Unidades Curriculares asignadas a un docente en el período académico activo.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            # Asume que el período más reciente con estado 'en_curso' o 'inscripcion' es el actual
+            cursor.execute("""
+                SELECT COUNT(DISTINCT duc.unidad_curricular_id)
+                FROM docente_uc duc
+                JOIN docente_sede_pnf dsp ON duc.docente_pnf_id = dsp.id
+                JOIN periodos_academicos pa ON duc.periodo_academico_id = pa.id
+                WHERE dsp.docente_id = ?
+                AND duc.activo = 1
+                AND pa.estado IN ('en_curso', 'inscripcion', 'planificacion')
+            """, (docente_id,))
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else 0
+        except Exception as e:
+            print(f"Error al contar UC asignadas al docente: {e}")
+            return 0
+        finally:
+            if con:
+                con.close()
+
+    def contar_estudiantes_a_cargo_docente(self, docente_id):
+        """
+        Cuenta el número total de estudiantes únicos que un docente tiene a su cargo
+        en el período académico activo.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            # La consulta cuenta estudiantes únicos inscritos en las secciones que imparte el docente en el período activo.
+            cursor.execute("""
+                SELECT COUNT(DISTINCT i.estudiante_id)
+                FROM docente_uc duc
+                JOIN docente_sede_pnf dsp ON duc.docente_pnf_id = dsp.id
+                JOIN unidades_curriculares uc ON duc.unidad_curricular_id = uc.id
+                JOIN periodos_academicos pa ON duc.periodo_academico_id = pa.id
+                JOIN secciones s ON pa.id = s.periodo_academico_id 
+                                 AND uc.pnf_id = s.pnf_id
+                                 AND uc.trayecto_id = s.trayecto_id AND uc.tramo_id = s.tramo_id
+                JOIN inscripciones i ON s.id = i.seccion_id
+                WHERE dsp.docente_id = ?
+                AND duc.activo = 1
+                AND pa.estado IN ('en_curso', 'inscripcion', 'planificacion')
+            """, (docente_id,))
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else 0
+        except Exception as e:
+            print(f"Error al contar estudiantes a cargo del docente: {e}")
+            return 0
+        finally:
+            if con:
+                con.close()
+
+
+
                            
     # def obtener_campo(self, table, columna, value):
     #     try:
@@ -646,3 +715,4 @@ class ModeloDocente:
     #         return False
         
               
+print(ModeloDocente().contar_estudiantes_a_cargo_docente(2))

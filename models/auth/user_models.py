@@ -7,6 +7,46 @@ class UserModel:
     
     def __init__(self):
         self.db_ruta = os.path.join('db', 'sistema_academico.db')
+
+    def obtener_datos_completos_usuario(self,username):
+        """
+        Obtiene un diccionario con los datos completos de un usuario (personal, rol, etc.)
+        a partir de su nombre de usuario.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            # Configurar para que devuelva diccionarios en lugar de tuplas
+            con.row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+            cursor = con.cursor()
+            cursor.execute("""
+                SELECT
+                    u.id as user_id,
+                    u.persona_id,
+                    ip.nombres,
+                    ip.apellidos,
+                    ip.tipo,
+                    d.id as docente_id,
+                    e.id as estudiante_id
+                FROM
+                    usuarios u
+                JOIN
+                    informacion_personal ip ON u.persona_id = ip.id
+                LEFT JOIN
+                    docentes d ON ip.id = d.persona_id
+                LEFT JOIN
+                    estudiantes e ON ip.id = e.persona_id
+                WHERE
+                    u.nombre_usuario = ?
+            """, (username,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error al obtener los datos completos del usuario: {e}")
+            return None
+        finally:
+            if con:
+                con.close()
+
     
     def obtener_tipo_user(self,id):
         con = None
@@ -307,4 +347,4 @@ class UserModel:
         finally:
             if con is not None:
                 con.close()
-#print(UserModel().the_user_is_blocked(3))
+

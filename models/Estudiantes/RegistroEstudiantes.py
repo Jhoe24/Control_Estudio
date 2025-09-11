@@ -753,15 +753,23 @@ class ModelRegistroEstudiantes:
                 con.close()
 
         
-    def contar_estudiantes_activos(self):
+    def contar_estudiantes_activos(self, id_pnf= None):
         con = None
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
-            cursor.execute('''
-                            SELECT COUNT(*) FROM estudiantes
-                            WHERE situacion_academica = 'Activo'
-                            ''')
+            if id_pnf:
+                cursor.execute('''
+                                SELECT COUNT(*) FROM estudiantes e
+                                JOIN estudiante_pnf ep ON e.id = ep.estudiante_id
+                                WHERE situacion_academica = 'Activo' AND ep.pnf_id = ? AND ep.estado = 'Activo'
+                                ''',(id_pnf,))
+                          
+            else:
+                cursor.execute('''
+                                SELECT COUNT(*) FROM estudiantes
+                                WHERE situacion_academica = 'Activo'
+                                ''')
             resultado = cursor.fetchone()
             con.close()
             return resultado[0]
@@ -771,5 +779,26 @@ class ModelRegistroEstudiantes:
         finally:
             if con is not None:
                 con.close()
-# bd = ModelRegistroEstudiantes()
+    def contar_uc_inscritas_estudiante(self, trayecto_id):
+        """
+        Cuenta todas las Unidades Curriculares que pertenecen a un trayecto específico.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("""
+                SELECT COUNT(*) FROM unidades_curriculares
+                WHERE trayecto_id = ?
+            """, (trayecto_id,))
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else 0
+        except Exception as e:
+            print(f"Error al contar UC por trayecto: {e}")
+            return 0
+        finally:
+            if con:
+                con.close()
+
+print(ModelRegistroEstudiantes().contar_uc_inscritas_estudiante(21))
 # print(bd.obtener_estudiante_id(21))
