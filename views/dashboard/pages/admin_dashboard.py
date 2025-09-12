@@ -63,7 +63,7 @@ class AdminDashboardView(BaseDashboardView):
         bienvenida.pack(fill="x", padx=10, pady=10)
         bienvenida.configurar(
             titulo="Panel de Control del Administrador",
-            mensaje="Desde aquí puedes supervisar y gestionar todos los aspectos del sistema. Los indicadores clave muestran un crecimiento constante. ¡Tu labor es fundamental para el éxito de nuestra institución!",
+            mensaje="Desde aquí puedes supervisar y gestionar todos los aspectos del sistema. Los indicadores clave muestran un crecimiento constante.\n¡Tu labor es fundamental para el éxito de nuestra institución!",
             icono_path=ruta,
             alineacion="center"
         )

@@ -187,17 +187,21 @@ class ListEstudiantesView(ctk.CTkFrame):
             )
             # averiguar si el estudiante tiene un PNF asignado
             if not self.controller_pnf.modelo.tiene_pnf_asignado(estudiante['id']):
-                text = "Asignar PNF"
+                text = "Inscripcion"
                 callback = lambda est=estudiante: self.cargar_pnf(est)
+                var_color = COLOR_BOTON_FONDO
+                hover_color = COLOR_BOTON_FONDO_HOVER
             else:
                 text = "Ver PNF"
                 callback = lambda est=estudiante: self.cargar_pnf(est,para_edicion=True)
+                var_color = COLOR_HEADER_SECCION_BG_2
+                hover_color = COLOR_BOTON_SECUNDARIO_HOVER
 
             btn_pnf = ctk.CTkButton(
                 frame_botones, text=text, width=100,
                 text_color="#ffffff",
-                fg_color=COLOR_BOTON_FONDO,
-                hover_color=COLOR_BOTON_FONDO_HOVER,
+                fg_color=var_color,
+                hover_color=hover_color,
                 command=callback
             )
 

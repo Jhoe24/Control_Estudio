@@ -59,7 +59,7 @@ class CoordinadorDashboardView(BaseDashboardView):
         bienvenida.pack(fill="x", padx=10, pady=10)
         bienvenida.configurar(
             titulo="Panel de Control del Coordinador General",
-            mensaje="Tu rol es clave para el éxito académico. Revisa el progreso de los estudiantes, gestiona las asignaciones de los docentes y asegúrate de que los programas se desarrollen sin contratiempos. ¡Comencemos a construir el futuro!",
+            mensaje="Tu rol es clave para el éxito académico. Revisa el progreso de los estudiantes, gestiona las asignaciones de los docentes \ny asegúrate de que los programas se desarrollen sin contratiempos. ¡Comencemos a construir el futuro!",
             icono_path=ruta,
             alineacion="center"
         )

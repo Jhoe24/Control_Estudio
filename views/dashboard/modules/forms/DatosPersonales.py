@@ -6,7 +6,7 @@ from views.dashboard.components.caendario import CTKFecha
 
 class DatosPersonalesFrame(SectionFrameBase):
 
-    def __init__(self, master, vcmd_num, vcmd_fecha):
+    def __init__(self, master, vcmd_num, vcmd_fecha, set_contactos = True):
         super().__init__(master, header_text="Datos Personales")
 
         self.tipo_documento_var = ctk.StringVar(value="cedula") # Valor por defecto: Cédula
@@ -70,10 +70,13 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.fecha_ingreso = CTKFecha(self, "Fecha de Ingreso")
         self.fecha_ingreso.pack(fill="x", pady=PADY_FILA, padx=15)
 
+        if set_contactos:
         # --- Fila para correo electronico ---
-        self._crear_fila_widgets([
-            ("Correo Electrónico:", crear_entry, {"width":300}, 1, self, 'correo_electronico_entry')
-        ])
+            self._crear_fila_widgets([
+                ("Correo Electrónico:", crear_entry, {"width":300}, 1, self, 'correo_electronico_entry')
+            ])
+        else:
+            self.correo_electronico_entry=None
 
         # --- Apartado dinámico de Teléfonos ---
         self.frame_telefonos = ctk.CTkFrame(self, fg_color="transparent")
@@ -192,7 +195,7 @@ class DatosPersonalesFrame(SectionFrameBase):
 
     
 
-    def set_datos(self, estudiante, nro_doc = None):
+    def set_datos(self, estudiante, nro_doc = None, set_contactos = True):
         """
         Carga los datos del estudiante en los campos y deshabilita la edición.
         Adapta los campos fijos de teléfono a la vista dinámica.
@@ -268,29 +271,34 @@ class DatosPersonalesFrame(SectionFrameBase):
             if fecha_ingreso is not None and fecha_ingreso != '':
                 self.fecha_ingreso.set_date(str(fecha_ingreso))
 
-        #Configuracion correo electronico - CORREGIDO
-        self.correo_electronico_entry.configure(state="normal")  # Asegurar que esté habilitado
-        self.correo_electronico_entry.delete(0, ctk.END)
-        correo = estudiante.get('correo_electronico', '')
-        if correo:  # Solo insertar si hay contenido
-            self.correo_electronico_entry.insert(0, correo)
-        self.correo_electronico_entry.configure(state="disabled")
+        if set_contactos:
+            #Configuracion correo electronico - CORREGIDO
+            self.correo_electronico_entry.configure(state="normal")  # Asegurar que esté habilitado
+            self.correo_electronico_entry.delete(0, ctk.END)
+            correo = estudiante.get('correo_electronico', '')
+            if correo:  # Solo insertar si hay contenido
+                self.correo_electronico_entry.insert(0, correo)
+            self.correo_electronico_entry.configure(state="disabled")
 
-        # --- Teléfonos dinámicos: mostrar todos los guardados ---
-        self.limpiar_telefonos()
-        telefonos = estudiante.get('telefonos', [])
-        for telefono in telefonos:
-            print(telefono)
-            self.agregar_telefono(telefono)
-            fila, _, tipo_menu, entry_num = self.telefono_widgets[-1]
-            tipo_menu.configure(state="disabled")
-            entry_num.configure(state="disabled")
+            # --- Teléfonos dinámicos: mostrar todos los guardados ---
+            self.limpiar_telefonos()
+            telefonos = estudiante.get('telefonos', [])
+            for telefono in telefonos:
+                print(telefono)
+                self.agregar_telefono(telefono)
+                fila, _, tipo_menu, entry_num = self.telefono_widgets[-1]
+                tipo_menu.configure(state="disabled")
+                entry_num.configure(state="disabled")
 
-            for widget in fila.winfo_children():
-                if isinstance(widget, ctk.CTkButton) and widget.cget("text") == "Eliminar":
-                    widget.configure(state="disabled")
-        # Deshabilita el botón agregar teléfono en modo solo lectura
-        self.btn_agregar_telefono.configure(state="disabled")
+                for widget in fila.winfo_children():
+                    if isinstance(widget, ctk.CTkButton) and widget.cget("text") == "Eliminar":
+                        widget.configure(state="disabled")
+            # Deshabilita el botón agregar teléfono en modo solo lectura
+            self.btn_agregar_telefono.configure(state="disabled")
+        else:
+            if self.correo_electronico_entry:
+                self.correo_electronico_entry.pack_forget()
+            self.btn_agregar_telefono.pack_forget()
         
 
     #metodo para habilitar la edicion de los campos sin eliminar el contenido
@@ -302,7 +310,8 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.edo_civil_menu.configure(state="normal")
         self.nacionalidad_menu.configure(state="normal")
         self.lugar_nac_entry.configure(state="normal")
-        self.correo_electronico_entry.configure(state="normal")
+        if self.correo_electronico_entry:
+            self.correo_electronico_entry.configure(state="normal")
         
 
         self.btn_agregar_telefono.configure(state="normal")    

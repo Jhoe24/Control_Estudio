@@ -134,3 +134,15 @@ def solo_decimal(new_text):
             return True
         else:
             return False
+
+
+def solo_numeros(new_text):
+        if new_text == "":  # Permite borrar el contenido del entry
+                return True
+        
+        pattern = r"^\d+$"
+            
+        if re.fullmatch(pattern, new_text):
+            return True
+        else:
+            return False

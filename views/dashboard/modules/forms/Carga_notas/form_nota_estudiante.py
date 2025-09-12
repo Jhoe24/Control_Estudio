@@ -67,7 +67,7 @@ class FrameNotaEstudiante(SectionFrameBase):
             celda_nota = ctk.CTkFrame(self.frame_tabla, fg_color="#f5f5f5", corner_radius=4)
             celda_nota.grid(row=i, column=3, padx=1, pady=1, sticky="nsew")
 
-            vcmd = self.register(solo_decimal)
+            vcmd = self.register(solo_numeros)
             entry_nota = ctk.CTkEntry(
                 celda_nota, width=80, fg_color=COLOR_ENTRY_BG,
                 text_color=COLOR_TEXTO_PRINCIPAL, font=FUENTE_LABEL_CAMPO,
@@ -82,7 +82,8 @@ class FrameNotaEstudiante(SectionFrameBase):
             state_guardar = "normal"
 
             if valor:
-                entry_nota.insert(0, valor)
+                text_valor  = int(valor)
+                entry_nota.insert(0, str(text_valor))
                 entry_nota.configure(state="disabled", border_color=COLOR_HEADER_SECCION_BG_2)
                 state_actualizar = "normal"
                 state_guardar = "disabled"

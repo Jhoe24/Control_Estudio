@@ -7,6 +7,7 @@ import platform
 
 from views.dashboard.components.widget_utils import *
 from views.auth.Roles.ListadoRolesUser import FrameRoles
+from views.dashboard.modules.forms.DatosContactos import DatosContactosFrame
 from views.dashboard.modules.forms.DatosPersonales import DatosPersonalesFrame
 from views.dashboard.modules.forms.DatosUbicacion import DatosUbicacionFrame
 
@@ -60,7 +61,7 @@ class Config_user(ctk.CTkScrollableFrame):
 
         self.btn_datos = ctk.CTkOptionMenu(
             self.button_frame, 
-            values=["Cambiar datos personales", "Cambiar Direccion"],
+            values=["Cambiar datos personales", "Cambiar Direccion", "Cambiar Contactos"],
             #command=self.mostrar_cambiar_datos_personales,
             button_color = "#23272f",
             dropdown_fg_color = "#ffffff",
@@ -167,18 +168,13 @@ class Config_user(ctk.CTkScrollableFrame):
         datos = self.controller["Usuario"].obtener_datos_personales(self.persona_id)
         nro_doc = datos.get("documento_identidad")
         if new_value == "Cambiar datos personales":
-            self.frame_datos_personales = DatosPersonalesFrame(self.contenido_frame,None,None)
+            self.frame_datos_personales = DatosPersonalesFrame(self.contenido_frame,None,None,set_contactos=False)
             self.frame_datos_personales.pack(fill="both", expand=True)
-            self.frame_datos_personales.set_datos(datos,nro_doc)
+            self.frame_datos_personales.set_datos(datos,nro_doc,set_contactos=False)
             self.frame_datos_personales.nro_documento_entry.configure(state="normal")
             self.frame_datos_personales.nro_documento_entry.insert(0,nro_doc)
             self.frame_datos_personales.habilitar_edicion()
             self.frame_datos_personales.nro_documento_entry.configure(state="disabled")
-
-            for telefono in datos.get('telefonos', []):
-                print(telefono)
-                self.frame_datos_personales.agregar_telefono(telefono)
-
             command = self.actualizar_datos_personales
 
         elif new_value == "Cambiar Direccion":
@@ -187,6 +183,12 @@ class Config_user(ctk.CTkScrollableFrame):
             self.frame_datos_ubicacion.set_datos(datos)
             self.frame_datos_ubicacion.habilitar_edicion()
             command = self.actualizar_direccion
+        
+        elif new_value == "Cambiar Contactos":
+            dc= DatosContactosFrame(self.contenido_frame,datos.get('telefonos', []), datos.get('correo_electronico'))
+            dc.pack(fill="both", expand=True)
+            command = print
+
 
 
         btn_actualizar = ctk.CTkButton(
