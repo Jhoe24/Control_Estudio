@@ -1101,6 +1101,3 @@ class ModeloPNF:
 
 
     
-bd = ModeloPNF()
-print(bd.obtener_pnf_asignado(11))
-# print(bd.obtener_periodo_id_por_nombre("Segundo Semestre 2025"))

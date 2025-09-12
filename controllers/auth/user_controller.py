@@ -60,22 +60,14 @@ class UserController:
         return dic_completo
     
     def update_datos_personales(self, id_persona, datos, tabla):
-        print(datos)
-        if tabla == "datos_perosonales":
-            if self.user_model.update_datos_personales(id_persona, datos):
-                if self.user_model.update_telefonos(id_persona, datos['telefonos']):
-                    return True
-                else:
-                    messagebox.showerror("Error", "Hubo un error al actualizar los teléfonos.")
-            else:
-                messagebox.showerror("Error", "Hubo un error al actualizar los datos personales.")
-                return False
+        """
+        Unifica las llamadas de actualización al modelo.
+        """
+        if self.user_model.update_informacion_persona(id_persona, datos, tipo_actualizacion=tabla):
+            return True
         else:
-            if self.user_model.update_direccion(id_persona, datos['direccion']):
-                return True
-            else:
-                messagebox.showerror("Error", "Hubo un error al actualizar la dirección.")
-                return False
+            messagebox.showerror("Error", f"Hubo un error al actualizar los datos de '{tabla}'.")
+            return False
 
     def the_user_is_blocked(self, id_persona):
         return self.user_model.the_user_is_blocked(id_persona)

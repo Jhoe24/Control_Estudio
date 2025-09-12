@@ -714,5 +714,3 @@ class ModeloDocente:
     #         print(f"Error en la consulta {table}: {e}") 
     #         return False
         
-              
-print(ModeloDocente().contar_estudiantes_a_cargo_docente(2))

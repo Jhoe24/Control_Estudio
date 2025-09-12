@@ -186,70 +186,76 @@ class UserModel:
         finally:
             if con is not None:
                 con.close()
-
-    def update_datos_personales(self, id_persona, datos):
-        con = None
-        try:
-            con = sql.connect(self.db_ruta)
-            cursor = con.cursor()
-            cursor.execute(
-                """
-                UPDATE informacion_personal SET nombres = ?, apellidos = ?, correo_electronico = ?, sexo = ?, estado_civil = ?, nacionalidad = ?, lugar_nacimiento = ? WHERE id = ?
-                """,(datos['nombres'], datos['apellidos'], datos['correo_electronico'], datos['sexo'], datos['estado_civil'], datos['nacionalidad'], datos['lugar_nacimiento'], id_persona))
-            con.commit()    
-            return True
-        except Exception as e:
-            print(f"Error al actualizar datos personales: {e}")
-            return False
-        finally:
-            if con is not None:
-                con.close()
     
-    def update_telefonos(self, id_persona, telefonos):
-        con = None
+    def _update_telefonos_transaccional(self, cursor, id_persona, telefonos):
+        """Método auxiliar para actualizar teléfonos dentro de una transacción existente."""
         try:
-            con = sql.connect(self.db_ruta)
-            cursor = con.cursor()
-            cursor.execute(
-                """
-                DELETE FROM telefonos WHERE persona_id = ?
-                """,(id_persona,))
-            con.commit()
+            cursor.execute("DELETE FROM telefonos WHERE persona_id = ?", (id_persona,))
             for tipo, numero in telefonos:
                 cursor.execute( 
-                """
-                INSERT INTO telefonos (persona_id, tipo_telefono, numero) VALUES (?, ?, ?)
-                """,(id_persona, tipo, numero))
-            con.commit()
+                    "INSERT INTO telefonos (persona_id, tipo_telefono, numero) VALUES (?, ?, ?)",
+                    (id_persona, tipo, numero)
+                )
             return True
         except Exception as e:
-            print(f"Error al actualizar telefonos: {e}")
-            return False
-        finally:
-            if con is not None:
-                con.close() 
+            print(f"Error en _update_telefonos_transaccional: {e}")
+            raise # Propaga el error para que la transacción principal haga rollback
 
-    def update_direccion(self, id_persona, direccion):
+    def update_informacion_persona(self, id_persona, datos, tipo_actualizacion):
         con = None
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
-            cursor.execute(
-                """
-                DELETE FROM direcciones WHERE persona_id = ?
-                """,(id_persona,))
-            con.commit()
-            cursor.execute("""
-                INSERT INTO direcciones (persona_id, direccion) VALUES (?, ?)
-                """,(id_persona, direccion))
+
+            if tipo_actualizacion == "datos_perosonales":
+                # Corregido: faltaba fecha_nacimiento en la consulta original
+                cursor.execute(
+                    """
+                    UPDATE informacion_personal 
+                    SET nombres = ?, apellidos = ?, sexo = ?, estado_civil = ?, nacionalidad = ?, lugar_nacimiento = ?, fecha_nacimiento = ? 
+                    WHERE id = ?
+                    """,
+                    (datos['nombres'], datos['apellidos'], datos['sexo'], datos['estado_civil'], 
+                     datos['nacionalidad'], datos['lugar_nacimiento'], datos['fecha_nacimiento'], id_persona)
+                )
+            
+            elif tipo_actualizacion == "contactos":
+                if 'correo_electronico' in datos:
+                    cursor.execute(
+                        "UPDATE informacion_personal SET correo_electronico = ? WHERE id = ?",
+                        (datos['correo_electronico'], id_persona)
+                    )
+                if 'telefonos' in datos:
+                    self._update_telefonos_transaccional(cursor, id_persona, datos['telefonos'])
+
+            elif tipo_actualizacion == "direccion":
+                # Asumiendo que la tabla 'direcciones' tiene una FK a 'informacion_personal'
+                # y que se quiere reemplazar la dirección principal.
+                cursor.execute("DELETE FROM direcciones WHERE persona_id = ? AND principal = 1", (id_persona,))
+                cursor.execute(
+                    """
+                    INSERT INTO direcciones (persona_id, estado, municipio, parroquia, sector, calle, casa_edificio, tipo_direccion, principal)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+                    """,
+                    (id_persona, datos['estado'], datos['municipio'], datos['parroquia'], 
+                     datos['sector'], datos['calle'], datos['nro_casa'])
+                )
+
             con.commit()
             return True
         except Exception as e:
-            print(f"Error al actualizar direccion: {e}")
+            if con:
+                con.rollback()
+            print(f"Error al actualizar '{tipo_actualizacion}' para la persona {id_persona}: {e}")
             return False
         finally:
-            if con is not None:
+            if con:
                 con.close()
+
+    # Los métodos antiguos pueden ser eliminados o marcados como obsoletos.
+    # def update_datos_personales(self, id_persona, datos): ...
+    # def update_contactos(self, id_persona, contactos): ...
+    # def update_direccion(self, id_persona, direccion): ...
     
     def change_user_and_pass(self, id_persona, user, password):
         con = None

@@ -800,5 +800,3 @@ class ModelRegistroEstudiantes:
             if con:
                 con.close()
 
-print(ModelRegistroEstudiantes().contar_uc_inscritas_estudiante(21))
-# print(bd.obtener_estudiante_id(21))

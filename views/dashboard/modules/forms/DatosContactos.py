@@ -20,7 +20,6 @@ class DatosContactosFrame(SectionFrameBase):
         self.correo_electronico_entry.delete(0, ctk.END)
         if self.correo:  # Solo insertar si hay contenido
             self.correo_electronico_entry.insert(0, self.correo)
-        self.correo_electronico_entry.configure(state="disabled")
 
         self.btn = ctk.CTkButton(self,text="Añadir Telefonos",command =self.anadir_telefono)
         self.btn.pack(anchor="w", pady=5)
@@ -60,14 +59,14 @@ class DatosContactosFrame(SectionFrameBase):
 
         entry_num.pack(side="left", padx=(0, 5))
         btn_eliminar.pack(side="left", padx=(0, 5))
-        self.lista_widget_tlf.append((var_tipo,tipo_menu,entry_num))
+        self.lista_widget_tlf.append((fila,var_tipo,tipo_menu,entry_num))
 
     def eliminar_telefono(self, fila):
         """
         Elimina una fila de teléfono de la interfaz y de la lista.
         """
         fila.destroy()
-        self.telefono_widgets = [
+        self.lista_widget_tlf = [
             t for t in self.lista_widget_tlf if t[0] != fila
         ]
 
@@ -78,12 +77,15 @@ class DatosContactosFrame(SectionFrameBase):
     def get_datos(self):
        
         result = []
-        for telefono in self.telefono:
-            result.append(telefono[0].get(),telefono[1].get())
+        # Itera directamente sobre la lista de tuplas de widgets.
+        for _, var_tipo, tipo_menu, entry_num in self.lista_widget_tlf:
+            numero = entry_num.get().strip()
+            if numero: # Verificar que el campo de número no esté vacío
+                result.append((var_tipo.get(), numero))
         
         return {
-           "telefono":result,
-           "correo":self.correo_electronico_entry.get()
+           "telefonos": result,
+           "correo_electronico":self.correo_electronico_entry.get()
         }
         
        

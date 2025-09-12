@@ -14,24 +14,23 @@ class AsignarSeccionFrame(SectionFrameBase):
         self.var_seccion = None
         #Secciones_disponibles es donde se extraen los datos de las secciones asignadas a ese pnf
         self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id,trayecto_id,tramo_id)
-        if self.secciones_disponibles or carga_datos == True:
+        self.var_seccion = ctk.StringVar(value=self.secciones_disponibles[0] if self.secciones_disponibles else "Sin secciones")
+        self.var_condicion = ctk.StringVar(value="Regular")
+        self.var_estado = ctk.StringVar(value="Inscrito")
+
+        self.frame_contenido_seccion = ctk.CTkFrame(self, fg_color="transparent")
+        self.frame_contenido_seccion.pack(fill="x", expand=True, pady=5)
+
+        self._crear_fila_widgets([
+            ("Secciones Disponibles:",crear_option_menu,{"values":self.secciones_disponibles,"variable":self.var_seccion},1,self.frame_contenido_seccion,"secciones_menu"),
+            ("Condición:",crear_option_menu,{"values":["Regular","Equivalencia","Repitente","Especial","Oyente"],"variable":self.var_condicion},1,self.frame_contenido_seccion,"condicion_menu"),
+            ("Estado:",crear_option_menu,{"values":["Inscrito","Retirado","Aprobado","Reprobado","Sin Calificar"],"variable":self.var_estado},1,self.frame_contenido_seccion,"estado_menu")
+        ])
+        if not self.secciones_disponibles or carga_datos == False:
             
-            self.var_seccion = ctk.StringVar(value=self.secciones_disponibles[0] if self.secciones_disponibles else "Sin secciones")
-            self.var_condicion = ctk.StringVar(value="Regular")
-            self.var_estado = ctk.StringVar(value="Inscrito")
-
-
-            self._crear_fila_widgets([
-                ("Secciones Disponibles:",crear_option_menu,{"values":self.secciones_disponibles,"variable":self.var_seccion},1,self,"secciones_menu"),
-                ("Condición:",crear_option_menu,{"values":["Regular","Equivalencia","Repitente","Especial","Oyente"],"variable":self.var_condicion},1,self,"condicion_menu"),
-                ("Estado:",crear_option_menu,{"values":["Inscrito","Retirado","Aprobado","Reprobado","Sin Calificar"],"variable":self.var_estado},1,self,"estado_menu")         
-
-            ])
-
-            
-        else:   
-            master.no_secciones_disponibles()
-
+            self.frame_contenido_seccion.pack_forget()
+            self.master.no_secciones_disponibles()  
+       
 
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
@@ -39,12 +38,15 @@ class AsignarSeccionFrame(SectionFrameBase):
         self.pnf_id = pnf_id
         self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id,trayecto_id,tramo_id)
         if not self.secciones_disponibles:
-            self.var_seccion.set("Sin secciones")
-            self.secciones_menu.configure(values=["Sin secciones"],state = "disabled")
+            self.frame_contenido_seccion.pack_forget()
+            self.master.no_secciones_disponibles()
         else:
+            self.master.button_frame.pack_forget()
+            self.frame_contenido_seccion.pack(fill="x", expand=True, pady=5)
             self.secciones_menu.configure(state = "normal")
             self.var_seccion.set(self.secciones_disponibles[0])
             self.secciones_menu.configure(values=self.secciones_disponibles)
+            self.master.button_frame.pack(pady=(25, 20))
 
         # if not self.secciones_disponibles:
         #     # Si no hay secciones disponibles, hacemos como en el master.no_secciones_disponibles()

@@ -40,7 +40,7 @@ class Config_user(ctk.CTkScrollableFrame):
             "fg_color": "#23272f",
             #"hover_color": "#31343c",
             "text_color": "#fff",
-            "font": ("Segoe UI", 16, "bold"),
+            "font": ("Segoe UI", 14, "bold"),
             #"border_width": 2,
             #"border_color": "#444857"
         }
@@ -185,14 +185,14 @@ class Config_user(ctk.CTkScrollableFrame):
             command = self.actualizar_direccion
         
         elif new_value == "Cambiar Contactos":
-            dc= DatosContactosFrame(self.contenido_frame,datos.get('telefonos', []), datos.get('correo_electronico'))
-            dc.pack(fill="both", expand=True)
-            command = print
+            self.dc= DatosContactosFrame(self.contenido_frame,datos.get('telefonos', []), datos.get('correo_electronico'))
+            self.dc.pack(fill="both", expand=True)
+            command=self.actualizar_contactos
 
 
 
         btn_actualizar = ctk.CTkButton(
-            self.contenido_frame, text="Actualizar Datos Personales",
+            self.contenido_frame, text="Actualizar Datos",
             command=command,
             font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG,
             hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT
@@ -232,13 +232,11 @@ class Config_user(ctk.CTkScrollableFrame):
         datos = {
             "nombres": self.frame_datos_personales.nombre_entry.get(),
             "apellidos": self.frame_datos_personales.apellido_entry.get(),
-            "correo_electronico": self.frame_datos_personales.correo_electronico_entry.get(),
             "sexo": self.frame_datos_personales.var_sexo.get(),
             "estado_civil": self.frame_datos_personales.var_estadoCivil.get(),
             "nacionalidad": self.frame_datos_personales.var_nacionalidad.get(),
             "lugar_nacimiento": self.frame_datos_personales.lugar_nac_entry.get(),
-            "telefonos": self.frame_datos_personales.obtener_telefonos()
-            
+            "fecha_nacimiento": self.frame_datos_personales.fecha_nacimiento.get_date(),
         }
         # campos_a_actualizar = {k: v for k, v in datos.items() if v}
         # print("Campos a actualizar: ", campos_a_actualizar)
@@ -275,13 +273,19 @@ class Config_user(ctk.CTkScrollableFrame):
         if self.controller["Usuario"].update_datos_personales(self.persona_id, datos, "direccion"):
             messagebox.showinfo("Éxito", "Datos de direccion actualizados correctamente.")
     
+    def actualizar_contactos(self):
+        datosDict = self.dc.get_datos()
+        if self.controller["Usuario"].update_datos_personales(self.persona_id, datosDict, "contactos"):
+            messagebox.showinfo("Éxito", "Datos de contactos actualizados correctamente.")
+        else:
+            messagebox.showerror("Error", "No se pudo actualizar los datos de contactos.")
 
     def asignar_roles(self):
         self.limpiar_contenido_frame()
 
         # 1. Mostrar un indicador de carga en el frame principal de contenido.
         #    Usamos .place() para centrarlo sin afectar a otros widgets que se añadirán con .pack()
-        loading_label = ctk.CTkLabel(self.contenido_frame, text="Cargando roles, por favor espere...", font=("Segoe UI", 16))
+        loading_label = ctk.CTkLabel(self.contenido_frame, text="Cargando roles, por favor espere...", font=("Segoe UI", 16),text_color=COLOR_TEXTO_PRINCIPAL)
         loading_label.place(relx=0.5, rely=0.5, anchor="center")
         self.contenido_frame.update_idletasks() # Para asegurar que el label se muestre
 
