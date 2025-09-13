@@ -25,7 +25,6 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
         self.informacion_academica_frame = None
         self.sistema_ingreso_frame = None
         self.datos_ubicacion_frame = None
-        self.evento_mouse()
 
         # Registrar funciones de validación
         try:
@@ -73,26 +72,6 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
     def limpiar_formulario_completo(self):
         self.controlador.limpiar_formulario_completo(self)
 
-        #hola mundo
-    
-    def evento_mouse(self):
-        # Accede al canvas interno de CTkScrollableFrame
-        canvas = self._parent_canvas  # atributo privado, pero funciona
-        # Para Windows y Mac
-        canvas.bind_all("<MouseWheel>", self.movimiento_mouse)
-        # Para Linux
-        canvas.bind_all("<Button-4>", self.movimiento_mouse)
-        canvas.bind_all("<Button-5>", self.movimiento_mouse)
-    
-    def movimiento_mouse(self, event):
-        
-        canvas = self._parent_canvas
-        if event.num == 4:  # Linux scroll up
-            canvas.yview_scroll(-1, "units")
-        elif event.num == 5:  # Linux scroll down
-            canvas.yview_scroll(1, "units")
-        else:  # Windows/Mac
-            canvas.yview_scroll(int(-1*(event.delta/2)), "units")
 
     # Formulario de actualizacion
     def ver_datos_completos(self, estudiante, listado_estudiantes=None):

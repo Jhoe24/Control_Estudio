@@ -8,10 +8,11 @@ from views.dashboard.modules.forms.Estudiantes.asignar_pnf import AsignarPNFFram
 
 
 class ListEstudiantesView(ctk.CTkFrame):
-    def __init__(self, master, controlador,controller_secciones,controller_pnf = None, role_user=None, user_name=None):
+    def __init__(self, master, controlador,controller_secciones,controller_pnf = None, role_user=None, user_name=None, controllerNotas=None):
         super().__init__(master, fg_color="white")
         self.furmulario_estudiante = FormularioEstudianteView(master, controlador)
         self.master = master
+        self.controllerNotas = controllerNotas
         self.controlador = controlador
         self.controller_pnf = controller_pnf
         self.controller_secciones = controller_secciones
@@ -263,11 +264,11 @@ class ListEstudiantesView(ctk.CTkFrame):
         # Crea el frame para asignar PNF
         
         if para_edicion:
-            asignar_pnf_frame = AsignarPNFFrame(scroll_frame, self.controlador,self.controller_pnf,self.controller_secciones,estudiante,True,self.actualizar_listado)
+            asignar_pnf_frame = AsignarPNFFrame(scroll_frame, self.controlador,self.controller_pnf,self.controller_secciones,estudiante,True,self.actualizar_listado,self.controllerNotas)
             # Si es para edición, carga los datos del PNF asignado
             asignar_pnf_frame.cargar_datos_pnf(estudiante['id'])
         else:
-            asignar_pnf_frame = AsignarPNFFrame(scroll_frame, self.controlador,self.controller_pnf,self.controller_secciones, estudiante,False,self.actualizar_listado)
+            asignar_pnf_frame = AsignarPNFFrame(scroll_frame, self.controlador,self.controller_pnf,self.controller_secciones, estudiante,False,self.actualizar_listado,self.controllerNotas)
         asignar_pnf_frame.pack(fill="both", expand=True)
 
 

@@ -1,5 +1,6 @@
 import tkinter.messagebox as messagebox
 import tkinter as tk
+from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from views.dashboard.modules.forms.Estudiantes.Ingreso_seccion import AsignarSeccionFrame
@@ -7,10 +8,11 @@ from ..DatosPersonales import DatosPersonalesFrame
 from pprint import pprint
 
 class AsignarPNFFrame(SectionFrameBase):
-    def __init__(self, master, controller, controller_pnf,controller_secciones, estudiante,para_edicion,callbak):
+    def __init__(self, master, controller, controller_pnf,controller_secciones, estudiante,para_edicion,callbak,controladorNotas):
         super().__init__(master,"Asignar PNF a Estudiante",COLOR_HEADER_SECCION_BG_2)
         self.controller = controller
         self.controller_pnf = controller_pnf
+        self.controllerNotas = controladorNotas
         self.estudiante = estudiante
         self.fecha_inicio = ""
         self.fecha_fin = ""
@@ -19,8 +21,9 @@ class AsignarPNFFrame(SectionFrameBase):
         self.callbak = callbak
         self.mensajesSecciones = None
         self.asignacion_seccion = None
-
+        self.estudiante_id = estudiante.get("id")
         self.para_edicion = para_edicion  # Variable para indicar si es para edición
+        self.trayectoActual = None
 
         if not self.controller_pnf:
             print("Error: El controlador de PNF no está definido.")
@@ -64,7 +67,7 @@ class AsignarPNFFrame(SectionFrameBase):
             ])
 
             self._crear_fila_widgets([
-                ("Trayecto Actual:", crear_option_menu, {"values": self.valores_trayecto, "variable": self.var_trayecto,"command": self.set_tramo}, 1, self, 'trayecto_menu'),
+                ("Trayecto Actual:", crear_option_menu, {"values": self.valores_trayecto, "variable": self.var_trayecto,"command": self.on_trayecto_change}, 1, self, 'trayecto_menu'),
                 ("Tramo Actual:", crear_option_menu, {"values": self.valores_tramos, "variable": self.var_tramo, "command": self.set_seccion}, 1, self, 'tramo_menu'),
                 ("Creditos aprobados:", crear_entry, {"width":300,"placeholder_text":"Ingrese los créditos aprobados"}, 1, self, 'creditos_aprobados_entry'),
                 ("Creditos cursados:", crear_entry, {"width":300,"placeholder_text":"Ingrese los créditos cursados"}, 1, self, 'creditos_cursados_entry'),
@@ -91,6 +94,7 @@ class AsignarPNFFrame(SectionFrameBase):
             self.button_frame.pack(pady=(25, 20))
             # Crear los botones
             if self.para_edicion:
+            
                 text = "Actualizar Datos"
                 text2 = "Editar PNF"
                 command = self.actualizar_datos_pnf
@@ -249,16 +253,37 @@ class AsignarPNFFrame(SectionFrameBase):
             self.asignacion_seccion.actualizar_datos_secciones(self.pnf_id_por_nombre[value],self.trayecto_id_por_nombre[self.var_trayecto.get()],self.tramo_id_por_nombre[self.var_tramo.get()])
 
 
-    def set_tramo(self, value):
+ 
+    def on_trayecto_change(self, nuevo_trayecto_nombre):
+        """
+        Se ejecuta al cambiar el trayecto. Valida si el estudiante puede avanzar
+        y, si es así, actualiza la lista de tramos.
+        """
         if self.mensajesSecciones:
             self.mensajesSecciones.pack_forget()
-        tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[value])
+
+        # Validar si el estudiante ha aprobado "Proyecto" antes de permitirle avanzar de trayecto.
+        # Esta validación solo se aplica en modo edición y si el trayecto seleccionado es diferente al actual.
+        if self.para_edicion and self.trayectoActual and nuevo_trayecto_nombre != self.trayectoActual:
+            aprobado = self.controllerNotas.validate_project(self.estudiante_id,self)
+            if not aprobado:
+                # Si no aprobó, se revierte la selección en la UI y se detiene la ejecución.
+                self.var_trayecto.set(self.trayectoActual)
+                return
+        
+        # Si la validación es exitosa (o no aplica), se procede a actualizar los tramos.
+        self.set_tramo(nuevo_trayecto_nombre)
+
+    def set_tramo(self, trayecto_nombre):
+        """Actualiza la lista de tramos disponibles según el trayecto seleccionado."""
+        self.trayecto_id_por_nombre = {trayecto[1]: trayecto[0] for trayecto in self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[self.var1.get()])}
+        tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[trayecto_nombre])
         self.valores_tramos = [tramo[1] for tramo in tupla_tramos]
         self.var_tramo.set(self.valores_tramos[0] if self.valores_tramos else "Tramo")
         self.tramo_menu.configure(values=self.valores_tramos)
         self.tramo_id_por_nombre = {tramo[1]: tramo[0] for tramo in tupla_tramos}
         if self.asignacion_seccion:
-            self.asignacion_seccion.actualizar_datos_secciones(self.pnf_id_por_nombre[self.var1.get()],self.trayecto_id_por_nombre[value],self.tramo_id_por_nombre[self.var_tramo.get()])
+            self.asignacion_seccion.actualizar_datos_secciones(self.pnf_id_por_nombre[self.var1.get()],self.trayecto_id_por_nombre[trayecto_nombre],self.tramo_id_por_nombre[self.var_tramo.get()])
 
     def set_seccion(self,value):
          if self.asignacion_seccion:
@@ -310,6 +335,7 @@ class AsignarPNFFrame(SectionFrameBase):
             
             self.var_trayecto.set(datos_pnf["trayecto_actual"])
             self.trayecto_menu.configure(state="disabled")
+            self.trayectoActual = datos_pnf["trayecto_actual"]
 
             self.var_tramo.set(datos_pnf["tramo_actual"])
             self.tramo_menu.configure(state="disabled")

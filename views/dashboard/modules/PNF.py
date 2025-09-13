@@ -20,7 +20,6 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         self.datos_trayecto = None
         self.datos_cantidad_trayecto = 0
         self.listado_trayectos = []
-        self.evento_mouse()
 
         self.dict_trayectos_invertido = {
             1: "I",
@@ -83,25 +82,6 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         self.btn_cancelar.pack(side="left", padx=10)
       
        
-        
-    def evento_mouse(self):
-        # Accede al canvas interno de CTkScrollableFrame
-        canvas = self._parent_canvas  # atributo privado, pero funciona
-        # Para Windows y Mac
-        canvas.bind_all("<MouseWheel>", self.movimiento_mouse)
-        # Para Linux
-        canvas.bind_all("<Button-4>", self.movimiento_mouse)
-        canvas.bind_all("<Button-5>", self.movimiento_mouse)
-    
-    def movimiento_mouse(self, event):
-        
-        canvas = self._parent_canvas
-        if event.num == 4:  # Linux scroll up
-            canvas.yview_scroll(-1, "units")
-        elif event.num == 5:  # Linux scroll down
-            canvas.yview_scroll(1, "units")
-        else:  # Windows/Mac
-            canvas.yview_scroll(int(-1*(event.delta/2)), "units")
 
     def comando_trayecto(self):
         # Verificar_codigo

@@ -13,6 +13,7 @@ class FrameNotaEstudiante(SectionFrameBase):
         if user_role and user_role.lower() != "docente":
             self.seccion_id = tupla[5]  # id de la sección que esta en la posicion de la tupla nuemero 5
         else:
+            print("tupla",tupla)
             self.seccion_id = self.controller_estudiante.obtener_seccion_id_por_pnf_periodoAcademico_y_docente(tupla)
             print(self.seccion_id)
             #self.seccion_id = tupla[1]  # id de la sección que esta en la posicion de la tupla nuemero 5 
@@ -20,7 +21,7 @@ class FrameNotaEstudiante(SectionFrameBase):
         #print(f'tupla es :{tupla}')
         #print(f"seccion_id recibido: {self.seccion_id}")
         self.lista_estudiantes = self.controller_estudiante.obtener_estudiantes_por_seccion(self.seccion_id)
-        #print(f"lista_estudiantes obtenida: {self.lista_estudiantes}")
+        print(f"seccion id obtenida {self.seccion_id} lista_estudiantes obtenida: {self.lista_estudiantes}")
         
         # si la lista de estudiantes está vacía, mostrar un mensaje
         # y no continuar con la carga de notas

@@ -18,7 +18,6 @@ class FormularioDocenteView(ctk.CTkScrollableFrame):
         self.datos_personales_frame = None
         self.datos_ubicacion_frame = None
         self.role_user = role_user
-        self.evento_mouse()
         #self.controlador.master_controlaor.docente.obtener_lista_docentes()
         # Registrar funciones de validación
         try:
@@ -57,26 +56,6 @@ class FormularioDocenteView(ctk.CTkScrollableFrame):
         """
         self.controlador.limpiar_formulario_completo(self)
 
-        #hola mundo
-    
-    def evento_mouse(self):
-        # Accede al canvas interno de CTkScrollableFrame
-        canvas = self._parent_canvas  # atributo privado, pero funciona
-        # Para Windows y Mac
-        canvas.bind_all("<MouseWheel>", self.movimiento_mouse)
-        # Para Linux
-        canvas.bind_all("<Button-4>", self.movimiento_mouse)
-        canvas.bind_all("<Button-5>", self.movimiento_mouse)
-    
-    def movimiento_mouse(self, event):
-        
-        canvas = self._parent_canvas
-        if event.num == 4:  # Linux scroll up
-            canvas.yview_scroll(-1, "units")
-        elif event.num == 5:  # Linux scroll down
-            canvas.yview_scroll(1, "units")
-        else:  # Windows/Mac
-            canvas.yview_scroll(int(-1*(event.delta/2)), "units")
 
     def procesar_formulario(self):
         resultado = self.controlador.obtener_todos_los_datos(self)
