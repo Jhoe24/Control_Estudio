@@ -95,4 +95,5 @@ class FrameDocente(SectionFrameBase):
         self.auxiliar_menu.configure(state="normal")
         self.dedicacion_menu.configure(state="normal")
         self.estado_doc_menu.configure(state="normal")
+        self.fecha_ingreso_uptrjf.enable()
     

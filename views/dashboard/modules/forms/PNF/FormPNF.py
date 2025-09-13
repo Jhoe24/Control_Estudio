@@ -282,6 +282,7 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.estado_menu.configure(state="normal")
             self.tipo_pnf_menu.configure(state="normal")
             self.duracion_tramos_entry.configure("normal")
+            self.fecha_resolucion.enable()
            
         # Habilitar el botón de grabar Trayecto si existe
 

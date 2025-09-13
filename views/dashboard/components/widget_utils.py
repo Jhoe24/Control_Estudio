@@ -41,7 +41,7 @@ def crear_entry(master, **kwargs):
     return ctk.CTkEntry(master, font=FUENTE_BASE, text_color=COLOR_ENTRY_TEXT, fg_color=COLOR_ENTRY_BG, border_color=COLOR_ENTRY_BORDER, placeholder_text_color=COLOR_ENTRY_PLACEHOLDER, **kwargs)
 
 def crear_option_menu(master, **kwargs):
-    return ctk.CTkOptionMenu(master, font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG, text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER, **kwargs)
+    return ctk.CTkOptionMenu(master,font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG, text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER, **kwargs)
 
 def crear_check_box(master, **kwargs):
     return ctk.CTkCheckBox(master, font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL, border_color=COLOR_ENTRY_BORDER, **kwargs)

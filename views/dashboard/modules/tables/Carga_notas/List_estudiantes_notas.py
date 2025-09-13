@@ -21,7 +21,7 @@ class ListadosEstudiantesNotas(ctk.CTkFrame):
 
                 self.pagina_actual = 1
                 self.uc_por_pagina = 11
-                self.total_paginas = (len(self.listado_notas) + self.uc_por_pagina - 1) // self.uc_por_pagina
+                self.total_paginas = max(1, (len(self.listado_notas) + self.uc_por_pagina - 1) // self.uc_por_pagina)
 
                 # lista de UC a mostrar en la página inicial
                 self.paginas_mostrar = self.listado_notas[:self.uc_por_pagina]

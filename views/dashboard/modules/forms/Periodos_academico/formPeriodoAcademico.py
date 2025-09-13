@@ -180,6 +180,14 @@ class FormPeriodoAcademico(SectionFrameBase):
         self.duracion_semanas_entry.configure(state="normal")
         self.estado_menu.configure(state="normal")
         self.observacion_entry.configure(state="normal")
+        self.fecha_inicio.enable()
+        self.fecha_fin.enable()
+        self.fecha_inicio_inscripcion.enable()
+        self.fecha_fin_inscripcion.enable()
+        self.fecha_inicio_clases.enable()
+        self.fecha_fin_clases.enable()
+        self.fecha_inicio_evaluaciones.enable()
+        self.fecha_fin_evaluaciones.enable()
         
     def deshabilitar_campos(self):
         self.codigo_entry.configure(state="disabled")

@@ -61,7 +61,7 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
     def procesar_formulario(self):
         datos = self.controlador.obtener_todos_los_datos(self)
         if self.controlador.modelo.buscar_estudiante(datos['tipo_documento'], datos['nro_documento']):
-            messagebox.showerror("Error", "Documento de identidad ya registrado.")
+            messagebox.showerror("Error", f"Documento de identidad '{datos['nro_documento']}' ya registrado.")
         else:
             if self.controlador.validar_campos_obligatorios(datos, self):
                 exito = self.controlador.procesar_guardado_estudiante(datos, self)
@@ -162,6 +162,7 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
             self.sistema_ingreso_frame.habilitar_edicion()
         if self.datos_ubicacion_frame is not None:
             self.datos_ubicacion_frame.habilitar_edicion()
+            
 
     def actualizar_estudiante(self, id, ventana, listado_estudiantes):
     

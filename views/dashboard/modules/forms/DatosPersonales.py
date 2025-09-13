@@ -310,6 +310,8 @@ class DatosPersonalesFrame(SectionFrameBase):
         if self.correo_electronico_entry:
             self.correo_electronico_entry.configure(state="normal")
         
+        self.fecha_nacimiento.enable()
+        self.fecha_ingreso.enable()
 
         self.btn_agregar_telefono.configure(state="normal")    
         # Habilitar edición en los teléfonos dinámicos

@@ -18,15 +18,36 @@ class AsignarSeccionFrame(SectionFrameBase):
         self.var_condicion = ctk.StringVar(value="Regular")
         self.var_estado = ctk.StringVar(value="Inscrito")
 
+        # Crear frame para los campos
         self.frame_contenido_seccion = ctk.CTkFrame(self, fg_color="transparent")
         self.frame_contenido_seccion.pack(fill="x", expand=True, pady=5)
 
-        self._crear_fila_widgets([
-            ("Secciones Disponibles:",crear_option_menu,{"values":self.secciones_disponibles,"variable":self.var_seccion},1,self.frame_contenido_seccion,"secciones_menu"),
-            ("Condición:",crear_option_menu,{"values":["Regular","Equivalencia","Repitente","Especial","Oyente"],"variable":self.var_condicion},1,self.frame_contenido_seccion,"condicion_menu"),
-            ("Estado:",crear_option_menu,{"values":["Inscrito","Retirado","Aprobado","Reprobado","Sin Calificar"],"variable":self.var_estado},1,self.frame_contenido_seccion,"estado_menu")
-        ])
-        if not self.secciones_disponibles or carga_datos == False:
+        # Secciones Disponibles
+        label_seccion = ctk.CTkLabel(self.frame_contenido_seccion, text="Secciones Disponibles:", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
+        label_seccion.grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        self.secciones_menu = crear_option_menu(self.frame_contenido_seccion, width=200,values=self.secciones_disponibles, variable=self.var_seccion)
+        self.secciones_menu.grid(row=0, column=1, sticky="ew", padx=10, pady=5)
+
+        # Condición
+        label_condicion = ctk.CTkLabel(self.frame_contenido_seccion, text="Condición:", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
+        label_condicion.grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        self.condicion_menu = crear_option_menu(self.frame_contenido_seccion, width=200,values=["Regular","Equivalencia","Repitente","Especial","Oyente"], variable=self.var_condicion)
+        self.condicion_menu.grid(row=1, column=1, sticky="ew", padx=10, pady=5)
+
+        # Estado
+        label_estado = ctk.CTkLabel(self.frame_contenido_seccion, text="Estado:", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
+        label_estado.grid(row=2, column=0, sticky="w", padx=10, pady=5)
+        self.estado_menu = crear_option_menu(self.frame_contenido_seccion, width=200,values=["Inscrito","Retirado","Aprobado","Reprobado","Sin Calificar"], variable=self.var_estado)
+        self.estado_menu.grid(row=2, column=1, sticky="ew", padx=10, pady=5)
+
+        self.frame_contenido_seccion.columnconfigure(1, weight=1)
+
+        if self.secciones_disponibles or carga_datos == True:
+            
+            self.frame_contenido_seccion.pack(fill="x", expand=True, pady=5)
+            self.actualizar_datos_secciones(self.pnf_id,self.trayecto_id,self.tramo_id)
+
+        if not self.secciones_disponibles:
             
             self.frame_contenido_seccion.pack_forget()
             self.master.no_secciones_disponibles()  
@@ -38,9 +59,15 @@ class AsignarSeccionFrame(SectionFrameBase):
         self.pnf_id = pnf_id
         self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(self.pnf_id,trayecto_id,tramo_id)
         if not self.secciones_disponibles:
-            self.frame_contenido_seccion.pack_forget()
             self.master.no_secciones_disponibles()
+            self.frame_contenido_seccion.pack_forget()
+            self.master.button_frame.pack_forget()
+
+            
+            self.master.button_frame.pack(pady=(25, 20))
         else:
+            if self.master.mensajesSecciones:
+                self.master.mensajesSecciones.pack_forget()
             self.master.button_frame.pack_forget()
             self.frame_contenido_seccion.pack(fill="x", expand=True, pady=5)
             self.secciones_menu.configure(state = "normal")
@@ -54,6 +81,8 @@ class AsignarSeccionFrame(SectionFrameBase):
 
 
     def cargar_datos_secciones(self, datos):
+        if self.master.mensajesSecciones:
+                self.master.mensajesSecciones.pack_forget()
         if datos["seccion_id"]:
             nombre = self.controller_secciones.obtener_nombre_por_id(datos["seccion_id"])
             if self.var_seccion:

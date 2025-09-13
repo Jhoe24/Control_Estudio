@@ -6,7 +6,6 @@ from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame
 from views.dashboard.modules.RegistrarDocentes import FormularioDocenteView
 from views.dashboard.modules.forms.Docentes.listaAsignacion import ListaAsignacionPNF
 from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
-from views.dashboard.modules.forms.Docentes.listaAsignacionUC import ListaAsignacionUC
 
 class ListDocenteView(ctk.CTkFrame):
     def __init__(self, master, controllers, role_user, user_name):
@@ -288,7 +287,9 @@ class ListDocenteView(ctk.CTkFrame):
         scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Obtener id del docente PNF
-        docente_pnf = (self.controller_pnf.modelo.obtener_pnf_asignado_docente(docente["id"]))[0]
+        #print("Docente seleccionado:", docente)
+        docente_pnf = (self.controller_pnf.modelo.obtener_pnf_asignado_docente(docente["docente_id"]))[0]
+         
 
         # Crea el frame para asignar Unidades Curriculares
         lista_asignacion = ListarUC(scroll_frame, self.controllers, user_role=self.role_user, username=self.user_name, docente_id=docente_pnf["id"])

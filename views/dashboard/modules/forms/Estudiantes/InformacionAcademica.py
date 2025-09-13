@@ -73,4 +73,5 @@ class InformacionAcademicaFrame(SectionFrameBase):
         #self.promedio_entry.configure(state="normal")
         self.titulo_entry.configure(state="normal")
         self.condicion_menu.configure(state="normal")
+        self.fecha_grado.enable()
     

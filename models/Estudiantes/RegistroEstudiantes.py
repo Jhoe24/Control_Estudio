@@ -705,7 +705,7 @@ class ModelRegistroEstudiantes:
 
             query = """
                 SELECT
-                    uc.nombre AS nombre_unidad_curricular, t.nombre AS nombre_trayecto,
+                    uc.nombre AS nombre_unidad_curricular, t.nombre AS nombre_trayecto, tr.nombre AS nombre_tramo,
                     ip_docente.nombres || ' ' || ip_docente.apellidos AS nombre_docente,
                     pa.nombre AS periodo_academico,
                     n.valor AS nota
@@ -721,6 +721,8 @@ class ModelRegistroEstudiantes:
                     unidades_curriculares uc ON n.unidad_curricular_id = uc.id
                 JOIN
                     trayectos t ON uc.trayecto_id = t.id
+                JOIN 
+                    tramos tr ON uc.tramo_id = tr.id
                 JOIN
                     docente_uc duc ON uc.id = duc.unidad_curricular_id AND pa.id = duc.periodo_academico_id
                 JOIN
@@ -752,7 +754,6 @@ class ModelRegistroEstudiantes:
             if con:
                 con.close()
 
-        
     def contar_estudiantes_activos(self, id_pnf= None):
         con = None
         try:
@@ -779,6 +780,7 @@ class ModelRegistroEstudiantes:
         finally:
             if con is not None:
                 con.close()
+
     def contar_uc_inscritas_estudiante(self, trayecto_id):
         """
         Cuenta todas las Unidades Curriculares que pertenecen a un trayecto específico.
@@ -800,3 +802,5 @@ class ModelRegistroEstudiantes:
             if con:
                 con.close()
 
+# db = ModelRegistroEstudiantes()
+# pprint(db.obtener_listado_notas_estudiantes(13))

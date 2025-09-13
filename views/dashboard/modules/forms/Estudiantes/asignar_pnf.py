@@ -9,7 +9,6 @@ from pprint import pprint
 class AsignarPNFFrame(SectionFrameBase):
     def __init__(self, master, controller, controller_pnf,controller_secciones, estudiante,para_edicion,callbak):
         super().__init__(master,"Asignar PNF a Estudiante",COLOR_HEADER_SECCION_BG_2)
-
         self.controller = controller
         self.controller_pnf = controller_pnf
         self.estudiante = estudiante
@@ -18,7 +17,7 @@ class AsignarPNFFrame(SectionFrameBase):
         self.btn_fecha = None
         self.controller_secciones = controller_secciones
         self.callbak = callbak
-
+        self.mensajesSecciones = None
         self.asignacion_seccion = None
 
         self.para_edicion = para_edicion  # Variable para indicar si es para edición
@@ -128,7 +127,9 @@ class AsignarPNFFrame(SectionFrameBase):
     _crear_fila_widgets = DatosPersonalesFrame._crear_fila_widgets
 
     def mostrar_form_seccion(self,datos = None):
-        self.btn_secciones.configure(text="Cancelar Seccion", command=self.cancelar_asignacion_seccion)
+        if self.mensajesSecciones:
+            self.mensajesSecciones.pack_forget()
+        self.btn_secciones.configure(text="Cancelar Seccion", command=self.cancelar_asignacion_seccion,state="normal")
 
         self.tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[self.var_trayecto.get()])  # Obtener los tramos para el trayecto seleccionado
         self.tramo_id_por_nombre = {tramo[1]: tramo[0] for tramo in self.tupla_tramos}
@@ -141,7 +142,7 @@ class AsignarPNFFrame(SectionFrameBase):
                                                       self.pnf_id_por_nombre[self.var1.get()],
                                                       self.trayecto_id_por_nombre[self.var_trayecto.get()],
                                                       self.tramo_id_por_nombre[self.var_tramo.get()],
-                                                      carga_datos=state_frame)
+                                                      carga_datos=True)
         
         self.asignacion_seccion.pack(pady = 10, padx = 10, fill="both", expand=True)
         if datos:
@@ -151,14 +152,20 @@ class AsignarPNFFrame(SectionFrameBase):
         self.button_frame.pack(pady=(25, 20))
     
     def no_secciones_disponibles(self):
-        ctk.CTkLabel(self, text="No hay secciones disponibles", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL).pack(pady=(10, 0), padx=10, anchor="w")
-        self.btn_secciones.configure(state="disabled")
+         # Elimina el mensaje anterior si existe
+        if self.mensajesSecciones and self.mensajesSecciones.winfo_exists():
+            self.mensajesSecciones.destroy()
+        # Crea el nuevo mensaje y guárdalo correctamente
+        self.mensajesSecciones = ctk.CTkLabel(self, text="No hay secciones disponibles", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
+        self.mensajesSecciones.pack(pady=(10, 0), padx=10, anchor="w")
  
     def cancelar_asignacion_seccion(self):
         self.asignacion_seccion.destroy()
         self.asignacion_seccion = None
         self.button_frame.pack(pady=(25, 20))
         self.btn_secciones.configure(text="Inscribir Sección", command=self.mostrar_form_seccion)
+        if self.mensajesSecciones and self.mensajesSecciones.winfo_exists():
+            self.mensajesSecciones.destroy()
 
     def registrar_fecha(self,callback,titulo_btn="Seleccionar Fecha",attr_name=None):
        
@@ -231,6 +238,8 @@ class AsignarPNFFrame(SectionFrameBase):
             self.fecha_fin_label.configure(text=f"Fecha de Fin: {self.fecha_fin}")
 
     def set_trayecto(self, value):
+        if self.mensajesSecciones:
+            self.mensajesSecciones.pack_forget()
         tupla_trayectos = self.controller_pnf.obtener_trayectos_por_pnf(self.pnf_id_por_nombre[value])
         self.valores_trayecto = [trayecto[1] for trayecto in tupla_trayectos]  # Obtener solo los nombres de los trayectos
         self.var_trayecto.set(self.valores_trayecto[0] if self.valores_trayecto else "Trayecto")  # Valor por defecto para el trayecto
@@ -241,6 +250,8 @@ class AsignarPNFFrame(SectionFrameBase):
 
 
     def set_tramo(self, value):
+        if self.mensajesSecciones:
+            self.mensajesSecciones.pack_forget()
         tupla_tramos = self.controller_pnf.obtener_tramos_por_trayecto(self.trayecto_id_por_nombre[value])
         self.valores_tramos = [tramo[1] for tramo in tupla_tramos]
         self.var_tramo.set(self.valores_tramos[0] if self.valores_tramos else "Tramo")
