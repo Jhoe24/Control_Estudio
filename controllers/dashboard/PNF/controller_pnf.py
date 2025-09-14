@@ -584,3 +584,6 @@ class ControllerPNF:
     
     def obtener_periodo_id_por_nombre(self, nombre_periodo):
         return self.modelo.obtener_periodo_id_por_nombre(nombre_periodo)
+
+    def obtener_docente_asignado_uc(self, uc_id, periodo_id):
+        return self.modelo.obtener_docente_asignado_uc(uc_id, periodo_id)

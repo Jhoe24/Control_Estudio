@@ -977,6 +977,30 @@ class ModeloPNF:
             if con:
                 con.close()
         
+    def obtener_docente_asignado_uc(self, uc_id, periodo_id):
+        """
+        Retorna el docente_id al que está asignada la UC en el periodo dado, o None si no está asignada.
+        """
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("""
+                SELECT docente_pnf_id
+                FROM docente_uc
+                WHERE unidad_curricular_id = ? AND periodo_academico_id = ? AND activo = 1
+                LIMIT 1
+            """, (uc_id, periodo_id))
+            resultado = cursor.fetchone()
+            if resultado:
+                return resultado[0]  # docente_id
+            return None
+        except Exception as e:
+            print(f"Error al obtener el docente asignado a la UC: {e}")
+            return None
+        finally:
+            if con:
+                con.close()
+
     def obtener_periodos_disponibles(self):
         """
         Devuelve una lista de tuplas (id, nombre) de los periodos académicos activos.

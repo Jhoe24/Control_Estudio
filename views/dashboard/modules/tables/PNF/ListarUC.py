@@ -411,10 +411,14 @@ class ListarUC(ctk.CTkFrame):
             return
 
         if var_check.get():  # Marcado 
-            print("si funka")
+            # Validar si la UC ya está asignada a otro docente en ese periodo
+            docente_actual = self.controller_pnf.obtener_docente_asignado_uc(uc[0], periodo_id)
+            if docente_actual is not None and docente_actual != self.docente_id:
+                messagebox.showerror("Error", "Esta UC ya está asignada a otro docente en este periodo.")
+                var_check.set(False)
+                return
             exito = self.controller_pnf.asignar_uc_a_docente(self.docente_id, uc[0], periodo_id)
             if not exito:
-                print("nofunka")
                 var_check.set(False)  # revertir si hubo error
         else:  # Desmarcado 
             exito = self.controller_pnf.desasignar_uc_de_docente(self.docente_id, uc[0], periodo_id)
