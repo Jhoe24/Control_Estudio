@@ -60,3 +60,6 @@ class NotasController:
         
     def estudiantes_por_uc(self, unidad_curricular_id, periodo_academico_id):
         return self.modelo_notas.estudiantes_por_uc(unidad_curricular_id, periodo_academico_id)
+    
+    def listarNotasEstudiante(self, estudiante_id):
+        return self.modelo_notas.listar_notas_estudiante(estudiante_id)

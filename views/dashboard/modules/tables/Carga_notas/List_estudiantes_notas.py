@@ -9,15 +9,16 @@ from pprint import pprint
 class ListadosEstudiantesNotas(ctk.CTkFrame):
     def __init__(self, master, controllers, user):
         super().__init__(master, fg_color=COLOR_FONDO_FORMULARIO)
-        ctk.CTkLabel(self, text="Consulta de Notas", font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).grid(row=0, column=0, pady= 0, padx=0, columnspan=5, sticky="ew")
+        ctk.CTkLabel(self, text="Consulta de Notas", font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).grid(row=0, column=0, pady= 0, padx=0, columnspan=6, sticky="ew")
         self.controller_user = controllers["Usuario"]
         self.controller_estudiantes = controllers["Estudiantes"]
+        self.controller_notas = controllers["Notas"]
         persona_id = self.controller_user.obtener_persona_id(user)
         
         if persona_id:
             self.estudiante_id = self.controller_estudiantes.modelo.obtener_estudiante_id(persona_id)
             if self.estudiante_id:
-                self.listado_notas = self.controller_estudiantes.obtener_listado_notas_estudiantes(self.estudiante_id)
+                self.listado_notas = self.controller_notas.listarNotasEstudiante(self.estudiante_id)
 
                 self.pagina_actual = 1
                 self.uc_por_pagina = 11
@@ -33,7 +34,7 @@ class ListadosEstudiantesNotas(ctk.CTkFrame):
 
                 self.fila_datos = []
 
-                headers = ["Unidad Curricular", "Trayecto","Profesor", "Periodo Académico", "Nota"]
+                headers = ["Unidad Curricular", "Trayecto", "Tramo", "Profesor", "Periodo Académico", "Nota"]
                 for col, header in enumerate(headers):
                     # cada encabezado está dentro de un CTkFrame con fondo gris
                     celda = ctk.CTkFrame(self, fg_color="#e0e0e0", corner_radius=4)
@@ -68,7 +69,7 @@ class ListadosEstudiantesNotas(ctk.CTkFrame):
 
                 # Coloca el frame de paginación al final de la tabla
                 fila_paginacion = len(self.paginas_mostrar) + 2
-                self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=5, pady=15, sticky="ew")
+                self.frame_paginacion.grid(row=fila_paginacion, column=0, columnspan=6, pady=15, sticky="ew")
 
                 if len(self.listado_notas) <= self.uc_por_pagina:
                     self.frame_paginacion.grid_remove()
@@ -98,40 +99,13 @@ class ListadosEstudiantesNotas(ctk.CTkFrame):
         #print(self.paginas_mostrar)
         for fila, dic_notas in enumerate(self.paginas_mostrar, start=2):
             fila_widgets = [
-                self._crear_celda(fila, 0, dic_notas['nombre_unidad_curricular']),
-                self._crear_celda(fila, 1, dic_notas['nombre_trayecto']),
-                self._crear_celda(fila, 2, dic_notas['nombre_docente']),
-                self._crear_celda(fila, 3, dic_notas['periodo_academico']),
-                self._crear_celda(fila, 4, dic_notas['nota']),
+                self._crear_celda(fila, 0, dic_notas['unidad_curricular']),
+                self._crear_celda(fila, 1, dic_notas['trayecto']),
+                self._crear_celda(fila, 2, dic_notas['tramo']),
+                self._crear_celda(fila, 3, dic_notas.get('nombre_docente') or "Editada por superior"),
+                self._crear_celda(fila, 4, dic_notas['periodo_academico']),
+                self._crear_celda(fila, 5, f"{dic_notas['valor']:.2f}"),
             ]
-            # celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=6)
-            # celda_btn.grid(row=fila, column=4, padx=1, pady=6, sticky="nsew")
-
-            # # Frame interno para centrar los botones
-            # frame_botones = ctk.CTkFrame(celda_btn, fg_color="transparent")
-            # frame_botones.pack(expand=True)
-
-            # button = ctk.CTkButton(
-            #     frame_botones,
-            #     text="Gestionar Notas",
-            #     width=100,
-            #     text_color="#ffffff",
-            #     fg_color=COLOR_BOTON_FONDO,
-            #     hover_color=COLOR_BOTON_FONDO_HOVER,
-            #     command=lambda uc_id = dic_uc["id"]: self.cargar_nota_uc(uc_id)
-            # )
-
-            # button_ver_notas = ctk.CTkButton(
-            #     frame_botones, text="Ver Notas", width=100,
-            #     text_color="#ffffff",
-            #     fg_color=COLOR_BOTON_FONDO,
-            #     hover_color=COLOR_BOTON_FONDO_HOVER,
-            #     command=lambda uc_id = dic_uc["id"]: self.ver_notas_uc(uc_id)
-            # )
-            #button.pack(side="left", padx=(0,4), pady=5)
-            #button_ver_notas.pack(side="left", pady=5)
-
-            #fila_widgets.append(celda_btn)
             self.fila_datos.append(fila_widgets)
 
 

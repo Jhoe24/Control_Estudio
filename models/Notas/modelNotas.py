@@ -148,5 +148,67 @@ class ModeloNotas:
             if con is not None:
                 con.close()
 
+    def listar_notas_estudiante(self, estudiante_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = sql.Row  # Para que los resultados se puedan acceder como diccionarios
+            cursor = con.cursor()
 
-#pprint(ModeloNotas().estudiantes_por_uc(8,1))
+            # Consulta mejorada para incluir docente y período académico
+            """
+            Existe una tabla llamada docente_uc que guarda relacion con unidad_curricular_id y docente_ pnf_id
+            pero docente_pnf_id no es lo mismo que docente_id, por lo que no se puede hacer la relacion directa
+            pero docente_pnd_id es el id de la tabla docente_sede_pnf que a su vez tiene el docente_id
+            y en la tabla docente por medio de perosona_id se puede obtener el nombre del docente en la tabla informacion_personal
+            """
+            cursor.execute('''
+                SELECT
+                    n.id AS nota_id,
+                    n.valor,
+                    uc.nombre AS unidad_curricular,
+                    t.nombre AS trayecto,
+                    tr.nombre AS tramo,
+                    p.nombre AS pnf,
+                    pa.nombre AS periodo_academico,
+                    ip_docente.nombres || ' ' || ip_docente.apellidos AS nombre_docente
+                FROM
+                    notas n
+                JOIN
+                    unidades_curriculares uc ON n.unidad_curricular_id = uc.id
+                JOIN
+                    inscripciones i ON n.inscripcion_id = i.id
+                JOIN
+                    secciones s ON i.seccion_id = s.id
+                JOIN
+                    periodos_academicos pa ON s.periodo_academico_id = pa.id
+                JOIN
+                    trayectos t ON uc.trayecto_id = t.id
+                JOIN
+                    tramos tr ON uc.tramo_id = tr.id
+                JOIN
+                    pnf p ON uc.pnf_id = p.id
+                -- Unión directa con el docente titular de la sección
+                -- La unión correcta es a través de la asignación de la UC al docente en el período correcto
+                LEFT JOIN
+                    docente_uc duc ON duc.unidad_curricular_id = uc.id AND duc.periodo_academico_id = pa.id
+                LEFT JOIN
+                    docente_sede_pnf dsp ON duc.docente_pnf_id = dsp.id
+                LEFT JOIN
+                    docentes d ON dsp.docente_id = d.id
+                LEFT JOIN
+                    informacion_personal ip_docente ON d.persona_id = ip_docente.id
+                WHERE
+                    i.estudiante_id = ?
+                GROUP BY n.id ORDER BY -- Agrupamos por nota para evitar duplicados si hay múltiples docentes asignados (caso raro)
+                    p.nombre, t.nombre, uc.nombre
+                            ''',(estudiante_id,))
+            resultado = cursor.fetchall()
+            return [dict(fila) for fila in resultado]
+        except Exception as e:
+            print(f"Error al realizar la consulta: {e}") 
+            return []
+        finally:
+            if con is not None:
+                con.close()
+pprint(ModeloNotas().listar_notas_estudiante(13))
