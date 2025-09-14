@@ -29,7 +29,6 @@ class FremeSecciones(SectionFrameBase):
             self.var_sede = ctk.StringVar(value=self.sedes[0])
         else:
             self.var_sede = ctk.StringVar(value="No hay sedes")
-        
 
         self.periodos_academicos = self.controller_PA.obtener_codigos()
         if self.periodos_academicos:
@@ -37,9 +36,6 @@ class FremeSecciones(SectionFrameBase):
         else:
             self.var_periodo = ctk.StringVar(value="No hay Periodos Academicos")
         
-        
-
-
         #Obterner datos pnf, trayecto y tramo
         self.nombres_pnf = self.controller_pnf.obtener_nombres_pnf()
         self.var1 = ctk.StringVar(value=self.nombres_pnf[0] if self.nombres_pnf else "") # Valor por defecto para el PNF

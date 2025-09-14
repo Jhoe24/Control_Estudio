@@ -69,9 +69,19 @@ class BaseDashboardView(BaseView):
         Crea el sidebar completo con submenús expandibles y ajuste automático de ancho
         """
         # Crear frame principal del sidebar
-        self.menu_lateral = ctk.CTkFrame(self, fg_color="#18244c", corner_radius=0, width=180)
+        self.menu_lateral = ctk.CTkScrollableFrame(
+            self, 
+            fg_color="#18244c", 
+            corner_radius=0, 
+            width=180,
+            scrollbar_fg_color="#18244c",
+            scrollbar_button_color="#18244c",
+            scrollbar_button_hover_color="#18244c"
+        )
+        
         self.menu_lateral.pack(side="left", fill="y")
-        self.menu_lateral.pack_propagate(False)
+        # CTkScrollableFrame no usa pack_propagate, el ancho se controla con el parámetro 'width'
+        # self.menu_lateral.pack_propagate(False) 
         
         # Variables para controlar submenús
         self.submenu_frames = {}
@@ -145,6 +155,7 @@ class BaseDashboardView(BaseView):
             menu_items = [
                 ("Inicio", "home_icon", self.inicio, False),
                 ("Mis Notas", "carga_notas_icon", self.carga_notas, False),
+                ('Solicitud', "list_estudiante_icon", self.solicitud, False),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
                 ("Configuración", "configuracion_icon", self.configuracion, True),
                 ("Cerrar Sesión", "cerrar_sesion_icon", self._confirmar_logout, False),
@@ -392,6 +403,7 @@ class BaseDashboardView(BaseView):
     def sedes(self): pass
     def perfil(self): pass
     def notas(self): pass
+    def solicitud(self): pass
     def mis_clases(self): pass
     def configuracion(self): pass
     def configuracion_usuarios(self): pass

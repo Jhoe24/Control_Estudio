@@ -7,6 +7,7 @@ from views.dashboard.components.label_Bienvenida import LabelBienvenida
 from views.dashboard.components.card import Card, CardDisplay
 
 from views.dashboard.modules.Carga_notas import CargaNotasView
+from views.dashboard.modules.Solicitud_doc import SolicitudDoc
 from views.dashboard.modules.tables.Carga_notas.List_estudiantes_notas import ListadosEstudiantesNotas
 from views.dashboard.modules.tables.Estudiantes.ListarEstudiantes import ListEstudiantesView
 
@@ -38,11 +39,11 @@ class EstudianteDashboardView(BaseDashboardView):
 
         # --- Personalizar bienvenida y obtener datos para las tarjetas ---
         nombre_estudiante = self.datos_estudiante.get("nombres", "") if self.datos_estudiante else ""
-        estudiante_id = self.datos_estudiante.get("estudiante_id") if self.datos_estudiante else None
+        self.estudiante_id = self.datos_estudiante.get("estudiante_id") if self.datos_estudiante else None
 
-        if estudiante_id:
+        if self.estudiante_id:
             # Obtener datos de las tarjetas            
-            datos_pnf_asignado = self.controller['PNF'].modelo.obtener_pnf_asignado(estudiante_id)
+            datos_pnf_asignado = self.controller['PNF'].modelo.obtener_pnf_asignado(self.estudiante_id)
 
             promedio = datos_pnf_asignado.get("promedio_general", 0.0) if datos_pnf_asignado else 0.0
             # Obtener el nombre del trayecto directamente, ya que se guarda como texto
@@ -87,6 +88,14 @@ class EstudianteDashboardView(BaseDashboardView):
                 
         carga_notas = ListadosEstudiantesNotas(self.cuerpo_principal, self.controller, user=self.username)
         carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def solicitud(self):
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+        
+        solicitud = SolicitudDoc(self.cuerpo_principal, self.controller, rol = self.user_role, id = self.estudiante_id)
+        solicitud.pack(fill="both", expand=True, padx=10, pady=10)
+                
 
     def configuracion_usuarios(self):
         for widget in self.cuerpo_principal.winfo_children():

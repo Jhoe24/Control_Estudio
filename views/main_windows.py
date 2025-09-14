@@ -1,6 +1,7 @@
 import customtkinter as ctk
 
 from controllers.dashboard.Notas.notasController import NotasController
+from controllers.dashboard.Solicitudes.controllerSolicitud import ControllerSolcitud
 from views.auth.login_view import LoginView
 from views.auth.register_view import RegisterView
 from views.auth.register_personal import RegisterPersonalView
@@ -73,7 +74,8 @@ class MainWindow(ctk.CTk):
             "Mostrar_Ventanas": self,
             "Ventana_Actual": self.vista_actual,
             "Usuario":UserController(),
-            "Notas":NotasController()
+            "Notas":NotasController(),
+            "Solicitud":ControllerSolcitud()
             }  # Aquí se inicializa el controlador del dashboard, que es el panel de control de la aplicación. 
         # El servicio de usuario se inyecta en el controlador de autenticación, cuya funcion es manejar la lógica de autenticación y autorización de usuarios. 
 

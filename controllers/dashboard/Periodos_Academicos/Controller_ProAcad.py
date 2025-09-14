@@ -117,3 +117,6 @@ class PeriodoAcademicoController:
     
     def obtener_codigo_por_id(self, id):
         return self.modelo_pa.obtener_codigo_por_id(id)
+    
+    def obtener_fechas_periodo_academico(self, id_periodo):
+        return self.modelo_pa.obtener_fechas_periodo_academico(id_periodo)

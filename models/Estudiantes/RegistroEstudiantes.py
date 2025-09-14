@@ -802,5 +802,67 @@ class ModelRegistroEstudiantes:
             if con:
                 con.close()
 
-# db = ModelRegistroEstudiantes()
-# pprint(db.obtener_listado_notas_estudiantes(13))
+    def obtener_datos_para_constancia(self, estudiante_id):
+        """
+        Obtiene todos los datos necesarios para generar una constancia de estudio.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = sql.Row
+            cursor = con.cursor()
+
+            # La consulta se ha reestructurado para obtener la sede desde la última inscripción,
+            # que es una fuente más fiable que la tabla estudiante_pnf.
+            query = """
+                SELECT
+                    ip.nombres,
+                    ip.apellidos,
+                    ip.tipo_documento,
+                    ip.documento_identidad,
+                    ip.sexo,
+                    ep.estado AS situacion_academica,
+                    pnf.nombre AS pnf_nombre,
+                    t.nombre AS trayecto_nombre,
+                    sede.nombre AS sede_nombre,
+                    pa.nombre AS periodo_academico_nombre,
+                    ep.turno,
+                    ep.cohorte
+                FROM
+                    estudiantes e
+                JOIN
+                    informacion_personal ip ON e.persona_id = ip.id
+                JOIN
+                    estudiante_pnf ep ON e.id = ep.estudiante_id
+                JOIN
+                    pnf ON ep.pnf_id = pnf.id
+                JOIN
+                    trayectos t ON ep.trayecto_actual = t.id AND ep.pnf_id = t.pnf_id
+                -- Subconsulta para encontrar la última sección/periodo en la que el estudiante se inscribió
+                LEFT JOIN (
+                    SELECT
+                        i.estudiante_id,
+                        s.periodo_academico_id,
+                        s.sede_id
+                    FROM inscripciones i
+                    JOIN secciones s ON i.seccion_id = s.id
+                    WHERE i.estudiante_id = ?
+                    ORDER BY s.periodo_academico_id DESC, i.fecha_inscripcion DESC
+                    LIMIT 1
+                ) AS ultima_inscripcion ON e.id = ultima_inscripcion.estudiante_id
+                LEFT JOIN periodos_academicos pa ON ultima_inscripcion.periodo_academico_id = pa.id
+                LEFT JOIN sedes sede ON ultima_inscripcion.sede_id = sede.id
+                WHERE
+                    e.id = ? AND ep.estado = 'Activo'
+                LIMIT 1;
+            """
+            cursor.execute(query, (estudiante_id, estudiante_id))
+            resultado = cursor.fetchone()
+            return dict(resultado) if resultado else None
+
+        except Exception as e:
+            print(f"Error al obtener datos para la constancia: {e}")
+            return None
+        finally:
+            if con:
+                con.close()
