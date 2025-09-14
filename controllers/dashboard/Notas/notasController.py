@@ -57,3 +57,6 @@ class NotasController:
             mensaje = f"El estudiante no ha aprobado la materia de Proyecto.\nSu nota final es de: {nota_final}"
             messagebox.showwarning("No Aprobado", mensaje, parent=vistaMostrar)
             return False
+        
+    def estudiantes_por_uc(self, unidad_curricular_id, periodo_academico_id):
+        return self.modelo_notas.estudiantes_por_uc(unidad_curricular_id, periodo_academico_id)

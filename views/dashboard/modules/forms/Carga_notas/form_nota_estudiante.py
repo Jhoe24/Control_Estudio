@@ -5,23 +5,27 @@ from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from ..DatosPersonales import DatosPersonalesFrame
 
 class FrameNotaEstudiante(SectionFrameBase):
-    def __init__(self, master, controller_estudiante, tupla, unidad_curricular_id, solo_lectura=False, user_role=None):
+    def __init__(self, master, controller_estudiante, controller_notas, tupla, unidad_curricular_id, solo_lectura=False, user_role=None):
         super().__init__(master, header_text="Gestión de Notas de Estudiantes", fg_color_label=COLOR_HEADER_SECCION_BG_2)
         self.controller_estudiante = controller_estudiante
+        self.controller_notas = controller_notas
+        self.user_role = user_role
         self.unidad_curricular_id = unidad_curricular_id
         self.solo_lectura = solo_lectura
         if user_role and user_role.lower() != "docente":
             self.seccion_id = tupla[5]  # id de la sección que esta en la posicion de la tupla nuemero 5
+            self.lista_estudiantes = self.controller_estudiante.obtener_estudiantes_por_seccion(self.seccion_id)
         else:
-            print("tupla",tupla)
+            #print("tupla",tupla)
             self.seccion_id = self.controller_estudiante.obtener_seccion_id_por_pnf_periodoAcademico_y_docente(tupla)
-            print(self.seccion_id)
+            self.lista_estudiantes = self.controller_notas.estudiantes_por_uc(self.unidad_curricular_id, tupla[1])  # id del periodo academico que esta en la posicion de la tupla numero 1
+            #print(self.seccion_id)
             #self.seccion_id = tupla[1]  # id de la sección que esta en la posicion de la tupla nuemero 5 
         #print("\n\n=========================================================")
         #print(f'tupla es :{tupla}')
         #print(f"seccion_id recibido: {self.seccion_id}")
-        self.lista_estudiantes = self.controller_estudiante.obtener_estudiantes_por_seccion(self.seccion_id)
-        print(f"seccion id obtenida {self.seccion_id} lista_estudiantes obtenida: {self.lista_estudiantes}")
+        #self.lista_estudiantes = self.controller_notas.estudiantes_por_uc(self.unidad_curricular_id, tupla[1])  # id del periodo academico que esta en la posicion de la tupla numero 1
+        #print(f"seccion id obtenida {self.seccion_id} lista_estudiantes obtenida: {self.lista_estudiantes}")
         
         # si la lista de estudiantes está vacía, mostrar un mensaje
         # y no continuar con la carga de notas
@@ -61,7 +65,10 @@ class FrameNotaEstudiante(SectionFrameBase):
             # Nombres
             fila_widgets.append(self._crear_celda_tabla(i, 1, estudiante['nombres']))
             # Seccion ID
-            fila_widgets.append(self._crear_celda_tabla(i, 2, self.seccion_id))
+            if self.user_role and self.user_role.lower() != "docente":
+                fila_widgets.append(self._crear_celda_tabla(i, 2, self.seccion_id))
+            else:
+                fila_widgets.append(self._crear_celda_tabla(i, 2, estudiante['nombre_seccion']))
 
 
             # Nota (Entry en celda)
@@ -76,7 +83,10 @@ class FrameNotaEstudiante(SectionFrameBase):
             )
             entry_nota.pack(padx=10, pady=5)
             # Si es solo lectura, mostrar la nota y deshabilitar
-            inscripcion_id = self.controller_estudiante.obtener_inscripcion_id(estudiante['id'], self.seccion_id)
+            if self.user_role and self.user_role.lower() != "docente":
+                inscripcion_id = self.controller_estudiante.obtener_inscripcion_id(estudiante['id'], self.seccion_id)
+            else:
+                inscripcion_id = self.controller_estudiante.obtener_inscripcion_id(estudiante['estudiante_id'], estudiante['seccion_id'])
 
             valor = self.controller_estudiante.obtener_nota(inscripcion_id, self.unidad_curricular_id)
             state_actualizar = "disabled"

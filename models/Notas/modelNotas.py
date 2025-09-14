@@ -117,6 +117,7 @@ class ModeloNotas:
                     ip.nombres,
                     ip.apellidos,
                     i.id AS inscripcion_id,
+                    s.id AS seccion_id,
                     s.codigo_seccion AS nombre_seccion
                 FROM
                     unidades_curriculares uc

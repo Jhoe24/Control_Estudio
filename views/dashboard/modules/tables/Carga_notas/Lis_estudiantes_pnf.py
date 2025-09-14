@@ -131,6 +131,7 @@ class ListadosEstudiantesPNF(ListarUC):
         carga_noras_estudiantes = FrameNotaEstudiante(
             scroll_frame,
             self.controller_estudiantes_inscritos,
+            self.controller_notas,
             self.tuplas_datos,
             unidad_curricular_id,
             solo_lectura=False,
@@ -176,6 +177,7 @@ class ListadosEstudiantesPNF(ListarUC):
         notas_estudiantes = FrameNotaEstudiante(
             scroll_frame,
             self.controller_estudiantes_inscritos,
+            self.controller_notas,
             self.tuplas_datos,
             unidad_curricular_id,
             solo_lectura=True
