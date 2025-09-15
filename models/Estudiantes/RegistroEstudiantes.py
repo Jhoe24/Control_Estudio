@@ -815,46 +815,16 @@ class ModelRegistroEstudiantes:
             # La consulta se ha reestructurado para obtener la sede desde la última inscripción,
             # que es una fuente más fiable que la tabla estudiante_pnf.
             query = """
-                SELECT
-                    ip.nombres,
-                    ip.apellidos,
-                    ip.tipo_documento,
-                    ip.documento_identidad,
-                    ip.sexo,
-                    ep.estado AS situacion_academica,
-                    pnf.nombre AS pnf_nombre,
-                    t.nombre AS trayecto_nombre,
-                    sede.nombre AS sede_nombre,
-                    pa.nombre AS periodo_academico_nombre,
-                    ep.turno,
-                    ep.cohorte
-                FROM
-                    estudiantes e
-                JOIN
-                    informacion_personal ip ON e.persona_id = ip.id
-                JOIN
-                    estudiante_pnf ep ON e.id = ep.estudiante_id
-                JOIN
-                    pnf ON ep.pnf_id = pnf.id
-                JOIN
-                    trayectos t ON ep.trayecto_actual = t.id AND ep.pnf_id = t.pnf_id
-                -- Subconsulta para encontrar la última sección/periodo en la que el estudiante se inscribió
-                LEFT JOIN (
-                    SELECT
-                        i.estudiante_id,
-                        s.periodo_academico_id,
-                        s.sede_id
-                    FROM inscripciones i
-                    JOIN secciones s ON i.seccion_id = s.id
-                    WHERE i.estudiante_id = ?
-                    ORDER BY s.periodo_academico_id DESC, i.fecha_inscripcion DESC
-                    LIMIT 1
-                ) AS ultima_inscripcion ON e.id = ultima_inscripcion.estudiante_id
-                LEFT JOIN periodos_academicos pa ON ultima_inscripcion.periodo_academico_id = pa.id
-                LEFT JOIN sedes sede ON ultima_inscripcion.sede_id = sede.id
-                WHERE
-                    e.id = ? AND ep.estado = 'Activo'
-                LIMIT 1;
+                SELECT 
+                ip.*,
+                s.nombre as nombre_sede
+                FROM estudiantes e
+                INNER JOIN informacion_personal ip ON e.persona_id = ip.id
+                INNER JOIN inscripciones i ON e.id = i.estudiante_id
+                INNER JOIN secciones sec ON i.seccion_id = sec.id
+                INNER JOIN sedes s ON sec.sede_id = s.id
+                WHERE e.id = ?
+                LIMIT 1
             """
             cursor.execute(query, (estudiante_id, estudiante_id))
             resultado = cursor.fetchone()
@@ -866,3 +836,5 @@ class ModelRegistroEstudiantes:
         finally:
             if con:
                 con.close()
+
+print(ModelRegistroEstudiantes().obtener_datos_para_constancia(11))

@@ -104,6 +104,10 @@ class ControllerSecciones:
 
     def obtener_id_por_nombre(self, nombre_seccion):
         return self._seccion_id_por_nombre.get(nombre_seccion)
+    
+    def obtener_id_por_nombre_pnf(self, nombre_pnf):
+        # Asegúrate de que el modelo tenga un método similar
+        return self.modelo.obtener_id_por_nombre(nombre_pnf)
 
     def actualizar_seccion(self, seccion_id, datos_actualizados, ventana):
         exito = self.modelo.actualizar_seccion(seccion_id, datos_actualizados,self.obtener_fecha_actual())
@@ -165,3 +169,37 @@ class ControllerSecciones:
         else:
             return None
         
+    def actualizar_estado_seccion_por_fecha(self, seccion, periodo_academico):
+        """
+        Actualiza el estado de una sección según las fechas del periodo académico.
+        """
+        ahora = datetime.now().date()
+        # Asegúrate de convertir las fechas a objetos date
+        fi_insc = datetime.strptime(periodo_academico["fecha_inicio_inscripcion"], "%Y-%m-%d").date()
+        ff_insc = datetime.strptime(periodo_academico["fecha_fin_inscripcion"], "%Y-%m-%d").date()
+        fi_clases = datetime.strptime(periodo_academico["fecha_inicio_clases"], "%Y-%m-%d").date()
+        ff_clases = datetime.strptime(periodo_academico["fecha_fin_clases"], "%Y-%m-%d").date()
+        fi_eval = datetime.strptime(periodo_academico["fecha_inicio_evaluaciones"], "%Y-%m-%d").date()
+        ff_eval = datetime.strptime(periodo_academico["fecha_fin_evaluaciones"], "%Y-%m-%d").date()
+
+        if ahora < fi_insc:
+            estado = "Planificada"
+        elif fi_insc <= ahora <= ff_insc:
+            estado = "Abierta"
+        elif fi_clases <= ahora <= ff_clases:
+            estado = "En curso"
+        elif fi_eval <= ahora <= ff_eval:
+            estado = "Abierta"
+        elif ahora > ff_eval:
+            estado = "Finalizada"
+        else:
+            estado = "Planificada"
+
+        print(f"Estado actual: {seccion['estado']} | Estado calculado: {estado}")
+
+        # Si el estado cambió, actualiza en la base de datos
+        if seccion["estado"] != estado:
+            print(f"Actualizando estado de la sección {seccion['id']} de {seccion['estado']} a {estado}") 
+            self.modelo.actualizar_estado(seccion["id"], estado)
+        return estado
+

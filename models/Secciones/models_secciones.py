@@ -1,6 +1,7 @@
 import sqlite3 as sql
 import os
 from pprint import pprint
+from datetime import datetime
 
 class ModeloSecciones:
     def __init__(self):
@@ -132,4 +133,35 @@ class ModeloSecciones:
                 if con is not None:
                     con.close()
 
+#===============================================================
 
+    def actualizar_estado(self, seccion_id, nuevo_estado):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("UPDATE secciones SET estado = ? WHERE id = ?", (nuevo_estado, seccion_id))
+            con.commit()
+            print("actualizacion exitosa")
+            return True
+        except Exception as e:
+            print(f"Error al actualizar el estado de la sección: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+    
+    def obtener_id_por_nombre(self, nombre_pnf):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute("SELECT id FROM pnf WHERE nombre = ?", (nombre_pnf,))
+            row = cursor.fetchone()
+            return row[0] if row else None
+        except Exception as e:
+            print(f"Error al obtener id por nombre: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()

@@ -293,12 +293,31 @@ class ListSeccionesView(ctk.CTkFrame):
         id_pnf = None
         try:
             nombre_pnf = self.filtrado.var1.get()
-            id_pnf = self.controlador_secciones.obtener_id_por_nombre(nombre_pnf) 
+            print(f"Nombre PNF seleccionado: {nombre_pnf}")
+            id_pnf = self.controlador_secciones.obtener_id_por_nombre_pnf(nombre_pnf) 
+            print(f"ID PNF obtenido: {id_pnf}")
         except Exception as e:
             print(f"No se pudo obtener id_pnf para listar secciones: {e}")
 
         if id_pnf:
             self.secciones = self.controlador_secciones.listar_secciones(id_pnf)
+            print(f"Secciones obtenidas para PNF ID {id_pnf}: {len(self.secciones)}")
+            # Actualizar estado de cada seccion segun las fechas del periodo academico
+            for seccion in self.secciones:
+                print("Campos de la sección:", seccion.keys()) 
+                periodo_id = seccion.get("periodo_academico_id")
+                print(f"periodo_id de la sección {seccion.get('codigo_seccion')}: {periodo_id}")  
+                if periodo_id:
+                    #obtener datos del periodo academico
+                    periodo = self.controlador_PA.obtener_periodo_academico_datos(periodo_id)
+                    print(periodo)
+                    if periodo and len(periodo) > 0:
+                        periodo = periodo[0]
+                        #actualizar el estado de la seccion si corresponde
+                        self.controlador_secciones.actualizar_estado_seccion_por_fecha(seccion, periodo)
+                        print(f'Se actualizo el estado de la seccion {seccion["codigo_seccion"]} segun las fechas del periodo academico {periodo["nombre"]}')
+                        print(f'Fechas: inicio clases: {periodo["fecha_inicio_clases"]}, fin clases: {periodo["fecha_fin_clases"]}, fecha inicio clases: {periodo["fecha_inicio_clases"]}, fecha fin clases: {periodo["fecha_fin_clases"]}, fecha actual: {self.controlador_secciones.obtener_fecha_actual()}')
+
         else:
             self.secciones = []  
 

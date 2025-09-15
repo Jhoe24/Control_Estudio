@@ -211,4 +211,4 @@ class ModeloNotas:
         finally:
             if con is not None:
                 con.close()
-pprint(ModeloNotas().listar_notas_estudiante(13))
+#pprint(ModeloNotas().listar_notas_estudiante(13))

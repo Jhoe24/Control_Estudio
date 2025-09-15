@@ -47,5 +47,9 @@ class FiltradoSecciones(ctk.CTkFrame):
     
     def realizar_busquedad(self):
         pnf_id = self.obtener_pnf_id()
+        print(pnf_id)
         self.master.secciones = self.controller_secciones.listar_secciones(pnf_id)
+        print(self.master.secciones)
+        self.master.actualizar_listado()
+        print("probando")
         self.master.calcular_pagina()
