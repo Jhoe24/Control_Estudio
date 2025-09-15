@@ -165,3 +165,5 @@ class ModeloSecciones:
         finally:
             if con is not None:
                 con.close()
+
+#print(ModeloSecciones().actualizar_estado(2, 'Abierta'))

@@ -174,7 +174,7 @@ class ControllerSecciones:
         Actualiza el estado de una sección según las fechas del periodo académico.
         """
         ahora = datetime.now().date()
-        # Asegúrate de convertir las fechas a objetos date
+     
         fi_insc = datetime.strptime(periodo_academico["fecha_inicio_inscripcion"], "%Y-%m-%d").date()
         ff_insc = datetime.strptime(periodo_academico["fecha_fin_inscripcion"], "%Y-%m-%d").date()
         fi_clases = datetime.strptime(periodo_academico["fecha_inicio_clases"], "%Y-%m-%d").date()
@@ -202,4 +202,3 @@ class ControllerSecciones:
             print(f"Actualizando estado de la sección {seccion['id']} de {seccion['estado']} a {estado}") 
             self.modelo.actualizar_estado(seccion["id"], estado)
         return estado
-

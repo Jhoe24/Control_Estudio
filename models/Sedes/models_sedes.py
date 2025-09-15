@@ -157,6 +157,43 @@ class ModeloSedes:
         finally:
             if con is not None:
                 con.close()
+    
+    # def obtener_periodo_academico_datos(self, id_periodo):
+    #     con = None
+    #     try:
+    #         con = sql.connect(self.db_ruta)
+    #         cursor = con.cursor()
+    #         cursor.execute(
+    #             """
+    #             SELECT id, codigo, nombre, tipo, fecha_inicio, fecha_fin, fecha_inicio_inscripcion, 
+    #             fecha_fin_inscripcion, fecha_inicio_clases, fecha_fin_clases, fecha_inicio_evaluaciones, 
+    #             fecha_fin_evaluaciones, duracion_semanas, estado, observaciones FROM periodos_academicos 
+    #             WHERE id=?""", (id_periodo,))
+    #         return [{
+    #             "id": row[0],
+    #             "codigo": row[1],
+    #             "nombre": row[2],
+    #             "tipo": row[3],
+    #             "fecha_inicio": row[4],
+    #             "fecha_fin": row[5],
+    #             "fecha_inicio_inscripcion": row[6],
+    #             "fecha_fin_inscripcion": row[7],
+    #             "fecha_inicio_clases": row[8],
+    #             "fecha_fin_clases": row[9],
+    #             "fecha_inicio_evaluaciones": row[10],
+    #             "fecha_fin_evaluaciones": row[11],
+    #             "duracion_semanas": row[12],
+    #             "estado": row[13],
+    #             "observaciones": row[14]
+    #         } for row in cursor.fetchall()]
+        
+    #     except Exception as e:
+    #         print(f"Error al obtener los periodos academicos: {e}") 
+    #         return []
+    #     finally:
+    #         if con is not None:
+    #             con.close()
+
 
 # bd = ModeloSedes()
 # print(bd.obtener_codigo_por_id(1))
