@@ -1,12 +1,18 @@
 import os
 from datetime import datetime
 from docxtpl import DocxTemplate
+from pathlib import Path
+try:
+    from docx2pdf import convert
+except ImportError:
+    convert = None
 
 class ModelSolicitud:
     def __init__(self):
         self.datos = None
         self.output_path = "reportes/constancias"
         self.template_path = "reportes/plantillas/plantilla_constancia.docx"
+        self.pdf_output_path = "reportes/constancias/pdf"
         os.makedirs(self.output_path, exist_ok=True)
 
     def generar_docx(self, datos):
@@ -17,8 +23,8 @@ class ModelSolicitud:
         try:
             doc = DocxTemplate(self.template_path)
         except Exception as e:
-            print(f"Error: No se pudo encontrar la plantilla en '{self.template_path}'. Asegúrate de que el archivo existe.")
-            raise e
+            print(f"Error al cargar la plantilla: No se pudo encontrar en '{self.template_path}'. Detalles: {e}")
+            return None # Devolver None si la plantilla no se encuentra
 
         now = datetime.now()
         meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
@@ -39,10 +45,10 @@ class ModelSolicitud:
             'fecha': f"{now.day} de {meses[now.month - 1]} de {now.year}",
             
             # Datos del coordinador (puedes moverlos a un archivo de configuración)
-            'coordinador': "ING. JOSÉ AGUSTÍN PÉREZ",
-            'cedula_coordinador': "V-12.345.678",
+            'coordinador': "________________________",
+            'cedula_coordinador': "________________",
             'cargo_coordinador': "COORDINADOR(A) DE CONTROL DE ESTUDIOS",
-            'correo_contacto': "dacecg@gmail.com"
+            'correo_contacto': "correo: ___________________"
         }
 
         doc.render(context)
@@ -52,4 +58,38 @@ class ModelSolicitud:
         filepath = os.path.join(self.output_path, filename)
         doc.save(filepath)
         return filepath
+    
+    def convertir_a_pdf(self, ruta_docx):
+        """
+        Convierte un archivo DOCX a PDF.
+        """
+        if convert is None:
+            print("Error: La librería 'docx2pdf' no está instalada. Ejecuta 'pip install docx2pdf'.")
+            return None
 
+        if not os.path.exists(ruta_docx):
+            print(f"Error: El archivo DOCX no se encuentra en '{ruta_docx}'")
+            return None
+
+        try:
+            # Obtener la ruta de la carpeta "Documentos" del usuario
+            # Path.home() encuentra el directorio de inicio del usuario (ej: C:\Users\TuUsuario)
+            documents_path = Path.home() / "Documents"
+
+            # Si la carpeta "Documents" no existe, intenta con "Documentos" (para Windows en español)
+            if not documents_path.exists():
+                documents_path = Path.home() / "Documentos"
+
+            # Crear una subcarpeta para las constancias si no existe
+            pdf_output_dir = documents_path / "Constancias de Estudio"
+            pdf_output_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Convertir el archivo y guardarlo en la nueva ruta
+            ruta_pdf_final = pdf_output_dir / Path(ruta_docx).name.replace('.docx', '.pdf')
+            convert(ruta_docx, str(ruta_pdf_final))
+            
+            print(f"Archivo convertido a PDF exitosamente en: {ruta_pdf_final}")
+            return str(ruta_pdf_final)
+        except Exception as e:
+            print(f"Error al convertir a PDF. Asegúrate de que Microsoft Word esté instalado. Detalles: {e}")
+            return None

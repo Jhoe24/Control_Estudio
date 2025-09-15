@@ -815,18 +815,25 @@ class ModelRegistroEstudiantes:
             # La consulta se ha reestructurado para obtener la sede desde la última inscripción,
             # que es una fuente más fiable que la tabla estudiante_pnf.
             query = """
-                SELECT 
-                ip.*,
-                s.nombre as nombre_sede
+                SELECT
+                    ip.*,
+                    s.nombre AS sede_nombre,
+                    t.nombre AS trayecto_nombre,
+                    p.nombre AS pnf_nombre,
+                    pa.nombre AS periodo_academico_nombre
                 FROM estudiantes e
                 INNER JOIN informacion_personal ip ON e.persona_id = ip.id
                 INNER JOIN inscripciones i ON e.id = i.estudiante_id
                 INNER JOIN secciones sec ON i.seccion_id = sec.id
                 INNER JOIN sedes s ON sec.sede_id = s.id
+                INNER JOIN pnf p ON sec.pnf_id = p.id
+                INNER JOIN trayectos t ON sec.trayecto_id = t.id
+                INNER JOIN periodos_academicos pa ON sec.periodo_academico_id = pa.id
                 WHERE e.id = ?
+                ORDER BY i.id DESC -- Ordenar por la inscripción más reciente
                 LIMIT 1
             """
-            cursor.execute(query, (estudiante_id, estudiante_id))
+            cursor.execute(query, (estudiante_id,))
             resultado = cursor.fetchone()
             return dict(resultado) if resultado else None
 
@@ -837,4 +844,4 @@ class ModelRegistroEstudiantes:
             if con:
                 con.close()
 
-print(ModelRegistroEstudiantes().obtener_datos_para_constancia(11))
+pprint(ModelRegistroEstudiantes().obtener_datos_para_constancia(11))

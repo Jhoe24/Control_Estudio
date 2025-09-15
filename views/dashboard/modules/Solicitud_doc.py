@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 import tkinter.messagebox as messagebox
 import os
+import webbrowser
 
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from views.dashboard.components.widget_utils import *
@@ -69,18 +70,34 @@ class SolicitudDoc(SectionFrameBase):
 
     def contanciaEstudio(self):
         if self.rol.lower() == "estudiante":
-            datos = self.controllerEstudiante.obtener_datos_para_constancia(self.id)
+            frase_a_quitar = "Programa Nacional de Formación"
+            datos = self.controllerEstudiante.modelo.obtener_datos_para_constancia(self.id)
+            nombre_pnf = datos.get('pnf_nombre', '')
+
+            if nombre_pnf.startswith(frase_a_quitar):
+                datos['pnf_nombre'] = nombre_pnf.replace(frase_a_quitar, "").strip()
+                print(datos["pnf_nombre"])
+
             if not datos:
                 messagebox.showerror("Error", "No se encontraron datos para la constancia.")
                 return
             
             try:
                 # El controlador devuelve la ruta del archivo generado
-                ruta_archivo = self.controllerSolicitud.generar_constancia(datos)
+                ruta_docx = self.controllerSolicitud.generar_constancia(datos)
                 
-                if ruta_archivo and os.path.exists(ruta_archivo):
-                    messagebox.showinfo("Éxito", f"Constancia generada correctamente en:\n{ruta_archivo}")
-                    # Abrir el archivo con la aplicación predeterminada del sistema
+                if ruta_docx and os.path.exists(ruta_docx):
+                    messagebox.showinfo("Éxito", f"Constancia DOCX generada en:\n{ruta_docx}")
+                    
+                    # Intentar convertir a PDF
+                    ruta_pdf = self.controllerSolicitud.convertir_a_pdf(ruta_docx)
+                    if ruta_pdf and os.path.exists(ruta_pdf):
+                        respuesta = messagebox.askyesno("Éxito", f"Constancia PDF generada en:\n{ruta_pdf}\n\n¿Desea abrir el archivo ahora?")
+                        if respuesta:
+                            # Abrir el archivo PDF en el navegador o visor predeterminado
+                            webbrowser.open_new_tab(ruta_pdf)
+                    else:
+                        messagebox.showwarning("Advertencia", "No se pudo convertir el archivo a PDF. Asegúrate de tener MS Word instalado.")
                 else:
                     messagebox.showerror("Error", "No se pudo generar el archivo de la constancia.")
             
