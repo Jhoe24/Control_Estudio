@@ -180,7 +180,7 @@ class ControllerSecciones:
         fi_clases = datetime.strptime(periodo_academico["fecha_inicio_clases"], "%Y-%m-%d").date()
         ff_clases = datetime.strptime(periodo_academico["fecha_fin_clases"], "%Y-%m-%d").date()
         fi_eval = datetime.strptime(periodo_academico["fecha_inicio_evaluaciones"], "%Y-%m-%d").date()
-        ff_eval = datetime.strptime(periodo_academico["fecha_fin_evaluaciones"], "%Y-%m-%d").date()
+        ff_eval = datetime.strptime(periodo_academico["fecha_fin"], "%Y-%m-%d").date()
 
         if ahora < fi_insc:
             estado = "Planificada"
@@ -189,7 +189,7 @@ class ControllerSecciones:
         elif fi_clases <= ahora <= ff_clases:
             estado = "En curso"
         elif fi_eval <= ahora <= ff_eval:
-            estado = "Abierta"
+            estado = "En curso"
         elif ahora > ff_eval:
             estado = "Finalizada"
         else:

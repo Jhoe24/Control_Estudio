@@ -3,7 +3,6 @@ import customtkinter as ctk
 import tkinter as tk
 import threading
 import tkinter.messagebox as messagebox
-from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.Sedes.formSedes import FormSedes
 from views.dashboard.modules.forms.PNF.FrameSecciones import FremeSecciones
@@ -91,15 +90,16 @@ class ListSeccionesView(ctk.CTkFrame):
         inicio = (self.pagina_actual - 1) * self.secciones_por_pagina
         fin = inicio + self.secciones_por_pagina
         secciones_mostrar = self.secciones[inicio:fin]
-
+        i = 0
         for idx, seccion in enumerate(secciones_mostrar, start=2):
-            sede = self.cambiar_id_por_nombre(seccion)
+            sede = self.cambiar_id_por_nombre(seccion,i)
+            #print(f'seccion {idx} en {seccion}')
             fila_widgets = [
-                self._crear_celda(idx, 0, sede["codigo_seccion"]),
-                self._crear_celda(idx, 1, sede["pnf_id"]),
-                self._crear_celda(idx, 2, sede["trayecto_id"]),
-                self._crear_celda(idx, 3, sede["docente_titular_id"]),
-                self._crear_celda(idx, 4, sede["estado"]),
+                self._crear_celda(idx, 0, seccion["codigo_seccion"]),
+                self._crear_celda(idx, 1, seccion["pnf_id"]),
+                self._crear_celda(idx, 2, seccion["trayecto_id"]),
+                self._crear_celda(idx, 3, seccion["docente_titular_id"]),
+                self._crear_celda(idx, 4, seccion["estado"]),
             ]
 
             celda_btn = ctk.CTkFrame(self, fg_color="#f5f5f5", corner_radius=4)
@@ -115,6 +115,7 @@ class ListSeccionesView(ctk.CTkFrame):
             btn_ver.pack(padx=10, pady=5)
             fila_widgets.append(celda_btn)
             self.filas_datos.append(fila_widgets)
+            i += 1
 
         # Actualizar el frame de paginación al final de la tabla
         fila_paginacion = len(secciones_mostrar) + 2
@@ -177,49 +178,6 @@ class ListSeccionesView(ctk.CTkFrame):
         self.boton_siguiente.configure(state="disabled" if self.pagina_actual >= self.total_paginas else "normal")
 
         self.mostrar_secciones()
-
-    def abrir_modal_formulario(self):
-        """
-        Abre el formulario de registro de sedes en un modal con scroll.
-        """
-        top = ctk.CTkToplevel(self, fg_color="white")
-        top.title("Agregar Sede")
-        ancho, alto = 700, 600
-
-        # Centrar ventana
-        top.update_idletasks()
-        screen_width = top.winfo_screenwidth()
-        screen_height = top.winfo_screenheight()
-        x = (screen_width // 2) - (ancho // 2)
-        y = (screen_height // 2) - (alto // 2)
-        top.geometry(f"{ancho}x{alto}+{x}+{y}")
-        top.lift()
-        top.focus_force()
-        top.grab_set()
-
-        # Crear frame con scroll dentro del modal
-        scrollable_frame = ctk.CTkFrame(top, width=ancho-40, height=alto-120, fg_color="white")
-        scrollable_frame.pack(padx=20, pady=20, fill="both", expand=True)
-
-        form = FormSedes(scrollable_frame, self.controlador)
-        form.pack(fill="both", expand=True)
-        
-        frame_btn = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
-        frame_btn.pack(pady=10)
-    
-        self.button_frame = ctk.CTkFrame(frame_btn, fg_color="transparent")
-        self.button_frame.pack(pady=(25, 20))
-
-        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Guardar", width=140, command=lambda: self.guardar_sede(form, top),
-                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT
-                                        )
-        self.btn_guardar.pack(side="left", padx=10)
-
-        self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Cerrar", width=140, command=top.destroy,
-                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT
-                                        )
-        self.btn_cancelar.pack(side="left", padx=10)
-
     
     def ver_datos_completos_sede(self, sede):
         """
@@ -287,42 +245,45 @@ class ListSeccionesView(ctk.CTkFrame):
                 self.actualizar_listado()
                 ventana.destroy()
                 
-    def actualizar_listado(self):
+    def actualizar_listado(self, id_pnf):
         #self.secciones = self.controlador_secciones.listar_secciones()
         # sin un atributo o método que proporcione el pnf
-        id_pnf = None
-        try:
-            nombre_pnf = self.filtrado.var1.get()
-            print(f"Nombre PNF seleccionado: {nombre_pnf}")
-            id_pnf = self.controlador_secciones.obtener_id_por_nombre_pnf(nombre_pnf) 
-            print(f"ID PNF obtenido: {id_pnf}")
-        except Exception as e:
-            print(f"No se pudo obtener id_pnf para listar secciones: {e}")
+        # id_pnf = None
+        # try:
+        #     nombre_pnf = self.filtrado.var1.get()
+        #     print(f"Nombre PNF seleccionado: {nombre_pnf}")
+        #     id_pnf = self.controlador_secciones.obtener_id_por_nombre_pnf(nombre_pnf) 
+        #     print(f"ID PNF obtenido: {id_pnf}")
+        # except Exception as e:
+        #     print(f"No se pudo obtener id_pnf para listar secciones: {e}")
 
         if id_pnf:
             self.secciones = self.controlador_secciones.listar_secciones(id_pnf)
-            print(f"Secciones obtenidas para PNF ID {id_pnf}: {len(self.secciones)}")
+            #print(self.secciones)
+            #print(f"Secciones obtenidas para PNF ID {id_pnf}: {len(self.secciones)}")
             # Actualizar estado de cada seccion segun las fechas del periodo academico
             for seccion in self.secciones:
-                print("Campos de la sección:", seccion.keys()) 
+                #print("Campos de la sección:", seccion.keys()) 
                 periodo_id = seccion.get("periodo_academico_id")
-                print(f"periodo_id de la sección {seccion.get('codigo_seccion')}: {periodo_id}")  
+                #print(f"periodo_id de la sección {seccion.get('codigo_seccion')}: {periodo_id}")  
                 if periodo_id:
                     #obtener datos del periodo academico
                     periodo = self.controlador_PA.obtener_periodo_academico_datos(periodo_id)
-                    print(periodo)
+                    #print(periodo)
                     if periodo and len(periodo) > 0:
                         periodo = periodo[0]
                         #actualizar el estado de la seccion si corresponde
                         self.controlador_secciones.actualizar_estado_seccion_por_fecha(seccion, periodo)
-                        print(f'Se actualizo el estado de la seccion {seccion["codigo_seccion"]} segun las fechas del periodo academico {periodo["nombre"]}')
-                        print(f'Fechas: inicio clases: {periodo["fecha_inicio_clases"]}, fin clases: {periodo["fecha_fin_clases"]}, fecha inicio clases: {periodo["fecha_inicio_clases"]}, fecha fin clases: {periodo["fecha_fin_clases"]}, fecha actual: {self.controlador_secciones.obtener_fecha_actual()}')
+                        #print(f'Se actualizo el estado de la seccion {seccion["codigo_seccion"]} segun las fechas del periodo academico {periodo["nombre"]}')
+                        #print(f'Fechas: inicio clases: {periodo["fecha_inicio_clases"]}, fin clases: {periodo["fecha_fin_clases"]}, fecha inicio clases: {periodo["fecha_inicio_clases"]}, fecha fin clases: {periodo["fecha_fin_clases"]}, fecha actual: {self.controlador_secciones.obtener_fecha_actual()}')
 
         else:
             self.secciones = []  
 
+
+        self.secciones = self.controlador_secciones.listar_secciones(id_pnf)
         self.calcular_pagina()
-        self.mostrar_secciones()
+        #self.mostrar_secciones()
         self.frame_paginacion.grid()
         self.frame_paginacion.grid_remove()
         self.frame_paginacion.grid()
@@ -353,8 +314,9 @@ class ListSeccionesView(ctk.CTkFrame):
             print(f"Error al obtener el nombre del docente titular: {e}")
             return "Error obteniendo docente"
 
-    def cambiar_id_por_nombre(self, seccion):
+    def cambiar_id_por_nombre(self, seccion, idx):
         # Docente Titular
+        print(idx)
         listado_docentes = self.controlador_docentes.obtener_solo_nombres_docentes_por_pnf(seccion["pnf_id"])
         for id_docente, nombre_apellido in listado_docentes:
             if id_docente == seccion["docente_titular_id"]:
@@ -365,13 +327,16 @@ class ListSeccionesView(ctk.CTkFrame):
 
         # Convertir PNF_ID a nombre
         pnf_nombre_tuple = self.controlador_pnf.obtener_nombres_por_id("pnf", seccion["pnf_id"])
+        #print(pnf_nombre_tuple)
         if pnf_nombre_tuple:
             seccion["pnf_id"] = pnf_nombre_tuple[0]
         else:
             seccion["pnf_id"] = "PNF Desconocido"
 
         # Convertir TRAYECTO_ID a nombre
+        
         trayecto_nombre_tuple = self.controlador_pnf.obtener_nombres_por_id("trayectos", seccion["trayecto_id"])
+        #print(trayecto_nombre_tuple)
         if trayecto_nombre_tuple:
             seccion["trayecto_id"] = trayecto_nombre_tuple[0]
         else:
@@ -380,6 +345,7 @@ class ListSeccionesView(ctk.CTkFrame):
         # Convertir TRAMO_ID a nombre 
         if "tramo_id" in seccion and seccion["tramo_id"] is not None:
             tramo_nombre_tuple = self.controlador_pnf.obtener_nombres_por_id("tramos", seccion["tramo_id"])
+            print(tramo_nombre_tuple)
             if tramo_nombre_tuple:
                 seccion["tramo_id"] = tramo_nombre_tuple[0]
             else:

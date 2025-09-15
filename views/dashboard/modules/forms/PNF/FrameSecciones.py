@@ -7,7 +7,7 @@ from controllers.dashboard.PNF.controller_pnf import ControllerPNF
 from ..DatosPersonales import DatosPersonalesFrame
 
 class FremeSecciones(SectionFrameBase):
-    def __init__(self, master, controlador_docentes, controlador_pnf, controller_seccion, controller_PA, controller_sede, titulo="Datos de Secciones", fgcolor=COLOR_HEADER_SECCION_BG):
+    def __init__(self, master, controlador_docentes, controlador_pnf, controller_seccion, controller_sede, controller_PA, titulo="Datos de Secciones", fgcolor=COLOR_HEADER_SECCION_BG):
         super().__init__(master, titulo,fgcolor)
         self.controlador_Doc = controlador_docentes
         self.controller_pnf = controlador_pnf   
