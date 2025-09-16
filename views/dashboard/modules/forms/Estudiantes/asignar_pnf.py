@@ -1,9 +1,8 @@
 import tkinter.messagebox as messagebox
-import tkinter as tk
-from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from views.dashboard.modules.forms.Estudiantes.Ingreso_seccion import AsignarSeccionFrame
+from views.dashboard.components.caendario import CTKFecha
 from ..DatosPersonales import DatosPersonalesFrame
 from pprint import pprint
 
@@ -14,9 +13,6 @@ class AsignarPNFFrame(SectionFrameBase):
         self.controller_pnf = controller_pnf
         self.controllerNotas = controladorNotas
         self.estudiante = estudiante
-        self.fecha_inicio = ""
-        self.fecha_fin = ""
-        self.btn_fecha = None
         self.controller_secciones = controller_secciones
         self.callbak = callbak
         self.mensajesSecciones = None
@@ -52,14 +48,11 @@ class AsignarPNFFrame(SectionFrameBase):
             self._crear_fila_widgets([
                 ("Seleccione un P.N.F:", crear_option_menu, {"values":self.nombres_pnf, "variable":self.var1, "command": self.set_trayecto  }, 1, self, 'pnf_menu')
             ])
-            # Asignar Fecha de Inicio y Fin
-            self.registrar_fecha(self.set_fecha_inicio, titulo_btn="Fecha de Inicio",attr_name="btn_fecha_inicio")
-            self.fecha_inicio_label = ctk.CTkLabel(self, text="Fecha de Inicio: No seleccionada", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
-            self.fecha_inicio_label.pack(pady=(10, 0), padx=10, anchor="w")
 
-            self.registrar_fecha(self.set_fecha_fin, titulo_btn="Fecha de Fin",attr_name="btn_fecha_fin")
-            self.fecha_fin_label = ctk.CTkLabel(self, text="Fecha de Fin: No seleccionada", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
-            self.fecha_fin_label.pack(pady=(10, 0), padx=10, anchor="w")
+            self.fecha_inicio = CTKFecha(self, "Fecha de Inicio")
+            self.fecha_inicio.pack(fill="x", pady=PADY_FILA, padx=15)
+            self.fecha_fin = CTKFecha(self, "Fecha de Fin")
+            self.fecha_fin.pack(fill="x", pady=PADY_FILA, padx=15)
 
             self._crear_fila_widgets([
                 ("Cohorte:", crear_entry, {"width":300,"placeholder_text":"Ingrese la cohorte"}, 1, self, 'cohorte_entry'),
@@ -78,6 +71,8 @@ class AsignarPNFFrame(SectionFrameBase):
             
             self.instancias_widgets = [
                 self.pnf_menu,
+                # self.fecha_inicio,
+                # self.fecha_fin,
                 self.trayecto_menu,
                 self.tramo_menu,
                 self.cohorte_entry,
@@ -170,76 +165,6 @@ class AsignarPNFFrame(SectionFrameBase):
         self.btn_secciones.configure(text="Inscribir Sección", command=self.mostrar_form_seccion)
         if self.mensajesSecciones and self.mensajesSecciones.winfo_exists():
             self.mensajesSecciones.destroy()
-
-    def registrar_fecha(self,callback,titulo_btn="Seleccionar Fecha",attr_name=None):
-       
-        def calendario():
-            top = ctk.CTkToplevel(self, fg_color="White")
-            top.title("Seleccionar Fecha")
-
-            # Tamaño deseado de la ventana emergente
-            ancho = 350
-            alto = 350
-
-            # Obtén el tamaño de la pantalla
-            top.update_idletasks()  # Asegura que winfo_screenwidth/height sean correctos
-            screen_width = top.winfo_screenwidth()
-            screen_height = top.winfo_screenheight()
-
-            # Calcula la posición centrada
-            x = (screen_width // 2) - (ancho // 2)
-            y = (screen_height // 2) - (alto // 2)
-
-            top.geometry(f"{ancho}x{alto}+{x}+{y}")
-            top.lift()
-            top.focus_force()
-            top.grab_set()
-            label = ctk.CTkLabel(top, text="Seleccione Fecha", font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL)
-            label.pack(pady=10)
-            self.cal = Calendar(top, locale='es_ES', date_pattern='yyyy-mm-dd')
-            self.cal.pack(pady=20)
-
-            def mostrar_fecha(date):
-                label.configure(text=f"Fecha seleccionada: {date}")
-
-            def guardar_fecha():
-                fecha = self.cal.get_date()
-                callback(fecha)  # Llama al callback con la fecha seleccionada
-                top.destroy()
-
-            self.cal.bind("<<CalendarSelected>>", lambda e: mostrar_fecha(self.cal.get_date()))
-            boton_guardar = ctk.CTkButton(top, text="Guardar Fecha", command=guardar_fecha)
-            boton_guardar.pack(pady=10)
-             # Crea una ventana emergente
-        frame_fecha = ctk.CTkFrame(self, fg_color="transparent")
-        frame_fecha.pack(fill="x", pady=(10, 0), padx=10)
-
-        self.btn_fecha = ctk.CTkButton(
-            frame_fecha,
-            text=titulo_btn,
-            command=calendario,
-            width=100,
-            font=FUENTE_BOTON,
-            fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-            text_color=COLOR_BOTON_PRIMARIO_TEXT
-        )
-        self.btn_fecha.pack(side="left", pady=(10, 0), anchor="w")
-        if attr_name:
-            setattr(self, attr_name, self.btn_fecha)
-
-
-    def set_fecha_inicio(self,fecha):
-        if fecha:
-            self.fecha_inicio = fecha
-            print("Fecha de inicio establecida:", self.fecha_inicio)
-            self.fecha_inicio_label.configure(text=f"Fecha de Inicio: {self.fecha_inicio}")
-    
-    def set_fecha_fin(self, fecha):
-        if fecha:
-            self.fecha_fin = fecha
-            print("Fecha de fin establecida:", self.fecha_fin)
-            self.fecha_fin_label.configure(text=f"Fecha de Fin: {self.fecha_fin}")
 
     def set_trayecto(self, value):
         if self.mensajesSecciones:
@@ -365,19 +290,19 @@ class AsignarPNFFrame(SectionFrameBase):
                 self.observaciones_entry.insert(0, datos_pnf["observaciones"])
             self.observaciones_entry.configure(state="disabled")
 
-            self.fecha_inicio = datos_pnf.get("fecha_inicio", "")
-            if self.fecha_inicio:
-                self.fecha_inicio_label.configure(text=f"Fecha de Inicio: {self.fecha_inicio}")
-            else:
-                self.fecha_inicio_label.configure(text="Fecha de Inicio: No seleccionada")
-            
-            self.fecha_fin = datos_pnf.get("fecha_fin", "")
-            if self.fecha_fin:
-                self.fecha_fin_label.configure(text=f"Fecha de Fin: {self.fecha_fin}")
-            else:
-                self.fecha_fin_label.configure(text="Fecha de Fin: No seleccionada")
-            self.btn_fecha_inicio.configure(state="disabled")
-            self.btn_fecha_fin.configure(state="disabled")
+            # fecha_inicio = datos_pnf.get('fecha_inicio')
+            # if fecha_inicio:
+            #     self.fecha_inicio.set_date(str(fecha_inicio))
+            # self.fecha_inicio.disable()
+
+            fecha_inicio = datos_pnf.get('fecha_inicio')
+            if fecha_inicio is not None and fecha_inicio != '':
+                self.fecha_inicio.set_date(str(fecha_inicio))
+
+            fecha_fin = datos_pnf.get('fecha_fin')
+            if fecha_fin is not None and fecha_fin != '':
+                self.fecha_fin.set_date(str(fecha_fin))
+
             self.btn_guardar.configure(state="disabled")
 
             resultado = self.controller_secciones.obtener_seccion_estudiante(estudiante_id)
@@ -419,8 +344,8 @@ class AsignarPNFFrame(SectionFrameBase):
     def habilitar_edicion_pnf(self):
         for widget in self.instancias_widgets:
             widget.configure(state="normal")
-        self.btn_fecha_inicio.configure(state="normal")
-        self.btn_fecha_fin.configure(state="normal")
+        self.fecha_inicio.enable()
+        self.fecha_fin.enable()
         self.btn_guardar.configure(state="normal")
 
         if self.asignacion_seccion:
@@ -432,10 +357,5 @@ class AsignarPNFFrame(SectionFrameBase):
                 widget.delete(0, "end")
             elif isinstance(widget, ctk.CTkButton):
                 widget.configure(state="normal")
-        
-        self.fecha_inicio_label.configure(text="Fecha de Inicio: No seleccionada")
-        self.fecha_fin_label.configure(text="Fecha de Fin: No seleccionada")
-        self.btn_fecha_inicio.configure(state="normal")
-        self.btn_fecha_fin.configure(state="normal")
 
     
