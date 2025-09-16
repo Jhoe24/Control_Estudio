@@ -137,6 +137,7 @@ class BaseDashboardView(BaseView):
             menu_items =[
                 ("Inicio", "home_icon", self.inicio, False),
                 ("Consulta P.N.F", "pnf_icon", self.pnf, False),
+                ("Carga de Notas", "carga_notas_icon", self.carga_notas, False),
                 ("Unidades Curriculares", "uc_icon", None, True),
                 ("Ayuda", "ayuda_icon", self._mostrar_ayuda, False),
                 ("Configuración", "configuracion_icon", self.configuracion, True),

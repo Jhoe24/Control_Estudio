@@ -76,7 +76,7 @@ class CargaNotasView(ctk.CTkFrame):
                                         width=self.winfo_width(), 
                                         height=350)
         self.frame_contenedor_carga_notas.pack(fill="x", pady=10)
-        if self.rol and self.rol.lower() != "docente":
+        if self.rol and self.rol.lower() not in ["docente", "coord_pnf"]:
             self.titulo.configure(text = f"Gestión de Carga de Notas de {tuplas_datos[3]} {tuplas_datos[4]}")
             
         listado_instancia = ListadosEstudiantesPNF(self.frame_contenedor_carga_notas,self.controladores,tuplas_datos,user = self.user, rol = self.rol)
@@ -96,4 +96,3 @@ class CargaNotasView(ctk.CTkFrame):
 
 
     def next(self):pass
-

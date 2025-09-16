@@ -12,7 +12,7 @@ class FrameNotaEstudiante(SectionFrameBase):
         self.user_role = user_role
         self.unidad_curricular_id = unidad_curricular_id
         self.solo_lectura = solo_lectura
-        if user_role and user_role.lower() != "docente":
+        if user_role and user_role.lower() not in ["docente", "coord_pnf"]:
             self.seccion_id = tupla[5]  # id de la sección que esta en la posicion de la tupla nuemero 5
             self.lista_estudiantes = self.controller_estudiante.obtener_estudiantes_por_seccion(self.seccion_id)
         else:
@@ -65,7 +65,7 @@ class FrameNotaEstudiante(SectionFrameBase):
             # Nombres
             fila_widgets.append(self._crear_celda_tabla(i, 1, estudiante['nombres']))
             # Seccion ID
-            if self.user_role and self.user_role.lower() != "docente":
+            if self.user_role and self.user_role.lower() not in ["docente", "coord_pnf"]:
                 fila_widgets.append(self._crear_celda_tabla(i, 2, self.seccion_id))
             else:
                 fila_widgets.append(self._crear_celda_tabla(i, 2, estudiante['nombre_seccion']))
@@ -83,7 +83,7 @@ class FrameNotaEstudiante(SectionFrameBase):
             )
             entry_nota.pack(padx=10, pady=5)
             # Si es solo lectura, mostrar la nota y deshabilitar
-            if self.user_role and self.user_role.lower() != "docente":
+            if self.user_role and self.user_role.lower() not in ["docente", "coord_pnf"]:
                 inscripcion_id = self.controller_estudiante.obtener_inscripcion_id(estudiante['id'], self.seccion_id)
             else:
                 inscripcion_id = self.controller_estudiante.obtener_inscripcion_id(estudiante['estudiante_id'], estudiante['seccion_id'])

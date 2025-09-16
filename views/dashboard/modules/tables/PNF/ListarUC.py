@@ -7,7 +7,7 @@ from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
 
 
 class ListarUC(ctk.CTkFrame):
-    def __init__(self, master, controller,tupla_datos = None, user_role=None, username=None, docente_id=None):
+    def __init__(self, master, controller,tupla_datos = None, user_role=None, username=None, docente_id=None, carga_nosta_coord_pnf=False):
         super().__init__(master, fg_color="white")
         # Diccionario de controladores disponibles
         self.controller = controller
@@ -28,7 +28,7 @@ class ListarUC(ctk.CTkFrame):
         donde tupla_datos[1] es el periodo_id y tupla_datos[2] es docente_sede_pnf_id
         y se necesita si es el docente en la carga de notas
         """
-        if user_role and user_role.lower() != "docente":
+        if user_role and user_role.lower() not in ["docente", "coord_pnf"] or carga_nosta_coord_pnf == False:
             tupla_id = ()
             self.tuplas_nombre = ()
             # tupla_datos es para los datos relacionados con el filtro aplicado
@@ -426,5 +426,3 @@ class ListarUC(ctk.CTkFrame):
                 var_check.set(True)  # revertir si hubo error
 
         self.actualizar_pagina()
-
-

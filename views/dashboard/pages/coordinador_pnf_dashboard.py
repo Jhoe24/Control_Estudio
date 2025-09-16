@@ -104,6 +104,12 @@ class CoordinadorPNFDashboardView(BaseDashboardView):
         listar_uc = ListarUC(self.cuerpo_principal, self.controller, user_role=self.user_role, username=self.username)
         listar_uc.pack(fill="both", expand=True, padx=10, pady=10)
     
+    def carga_notas(self): 
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+        carga_notas = CargaNotasView(self.cuerpo_principal,self.controller,user=self.username, rol=self.user_role)
+        carga_notas.pack(fill="both", expand=True, padx=10, pady=10)
+    
     def configuracion_usuarios(self):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
@@ -123,5 +129,6 @@ class CoordinadorPNFDashboardView(BaseDashboardView):
         docente_id = self.controller["Docentes"].obtener_id_docente(persona_id)
         pnf_id = self.controller["Docentes"].obtener_pnf_id(docente_id)
         return self.controller["PNF"].obtener_pnf(pnf_id)
+    
     
         
