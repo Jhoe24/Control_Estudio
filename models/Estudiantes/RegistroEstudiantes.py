@@ -844,4 +844,4 @@ class ModelRegistroEstudiantes:
             if con:
                 con.close()
 
-pprint(ModelRegistroEstudiantes().obtener_datos_para_constancia(11))
+#pprint(ModelRegistroEstudiantes().obtener_datos_para_constancia(11))

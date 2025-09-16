@@ -1,5 +1,4 @@
 import customtkinter as ctk
-import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.PNF.FrameSecciones import FremeSecciones
 
@@ -14,7 +13,7 @@ class SeccionView(ctk.CTkFrame):
         self.controller_secciones = controller_secciones
 
         ctk.CTkLabel(self, text="Registrar Sección", font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).pack(pady=10, padx=10, anchor="w")
-        self.form_seccion = FremeSecciones(self, self.controller_Doc, self.controller_pnf, self.controller_secciones,self.controller_PA,self.controller_sede)
+        self.form_seccion = FremeSecciones(self, self.controller_Doc, self.controller_pnf, self.controller_secciones,self.controller_sede, self.controller_PA)
         self.form_seccion.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Empacar los frames

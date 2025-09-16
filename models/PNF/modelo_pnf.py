@@ -1,6 +1,5 @@
 import sqlite3 as sql
 import os
-from datetime import date
 from pprint import pprint
 
 class ModeloPNF:

@@ -4,7 +4,6 @@ import tkinter as tk
 import threading
 import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
-from views.dashboard.modules.forms.Sedes.formSedes import FormSedes
 from views.dashboard.modules.forms.PNF.FrameSecciones import FremeSecciones
 from views.dashboard.modules.forms.PNF.FrameFiltradoSecciones import FiltradoSecciones
 

@@ -1,12 +1,10 @@
 import customtkinter as ctk
 import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
-from views.dashboard.modules.forms.DatosPersonales import DatosPersonalesFrame
-from views.dashboard.modules.forms.DatosUbicacion import DatosUbicacionFrame
+#from views.dashboard.modules.forms.DatosPersonales import DatosPersonalesFrame
+#from views.dashboard.modules.forms.DatosUbicacion import DatosUbicacionFrame
 from views.dashboard.modules.forms.PNF.FormPNF import DatosPNFPensumFrame
 from views.dashboard.modules.forms.PNF.frameTrayecto import FrameTrayecto
-import pprint
-
 
 from config.app_config import AppConfig
 
@@ -208,4 +206,3 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
                 i += 1
                 
         self.button_frame.pack_forget()
-        

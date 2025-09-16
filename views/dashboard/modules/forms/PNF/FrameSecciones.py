@@ -2,7 +2,7 @@ import customtkinter as ctk
 import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
-from controllers.dashboard.PNF.controller_pnf import ControllerPNF
+#from controllers.dashboard.PNF.controller_pnf import ControllerPNF
 
 from ..DatosPersonales import DatosPersonalesFrame
 

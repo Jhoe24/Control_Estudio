@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from views.base_view import BaseView
 from config.settings import Settings
+import tkinter as tk
 
 
 class BaseDashboardView(BaseView):
@@ -20,6 +21,9 @@ class BaseDashboardView(BaseView):
         
         self.cuerpo_principal = ctk.CTkFrame(self, fg_color="white")
         self.cuerpo_principal.pack(side="right", fill="both", expand=True)
+
+        # Bindeo global y único para el scroll
+        self.master.bind_all("<MouseWheel>", self._on_global_mousewheel, add="+")
 
 
     def topbar(self):
@@ -411,3 +415,31 @@ class BaseDashboardView(BaseView):
     def configuracion_sistema(self): pass
     def configuracion_respaldos(self): pass
     def _mostrar_ayuda(self): pass
+
+    def _on_global_mousewheel(self, event):
+        """
+        Manejador de scroll global. Redirige el evento de scroll al widget
+        CTkScrollableFrame que se encuentre bajo el cursor del mouse.
+        """
+        widget_bajo_cursor = self.winfo_containing(event.x_root, event.y_root)
+        if not widget_bajo_cursor:
+            return
+
+        # Buscar el CTkScrollableFrame padre del widget bajo el cursor
+        scrollable_widget = widget_bajo_cursor
+        while scrollable_widget is not None and not isinstance(scrollable_widget, ctk.CTkScrollableFrame):
+            scrollable_widget = scrollable_widget.master
+
+        # Si encontramos un CTkScrollableFrame, le pasamos el evento de scroll
+        if scrollable_widget and hasattr(scrollable_widget, "_parent_canvas"):
+            # El canvas interno es el que realmente maneja el scroll
+            canvas = scrollable_widget._parent_canvas
+            if canvas.winfo_exists():
+                velocidad = 20
+                canvas.yview_scroll(int(-1 * (event.delta / 120)* velocidad), "units")
+                return "break" # Detenemos la propagación del evento
+
+    def destroy(self):
+        """Sobrescribimos destroy para desvincular el evento global."""
+        self.master.unbind_all("<MouseWheel>")
+        super().destroy()

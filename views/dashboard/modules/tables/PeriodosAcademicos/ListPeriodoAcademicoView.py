@@ -2,9 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 import threading
 import tkinter.messagebox as messagebox
-from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
-from views.dashboard.components.caendario import CTKFecha
 from views.dashboard.modules.forms.Periodos_academico.formPeriodoAcademico import FormPeriodoAcademico
 
 class ListPeriodoAcademicoView(ctk.CTkFrame):

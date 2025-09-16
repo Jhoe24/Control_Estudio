@@ -22,7 +22,7 @@ from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
 from views.dashboard.modules.Carga_notas import CargaNotasView
 #from views.dashboard.modules.Sedes import ListSedesView
 
-from views.dashboard.modules.Freame_periodos_academicos import PeriodoAcademicoView
+#from views.dashboard.modules.Freame_periodos_academicos import PeriodoAcademicoView
 from views.dashboard.modules.tables.PeriodosAcademicos.ListPeriodoAcademicoView import ListPeriodoAcademicoView
 
 from views.dashboard.modules.SeccionesView import SeccionView
@@ -32,8 +32,6 @@ from views.dashboard.modules.configuracion import Config_user
 from views.dashboard.modules.configuracion_sistema import Config_system
 
 from views.dashboard.modules.tables.Secciones.ListadoSeccionesView import ListSeccionesView
-
-
 
 
 class AdminDashboardView(BaseDashboardView):

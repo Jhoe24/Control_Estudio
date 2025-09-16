@@ -15,7 +15,7 @@ from views.dashboard.pages.estudiante_dashboard import EstudianteDashboardView
 
 from controllers.auth.auth_controller import AuthController
 from controllers.auth.user_controller import UserController
-from services.usuario_services import UsuarioService
+#from services.usuario_services import UsuarioService
 
 from controllers.dashboard.RegistroEstudiantes.RegistroEstudiante import EstudianteController
 from controllers.dashboard.RegistroDocentes.RegistroDocentes import DocenteController
