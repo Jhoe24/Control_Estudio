@@ -6,6 +6,7 @@ from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame
 from views.dashboard.modules.RegistrarDocentes import FormularioDocenteView
 from views.dashboard.modules.forms.Docentes.listaAsignacion import ListaAsignacionPNF
 from views.dashboard.modules.tables.PNF.ListarUC import ListarUC
+from views.dashboard.components.adicional import obtener_escala_windows_correcta
 
 class ListDocenteView(ctk.CTkFrame):
     def __init__(self, master, controllers, role_user, user_name):
@@ -30,8 +31,15 @@ class ListDocenteView(ctk.CTkFrame):
             self.pnf_id = self.controlador.obtener_pnf_id(docente_id)
             self.docente_id = docente_id
 
-        self.docente = self.controlador.obtener_lista_docentes(0,pnf_id=self.pnf_id)
-        self.registros_por_pagina = 13
+        escala = obtener_escala_windows_correcta()
+        if escala == 150:
+            self.registros_por_pagina = 9
+        elif escala == 125:
+            self.registros_por_pagina = 13
+        elif escala == 100:
+            self.registros_por_pagina = 18
+        self.docente = self.controlador.obtener_lista_docentes(canRegistro=self.registros_por_pagina, desde=0, pnf_id=self.pnf_id)
+        #self.registros_por_pagina = 13
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_docente // self.registros_por_pagina) + (1 if self.cantidad_docente % self.registros_por_pagina > 0 else 0)
         
@@ -147,7 +155,7 @@ class ListDocenteView(ctk.CTkFrame):
         
         def tarea():
             # Obtiene la lista de docentes usando el offset calculado
-            self.docente = self.controlador.obtener_lista_docentes(offset, pnf_id=self.pnf_id)
+            self.docente = self.controlador.obtener_lista_docentes(offset, pnf_id=self.pnf_id, canRegistro=self.registros_por_pagina)
             # Actualiza la interfaz de usuario en el hilo principal
             self.after(0, self.mostrar_pagina)
             self.after(0, lambda: self.boton_anterior.configure(state="normal"))

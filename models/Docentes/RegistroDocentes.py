@@ -120,7 +120,7 @@ class ModeloDocente:
             if con is not None:
                 con.close()
     
-    def lista_Docentes(self, registro_inicio = 0, pnf_id = None):
+    def lista_Docentes(self,canRegistro,registro_inicio = 0, pnf_id = None):
         
         try:
             con = sql.connect(self.db_ruta)
@@ -137,22 +137,22 @@ class ModeloDocente:
 
             #Extraer de la tabla informacion personal y esrudiantes
             if pnf_id:
-                cursor.execute('''
+                cursor.execute(f'''
                                SELECT ip.*, e.id as docente_id, e.persona_id, e.abreviatura_titulo, e.especialidad, e.fecha_ingreso, e.fecha_ingreso_uptrjf, e.tipo_contrato, e.categoria, e.auxiliar, e.dedicacion, e.estado as estado_docente
                                FROM informacion_personal ip
                                JOIN docentes e ON ip.id = e.persona_id
                                JOIN docente_sede_pnf dsp ON e.id = dsp.docente_id
                                WHERE ip.tipo='docente' AND dsp.pnf_id = ?
-                               LIMIT 13
+                               LIMIT {canRegistro}
                                OFFSET ?
                                ''', (pnf_id, registro_inicio))
             else:   
-                cursor.execute('''
+                cursor.execute(f'''
                             SELECT ip.*, e.*
                             FROM informacion_personal ip
                             JOIN docentes e ON ip.id = e.persona_id
                             WHERE ip.tipo='docente'
-                            LIMIT 13
+                            LIMIT {canRegistro}
                             OFFSET ?
                             ''',(registro_inicio,))
             resultados = cursor.fetchall()

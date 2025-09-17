@@ -3,6 +3,7 @@ import tkinter as tk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.PNF.FormPNF import DatosPNFPensumFrame
 from views.dashboard.modules.forms.PNF.frameTrayecto import FrameTrayecto
+from views.dashboard.components.adicional import obtener_escala_windows_correcta
 from pprint import pprint
 
 class ListarPNF(ctk.CTkFrame):
@@ -24,7 +25,14 @@ class ListarPNF(ctk.CTkFrame):
         self.botones_frame = None
 
         self.pagina_actual = 1
-        self.cantidad_mostrar = 10
+        escala = obtener_escala_windows_correcta()
+        if escala == 150:
+            self.cantidad_mostrar = 9
+        elif escala == 125:
+            self.cantidad_mostrar = 13
+        elif escala == 100:
+            self.cantidad_mostrar = 18
+        #self.cantidad_mostrar = 10
         self.cantidad_paginas = (len(self.lista_pnf) // self.cantidad_mostrar) + (1 if len(self.lista_pnf) % self.cantidad_mostrar > 0 else 0)
         self.filas_datos = []
 

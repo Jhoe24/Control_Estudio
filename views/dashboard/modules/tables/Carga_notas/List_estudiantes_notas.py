@@ -1,8 +1,9 @@
 import customtkinter as ctk
-import tkinter as tk
+#import tkinter as tk
 from views.dashboard.components.widget_utils import *
-from views.dashboard.components.SectionFrameBase import SectionFrameBase
-from views.dashboard.modules.forms.Carga_notas.form_nota_estudiante import FrameNotaEstudiante
+#from views.dashboard.components.SectionFrameBase import SectionFrameBase
+#from views.dashboard.modules.forms.Carga_notas.form_nota_estudiante import FrameNotaEstudiante
+from views.dashboard.components.adicional import obtener_escala_windows_correcta
 from pprint import pprint
 
 # UC   Profesor   Periodo Academico   Nota 
@@ -21,7 +22,13 @@ class ListadosEstudiantesNotas(ctk.CTkFrame):
                 self.listado_notas = self.controller_notas.listarNotasEstudiante(self.estudiante_id)
 
                 self.pagina_actual = 1
-                self.uc_por_pagina = 11
+                escala = obtener_escala_windows_correcta()
+                if escala == 150:
+                    self.uc_por_pagina = 9
+                elif escala == 125:
+                    self.uc_por_pagina = 13
+                elif escala == 100:
+                    self.uc_por_pagina = 18
                 self.total_paginas = max(1, (len(self.listado_notas) + self.uc_por_pagina - 1) // self.uc_por_pagina)
 
                 # lista de UC a mostrar en la página inicial

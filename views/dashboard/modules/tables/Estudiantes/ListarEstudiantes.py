@@ -5,6 +5,7 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame
 from views.dashboard.modules.RegistrarEstudiantes import FormularioEstudianteView
 from views.dashboard.modules.forms.Estudiantes.asignar_pnf import AsignarPNFFrame
+from views.dashboard.components.adicional import obtener_escala_windows_correcta
 
 
 class ListEstudiantesView(ctk.CTkFrame):
@@ -23,8 +24,14 @@ class ListEstudiantesView(ctk.CTkFrame):
         self.cantidad_estudiantes = self.controlador.modelo.obtener_cantidad_estudiantes()
         self.pagina_actual = 1
         self.primer_id_table = self.controlador.modelo.obtener_primer_id()
-        self.estudiantes =  self.controlador.obtener_lista_estudiantes(0)
-        self.registros_por_pagina = 11
+        escala = obtener_escala_windows_correcta()
+        if escala == 150:
+            self.registros_por_pagina = 9
+        elif escala == 125:
+            self.registros_por_pagina = 13
+        elif escala == 100:
+            self.registros_por_pagina = 18
+        self.estudiantes =  self.controlador.obtener_lista_estudiantes(0,canRegistro = self.registros_por_pagina)
         # Calcula la cantidad total de páginas, asegurando al menos 1 si hay registros
         self.cantidad_total_paginas = (self.cantidad_estudiantes // self.registros_por_pagina) + (1 if self.cantidad_estudiantes % self.registros_por_pagina > 0 else 0)
        
@@ -91,7 +98,7 @@ class ListEstudiantesView(ctk.CTkFrame):
         """
         if indicador:
             # Si se indica, se recarga la página actual
-            self.estudiantes = self.controlador.obtener_lista_estudiantes((self.pagina_actual - 1) * self.registros_por_pagina)
+            self.estudiantes = self.controlador.obtener_lista_estudiantes((self.pagina_actual - 1) * self.registros_por_pagina, canRegistro = self.registros_por_pagina)
 
         self.cargar_datos(self.estudiantes)
         self.label_pagina.configure(text=f"{self.pagina_actual} de {self.cantidad_total_paginas}")
@@ -144,7 +151,7 @@ class ListEstudiantesView(ctk.CTkFrame):
         
         def tarea():
             # Obtiene la lista de estudiantes usando el offset calculado
-            self.estudiantes = self.controlador.obtener_lista_estudiantes(offset)
+            self.estudiantes = self.controlador.obtener_lista_estudiantes(offset, canRegistro = self.registros_por_pagina)
             # Actualiza la interfaz de usuario en el hilo principal
             self.after(0, self.mostrar_pagina)
             self.after(0, lambda: self.boton_anterior.configure(state="normal"))

@@ -137,19 +137,18 @@ class ModelRegistroEstudiantes:
             if con is not None:
                 con.close()
     
-    def lista_Estudiantes(self, registro_inicio = 0):
-        con = None
+    def lista_Estudiantes(self,canRegistro, registro_inicio = 0):
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
 
             #Extraer de la tabla informacion personal y estudiantes
-            cursor.execute('''
+            cursor.execute(f'''
                             SELECT ip.id AS persona_id, ip.*, e.*
                             FROM informacion_personal ip
                             LEFT JOIN estudiantes e ON ip.id = e.persona_id
                             WHERE ip.tipo='estudiante'
-                            LIMIT 11
+                            LIMIT {canRegistro}
                             OFFSET ?
                             ''',(registro_inicio,))
             resultados = cursor.fetchall()

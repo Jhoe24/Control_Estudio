@@ -4,6 +4,7 @@ import threading
 import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.Periodos_academico.formPeriodoAcademico import FormPeriodoAcademico
+from views.dashboard.components.adicional import obtener_escala_windows_correcta
 
 class ListPeriodoAcademicoView(ctk.CTkFrame):
     def __init__(self, master, controlador):
@@ -19,7 +20,13 @@ class ListPeriodoAcademicoView(ctk.CTkFrame):
 
         # Paginación
         self.pagina_actual = 1
-        self.periodos_por_pagina = 13
+        escala = obtener_escala_windows_correcta()
+        if escala == 150:
+            self.periodos_por_pagina = 9
+        elif escala == 125:
+            self.periodos_por_pagina = 13
+        elif escala == 100:
+            self.periodos_por_pagina = 18
         self.total_paginas = (len(self.periodos) + self.periodos_por_pagina - 1) // self.periodos_por_pagina
 
         self.paginas_mostrar = self.periodos[:self.periodos_por_pagina]

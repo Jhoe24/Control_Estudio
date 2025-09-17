@@ -6,6 +6,7 @@ import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.PNF.FrameSecciones import FremeSecciones
 from views.dashboard.modules.forms.PNF.FrameFiltradoSecciones import FiltradoSecciones
+from views.dashboard.components.adicional import obtener_escala_windows_correcta
 
 class ListSeccionesView(ctk.CTkFrame):
     def __init__(self, master, controlador_pnf, controlador_secciones, controlador_docentes, controller_sede, controller_PA):
@@ -20,7 +21,14 @@ class ListSeccionesView(ctk.CTkFrame):
        
         self.secciones = []
         self.cantidad_secciones = len(self.secciones)
-        self.secciones_por_pagina = 13  # Número de sedes por página
+        # Número de sedes por página
+        escala = obtener_escala_windows_correcta()
+        if escala == 150:
+            self.secciones_por_pagina = 9
+        elif escala == 125:
+            self.secciones_por_pagina = 13
+        elif escala == 100:
+            self.secciones_por_pagina = 18
         self.pagina_actual = 1          # Página actual
         self.total_paginas = 1          # Total de páginas
 

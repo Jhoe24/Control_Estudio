@@ -1,12 +1,13 @@
 # archivo : views/dashboard/modules/tables/Sedes/ListSedesView.py
 import customtkinter as ctk
-import tkinter as tk
-import threading
+#import tkinter as tk
+#import threading
 import tkinter.messagebox as messagebox
-from tkcalendar import Calendar
+#from tkcalendar import Calendar
 from views.dashboard.components.widget_utils import *
-from views.dashboard.components.caendario import CTKFecha
+#from views.dashboard.components.caendario import CTKFecha
 from views.dashboard.modules.forms.Sedes.formSedes import FormSedes
+from views.dashboard.components.adicional import obtener_escala_windows_correcta
 
 class ListSedesView(ctk.CTkFrame):
     def __init__(self, master, controlador):
@@ -36,6 +37,14 @@ class ListSedesView(ctk.CTkFrame):
 
         self.sedes = self.controlador.listar_sedes()
         self.cantidad_sedes = len(self.sedes)
+        # Número de sedes por página
+        escala = obtener_escala_windows_correcta()
+        if escala == 150:
+            self.secciones_por_pagina = 9
+        elif escala == 125:
+            self.secciones_por_pagina = 13
+        elif escala == 100:
+            self.secciones_por_pagina = 18
         self.sedes_por_pagina = 13  # Número de sedes por página
         self.pagina_actual = 1      # Página actual
         self.total_paginas = 1      # Total de páginas

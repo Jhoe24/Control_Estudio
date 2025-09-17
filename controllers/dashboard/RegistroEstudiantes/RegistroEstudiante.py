@@ -35,7 +35,7 @@ class EstudianteController:
         else:
             messagebox.showerror("Error", "Hubo un error al registrar el estudiante.", parent=vista_formulario)
             return False
-        print(datos_estudiante)
+        p#rint(datos_estudiante)
 
     def cargar_estudiante_para_edicion(self, id_estudiante, dic_estudiante, vista_formulario):
         print(f"cargar estudiante para edicion {id_estudiante} : {dic_estudiante}")
@@ -47,13 +47,13 @@ class EstudianteController:
             messagebox.showerror("Error", "Hubo un error al actualizar los datos del estudiante.", parent=vista_formulario)
             return False
 
-    def obtener_lista_estudiantes(self,desde):
-        #Obtener 10 registro de estudiantes
+    def obtener_lista_estudiantes(self, desde, canRegistro):
+        #Obtener 'canRegistro' registros de estudiantes
         nmin = 0
         nmax = self.modelo.obtener_id_ultimo()
         if desde < nmin : desde = nmin
         if desde > (nmax) : desde = nmax-1
-        resultado = self.modelo.lista_Estudiantes(desde)
+        resultado = self.modelo.lista_Estudiantes(registro_inicio=desde, canRegistro=canRegistro)
         #print(f"obtener lista estudiantes desde {resultado}")
         return resultado
 

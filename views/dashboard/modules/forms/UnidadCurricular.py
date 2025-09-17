@@ -156,7 +156,7 @@ class UnidadCurricular(SectionFrameBase):
 
             self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.procesar_formulario,
                                             font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, 
-                                            text_color=COLOR_BOTON_PRIMARIO_TEXT, state="disabled")
+                                            text_color=COLOR_BOTON_PRIMARIO_TEXT)
             self.btn_guardar.pack(side="left", padx=10)
 
             self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Limpiar Campos", width=140, command=self.limpiar_formulario_completo,
@@ -257,18 +257,12 @@ class UnidadCurricular(SectionFrameBase):
         datos_uc['id_trayecto'] = id_trayecto
         datos_uc['id_tramo'] = id_tramo
 
-        # pprint.pprint(datos_uc)  # Para verificar en consola
-
-        # Valida campos obligatorios
-        if not self.controlador.validar_campos_obligatorios_uc(datos_uc, self):
+        if not self.controlador.validar_campos_obligatorios_uc(datos_uc, self, mostrar_mensajes=True):
             return
 
-        # Registra en el modelo usando el controlador
         exito = self.controlador.registrar_unidad_curricular(datos_uc, self)
-
         if exito:
             self.limpiar_formulario_completo()
-            
 
     def limpiar_formulario_completo(self):
         """
@@ -402,22 +396,21 @@ class UnidadCurricular(SectionFrameBase):
         habilitando o deshabilitando el botón de guardar según corresponda.
         """
         datos_uc = self.controlador.getUnidadCurricular(self)
-
-        # Captura ids actuales de PNF, Trayecto y Tramo
+            # Capturar nombres seleccionados
         nombre_pnf = self.pnfmenu.get()
         nombre_trayecto = self.trayectomenu.get()
         nombre_tramo = self.tramomenu.get()
-
         id_pnf = self.pnf_id_por_nombre.get(nombre_pnf)
         id_trayecto = self.trayecto_id_por_nombre.get(nombre_trayecto)
         id_tramo = self.tramo_id_por_nombre.get(nombre_tramo)
-
         datos_uc['id_pnf'] = id_pnf
         datos_uc['id_trayecto'] = id_trayecto
         datos_uc['id_tramo'] = id_tramo
 
-        # Validar y gestionar el botón
-        self.controlador.validar_campos_obligatorios_uc(datos_uc, self)
+        # Solo habilita/deshabilita el botón, sin mostrar mensajes
+        es_valido = self.controlador.validar_campos_obligatorios_uc(datos_uc, self, mostrar_mensajes=False)
+        if self.btn_guardar:
+            self.btn_guardar.configure(state="normal" if es_valido else "normal")
     
     def set_datos(self, datos):
         """
@@ -518,10 +511,13 @@ class UnidadCurricular(SectionFrameBase):
         pnf_id = datos.get("pnf_id")
         if pnf_id is not None:
             pnf_nombre = pnf_nombre_por_id.get(pnf_id)
+            # Actualizar trayectos basado en el PNF seleccionado
+            self.actualizar_trayectos_por_pnf(pnf_nombre)
             if pnf_nombre:
                 self.pnfmenu.set(pnf_nombre)
                 # Actualizar trayectos basado en el PNF seleccionado
                 self.actualizar_trayectos_por_pnf(pnf_nombre)
+
             else:
                 # Si no encuentra el PNF, mostrar el ID
                 valores_pnf_actuales = list(self.pnfmenu.cget("values"))
@@ -537,7 +533,11 @@ class UnidadCurricular(SectionFrameBase):
 
         trayecto_id = datos.get("trayecto_id")
         if trayecto_id is not None:
+            # Actualizar el mapeo inverso después de actualizar los trayectos
+            trayecto_nombre_por_id = {v: k for k, v in self.trayecto_id_por_nombre.items()}
             trayecto_nombre = trayecto_nombre_por_id.get(trayecto_id)
+            # Actualizar tramos basado en el trayecto seleccionado
+            self.actualizar_tramos_por_trayecto(trayecto_nombre)
             if trayecto_nombre:
                 self.trayectomenu.set(trayecto_nombre)
                 # Actualizar tramos basado en el trayecto seleccionado

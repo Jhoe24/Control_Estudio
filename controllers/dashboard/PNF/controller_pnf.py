@@ -409,41 +409,73 @@ class ControllerPNF:
         }
         return dic_uc
     
-    def validar_campos_obligatorios_uc(self, datos_uc, vista):
+    def validar_campos_obligatorios_uc(self, datos_uc, vista, mostrar_mensajes=True):
         """
         Valida campos obligatorios y gestiona el estado del botón de grabar:
         - Deshabilita el botón si falta algún campo o si no se selecciona un tramo válido.
         - Habilita el botón si todo está completo.
         """
-        campos_obligatorios = [
-            'codigo', 'nombre', 'nombre_corto', 'area', 'subarea',
-            'horas_teoricas', 'horas_practicas',
-            'horas_laboratorio', 'horas_trabajo_independiente', 'horas_totales',
-            'unidades_credito', 'clave_especial'
-            # 'fecha_creacion', 'fecha_actualizacion'
-        ]
+        # campos_obligatorios = [
+        #     'codigo', 'nombre', 'nombre_corto', 'area', 'subarea',
+        #     'horas_teoricas', 'horas_practicas',
+        #     'horas_laboratorio', 'horas_trabajo_independiente', 'horas_totales',
+        #     'unidades_credito', 'clave_especial'
+        #     # 'fecha_creacion', 'fecha_actualizacion'
+        # ]
 
-        campos_faltantes = []
-        for campo in campos_obligatorios:
-            valor = datos_uc.get(campo, "").strip()
-            if not valor:
-                campos_faltantes.append(campo)
+        # campos_faltantes = []
+        # for campo in campos_obligatorios:
+        #     valor = datos_uc.get(campo, "").strip()
+        #     if not valor:
+        #         campos_faltantes.append(campo)
 
-        # Validar selección de Tramo
-        id_tramo = datos_uc.get('id_tramo')
-        tramo_valido = id_tramo is not None
+        # # Validar selección de Tramo
+        # id_tramo = datos_uc.get('id_tramo')
+        # tramo_valido = id_tramo is not None
 
-        if campos_faltantes or not tramo_valido:
-            # Deshabilitar botón
-            if hasattr(vista, "btn_guardar") and vista.btn_guardar:
-                vista.btn_guardar.configure(state="disabled")
-            return False
-        else:
-            # Habilitar botón
-            if hasattr(vista, "btn_guardar") and vista.btn_guardar:
-                vista.btn_guardar.configure(state="normal")
-            return True
-    
+        # if campos_faltantes or not tramo_valido:
+        #     # Deshabilitar botón
+        #     if hasattr(vista, "btn_guardar") and vista.btn_guardar:
+        #         vista.btn_guardar.configure(state="disabled")
+        #     return False
+        # else:
+        #     # Habilitar botón
+        #     if hasattr(vista, "btn_guardar") and vista.btn_guardar:
+        #         vista.btn_guardar.configure(state="normal")
+        #     return True
+        try:
+            campos_a_validar = [
+                ("codigo", "Código"),
+                ("nombre", "Nombre"),
+                ("horas_teoricas", "Horas Teóricas"),
+                ("horas_practicas", "Horas Prácticas"),
+                ("horas_laboratorio", "Horas Laboratorio"),
+                ("horas_trabajo_independiente", "Horas Trabajo Independiente"),
+                ("unidades_credito", "Unidad de Crédito"),
+            ]
+            campos_faltantes = []
+            for campo, nombre_campo in campos_a_validar:
+                valor_campo = datos_uc.get(campo, "").strip()
+                if not valor_campo:
+                    campos_faltantes.append(nombre_campo)
+            # Validar tramo
+            tramo_valido = datos_uc.get('id_tramo') is not None
+
+            if mostrar_mensajes:
+                if campos_faltantes:
+                    messagebox.showwarning("Campo Vacío", f"Los siguientes campos son obligatorios: {', '.join(campos_faltantes)}.", parent=vista)
+                    return False
+                if not tramo_valido:
+                    messagebox.showwarning("Campo Vacío", "Debe seleccionar un tramo válido.", parent=vista)
+                    return False
+                return True
+            else:
+                # Solo para habilitar/deshabilitar el botón, sin mostrar mensajes
+                return not campos_faltantes and tramo_valido
+        
+        except Exception as e:
+            print(e)
+
     def obtener_trayectos_por_pnf(self, id_pnf):
         return self.modelo.obtener_lista_trayecto(id_pnf)
 

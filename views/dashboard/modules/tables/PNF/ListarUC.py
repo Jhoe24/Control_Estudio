@@ -4,6 +4,7 @@ import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
 from views.dashboard.modules.FiltradoPNFFrame import FiltradoPNFFrame
+from views.dashboard.components.adicional import obtener_escala_windows_correcta
 
 
 class ListarUC(ctk.CTkFrame):
@@ -52,7 +53,15 @@ class ListarUC(ctk.CTkFrame):
             self.lista_UC = self.controller_pnf.obtener_UC(periodo_id=tupla_datos[1], docente_pnf_id=tupla_datos[2])
             
         self.pagina_actual = 1
-        self.uc_por_pagina = 11
+
+        escala = obtener_escala_windows_correcta()
+        if escala == 150:
+            self.uc_por_pagina = 9
+        elif escala == 125:
+            self.uc_por_pagina = 13
+        elif escala == 100:
+            self.uc_por_pagina = 18
+            
         self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
 
         # lista de UC a mostrar en la página inicial
@@ -350,8 +359,8 @@ class ListarUC(ctk.CTkFrame):
             top.destroy()
             #self.lista_uc = self.controller.obtener_lista_uc()
             #actualiza la paginacion y muestra el listado
-            self.total_paginas = (len(self.lista_uc) + self.uc_por_pagina - 1) // self.uc_por_pagina
-            self.paginas_mostrar = self.lista_uc[(self.pagina_actual-1)*self.uc_por_pagina:self.pagina_actual*self.uc_por_pagina]
+            self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
+            self.paginas_mostrar = self.lista_UC[(self.pagina_actual-1)*self.uc_por_pagina:self.pagina_actual*self.uc_por_pagina]
             self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
             self.mostrar_listado()
     
