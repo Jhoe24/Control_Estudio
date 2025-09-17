@@ -100,6 +100,8 @@ class UnidadCurricular(SectionFrameBase):
                     nombre_pnf = tupla[2]
                     break
             if nombre_pnf:
+                # Actualizar el mapeo para que solo contenga el PNF del coordinador
+                self.pnf_id_por_nombre = {nombre_pnf: pnf_id}
                 valores_pnf = [nombre_pnf]
             else:
                 self.deshabilitar_campos()

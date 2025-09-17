@@ -45,7 +45,7 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.var_tipo_pnf = ctk.StringVar(value='TSU')
         self._crear_fila_widgets([
             ("Tipo de PNF:", crear_option_menu, {
-                "values": ["TSU", "Ingeniería", "Especialización", "Licenciatura", "Medicina Veterinaria"],
+                "values": ["TSU", "Ingeniero", "Especialización", "Licenciatura", "Medico Veterinario"],
                 'variable': self.var_tipo_pnf,
                 "command": lambda v: setattr(self.tipo_pnf_menu, '_current_value', v)
             }, 1, self, 'tipo_pnf_menu')
