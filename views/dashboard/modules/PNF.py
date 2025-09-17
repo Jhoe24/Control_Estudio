@@ -5,7 +5,7 @@ from views.dashboard.components.widget_utils import *
 #from views.dashboard.modules.forms.DatosUbicacion import DatosUbicacionFrame
 from views.dashboard.modules.forms.PNF.FormPNF import DatosPNFPensumFrame
 from views.dashboard.modules.forms.PNF.frameTrayecto import FrameTrayecto
-
+from pprint import pprint
 from config.app_config import AppConfig
 
 class FormularioPNFPensumView(ctk.CTkScrollableFrame):
@@ -52,25 +52,25 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         for entry in self.datos_pnf.entries_a_validar:
             entry.bind("<KeyRelease>", lambda event: self.validar_campos_trayecto())
         
-        self.button_siguiente = ctk.CTkButton(
-            self,
-            text="Grabar trayecto",
-            width=140,
-            font=FUENTE_BOTON,
-            fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-            text_color=COLOR_BOTON_PRIMARIO_TEXT,
-            command=self.comando_trayecto,
-            state="disabled"  # Deshabilitar al inicio
-        )
-        self.button_siguiente.pack(pady=(20, 0))
+        # self.button_siguiente = ctk.CTkButton(
+        #     self,
+        #     text="Grabar trayecto",
+        #     width=140,
+        #     font=FUENTE_BOTON,
+        #     fg_color=COLOR_BOTON_PRIMARIO_FG,
+        #     hover_color=COLOR_BOTON_PRIMARIO_HOVER,
+        #     text_color=COLOR_BOTON_PRIMARIO_TEXT,
+        #     command=self.comando_trayecto,
+        #     state="disabled"  # Deshabilitar al inicio
+        # )
+        # self.button_siguiente.pack(pady=(20, 0))
 
         # Empacar los frames
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.pack(pady=(25, 20))
 
         self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.obtener_datos_trayecto,
-                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT,
+                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT,
                                         state="disabled")
         self.btn_guardar.pack(side="left", padx=10)
 
@@ -115,24 +115,32 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         self.button_frame.pack(pady=(25, 20))
     
     def obtener_datos_trayecto(self):
-        list_dic_trayectos = []
-        if self.listado_trayectos:
-            for frame_trayectos in self.listado_trayectos:
-                list_dic_trayectos.append(frame_trayectos.obtener_datos_trayectos())
+        # list_dic_trayectos = []
+        # if self.listado_trayectos:
+        #     for frame_trayectos in self.listado_trayectos:
+        #         list_dic_trayectos.append(frame_trayectos.obtener_datos_trayectos())
+        codigo = self.datos_pnf.codigo_entry.get().strip()
+        if self.controlador.existe_codigo(codigo):
+            messagebox.showerror("Error", "El código ingresado ya existe. Por favor, ingrese un código único.")
+            return
+        codigo_nacional = self.datos_pnf.codigo_nacional_entry.get().strip()
+        if self.controlador.existe_codigo_nacional(codigo_nacional):
+            messagebox.showerror("Error", "El código nacional ingresado ya existe. Por favor, ingrese un código único.")
+            return
         
-        dato_completos = self.controlador.getPNF(self.datos_pnf,list_dic_trayectos)
+        dato_completos = self.controlador.getPNF(self.datos_pnf)
         if dato_completos:
             self.controlador.registrar_pnf(dato_completos,self)
-            #print("Datos del PNF:", dato_completos)
+            #pprint(dato_completos)
     
     def validar_campos_trayecto(self):
     # Verifica que todos los entries tengan datos
         todos_llenos = all(entry.get().strip() for entry in self.datos_pnf.entries_a_validar)
         fecha_ok = self.datos_pnf.fecha_resolucion is not None and str(self.datos_pnf.fecha_resolucion).strip() != ""
         if todos_llenos and fecha_ok:
-            self.button_siguiente.configure(state="normal", fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER)
+            self.btn_guardar.configure(state="normal", fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER)
         else:
-            self.button_siguiente.configure(state="disabled")
+            self.btn_guardar.configure(state="disabled")
     
     def actualizar_cantidad_trayecto(self):
         self.datos_cantidad_trayecto = self.datos_pnf.get_trayecto()

@@ -37,26 +37,60 @@ class ControllerPNF:
     
     def registrar_pnf(self, dic_pnf, vista_formulario=None):
         try:
+            exito_tramo = None
             fecha_actual = self.obtener_fecha_actual()
-            lista_trayectos = dic_pnf["lista_trayectos"]
+            #ista_trayectos = dic_pnf["lista_trayectos"]
+            """Se resigistra el PNF"""
             id_pnf = self.modelo.registrar_pnf(dic_pnf, fecha_actual)
-
+        
             if not id_pnf:
                 messagebox.showerror("Error", "No se pudo registrar el PNF.", parent=vista_formulario)
                 return False
 
-            for trayecto in lista_trayectos:
-                lista_tramos = trayecto["lista_tramos"]
-                id_trayecto = self.modelo.registrar_trayecto(trayecto, id_pnf)
+            # Iterar para registrar Trayecto Inicial (i=0) y los trayectos profesionales (i > 0)
+            for i in range(dic_pnf["cantidad_trayectos"] + 1):
+                if i == 0:
+                    # Registrar Trayecto Inicial
+                    trayecto_id = self.modelo.registrar_trayecto(datos_trayecto={
+                        "numero": 0,
+                        "nombre": "Trayecto Inicial"
+                    }, id_pnf=id_pnf, numero_tramos=1)
+                    cantidad_tramos_a_registrar = 1 # El trayecto inicial solo tiene 1 tramo
+                else:
+                    # Registrar Trayectos Profesionales
+                    trayecto_id = self.modelo.registrar_trayecto({
+                        "numero": i,
+                        "nombre": f"Trayecto {vista_formulario.dict_trayectos_invertido.get(i,i)}"
+                    }, id_pnf=id_pnf, numero_tramos=dic_pnf["cantidad_tramos"])
+                    cantidad_tramos_a_registrar = dic_pnf["cantidad_tramos"]
 
-                if not id_trayecto:
-                    messagebox.showerror("Error", f"No se pudo registrar el trayecto {trayecto.get('numero', '')}.", parent=vista_formulario)
-                    continue
+                if not trayecto_id:
+                    nombre_trayecto = "Inicial" if i == 0 else vista_formulario.dict_trayectos_invertido.get(i, i)
+                    messagebox.showerror("Error", f"No se pudo registrar el trayecto {nombre_trayecto}.", parent=vista_formulario)
+                    continue # Si falla un trayecto, pasa al siguiente
+                
+                # Bucle para registrar los tramos correspondientes a cada trayecto
+                for j in range(1, cantidad_tramos_a_registrar + 1):
+                    nombre_tramo_romano = vista_formulario.dict_trayectos_invertido.get(j, j)
+                    exito_tramo = self.modelo.registrar_tramos(
+                        {"numero": j, "nombre": f"Tramo {nombre_tramo_romano}"}, 
+                        trayecto_id
+                    )
+                    if not exito_tramo:
+                        messagebox.showerror("Error",f"Error al registrar el tramo {nombre_tramo_romano}", parent=vista_formulario)
 
-                for tramo in lista_tramos:
-                    exito_tramo = self.modelo.registrar_tramos(tramo, id_trayecto)
-                    if exito_tramo is not True:
-                        messagebox.showerror("Error", f"Error al registrar el tramo {tramo.get('numero', '')} del trayecto {trayecto.get('numero', '')}.", parent=vista_formulario)
+            # for trayecto in lista_trayectos:
+            #     lista_tramos = trayecto["lista_tramos"]
+            #     id_trayecto = self.modelo.registrar_trayecto(trayecto, id_pnf)
+
+            #     if not id_trayecto:
+            #         messagebox.showerror("Error", f"No se pudo registrar el trayecto {trayecto.get('numero', '')}.", parent=vista_formulario)
+            #         continue
+
+            #     for tramo in lista_tramos:
+            #         exito_tramo = self.modelo.registrar_tramos(tramo, id_trayecto)
+            #         if exito_tramo is not True:
+            #             messagebox.showerror("Error", f"Error al registrar el tramo {tramo.get('numero', '')} del trayecto {trayecto.get('numero', '')}.", parent=vista_formulario)
 
             messagebox.showinfo("Éxito", "PNF registrado correctamente.", parent=vista_formulario)
             # Actualizar el listado de PNF en el modelo
@@ -201,7 +235,7 @@ class ControllerPNF:
         
         return dic_trayectos 
 
-    def getPNF(self,vista_pnf, lista_trayectos):
+    def getPNF(self,vista_pnf, lista_trayectos = None):
         #diccinario para guardar el pnf completo
         dic_pnf = {
             "codigo": vista_pnf.codigo_entry.get(),
@@ -209,18 +243,19 @@ class ControllerPNF:
             "nombre_pnf": vista_pnf.nombre_entry.get(),
             "siglas": vista_pnf.siglas_entry.get(),
             "tipo_pnf": vista_pnf.tipo_pnf_menu.get(),
-            "area_conocimiento": vista_pnf.area_conocimiento_entry.get(),
+            #"area_conocimiento": vista_pnf.area_conocimiento_entry.get(),
+            "cantidad_tramos": vista_pnf.get_tramos(),
             "cantidad_trayectos": vista_pnf.get_trayecto(),
             "duracion_semana": vista_pnf.duracion_semanas_entry.get(),
             "duracion_creditos": vista_pnf.duracion_creditos_entry.get(),
             "duracion_horas": vista_pnf.duracion_horas_entry.get(),
 
-            "fecha_resolucion": vista_pnf.fecha_resolucion.get_date(),
+            "fecha_resolucion": vista_pnf.get_fecha_resolucion(),
             "titulo_otorga": vista_pnf.titulo_otorga_entry.get(),
-            "perfil_egreso": vista_pnf.perfil_egreso_entry.get(),
+            #"perfil_egreso": vista_pnf.perfil_egreso_entry.get(),
             "version_pensum": vista_pnf.version_pensum_entry.get(),
             "estado": vista_pnf.estado_menu.get(),
-            "lista_trayectos": lista_trayectos  
+            #"lista_trayectos": lista_trayectos  
         }
         return dic_pnf
 
@@ -322,7 +357,7 @@ class ControllerPNF:
                 ("creditos", "Créditos"),
                 ("fecha_resolucion", "Fecha de Resolución"),
                 ("titulo_otorga", "Título que Otorga"),
-                ("perfil_egreso", "Perfil de Egreso"),
+                #("perfil_egreso", "Perfil de Egreso"),
                 ("version_pensum", "Versión del Pensum"),
                 ("estado", "Estado")
             ]

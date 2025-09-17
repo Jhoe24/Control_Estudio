@@ -15,10 +15,10 @@ class ModeloPNF:
             cursor.execute(
                 """
                 INSERT INTO pnf 
-                (codigo, codigo_nacional, nombre, nombre_corto, nivel,area_conocimiento, duracion_trayectos,
-                duracion_semanas, total_creditos,total_horas, titulo_otorga, perfil_egreso,
+                (codigo, codigo_nacional, nombre, nombre_corto, nivel, duracion_trayectos,
+                duracion_semanas, total_creditos,total_horas, titulo_otorga,
                 fecha_resolucion, version_pensum, fecha_creacion,fecha_actualizacion, estado) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     datos_pnf["codigo"],
@@ -26,13 +26,13 @@ class ModeloPNF:
                     datos_pnf["nombre_pnf"],
                     datos_pnf["siglas"],
                     datos_pnf["tipo_pnf"],
-                    datos_pnf["area_conocimiento"],
+                    #datos_pnf["area_conocimiento"],
                     datos_pnf["cantidad_trayectos"],
                     datos_pnf["duracion_semana"],
                     datos_pnf["duracion_creditos"],
                     datos_pnf["duracion_horas"],
                     datos_pnf["titulo_otorga"],
-                    datos_pnf["perfil_egreso"],
+                    #datos_pnf["perfil_egreso"],
                     datos_pnf["fecha_resolucion"],
                     datos_pnf["version_pensum"],
                     fecha_creacion,
@@ -52,7 +52,7 @@ class ModeloPNF:
             if con is not None:
                 con.close()
     
-    def registrar_trayecto(self,datos_trayecto,id_pnf):
+    def registrar_trayecto(self,datos_trayecto,id_pnf,numero_tramos = 3):
         con = None
         try:
             con = sql.connect(self.db_ruta)
@@ -61,25 +61,15 @@ class ModeloPNF:
             cursor.execute(
                 """
                 INSERT INTO trayectos 
-                (pnf_id, numero, nombre, tipo, duracion_semanas, duracion_horas, creditos_minimos,
-                creditos_maximos, numero_tramos, objetivos, perfil_egreso, obligatorio, secuencial, estado) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (pnf_id, numero, nombre, numero_tramos) 
+                VALUES (?, ?, ?, ?)
                 """,
                 (
                     id_pnf,
                     datos_trayecto["numero"],
                     datos_trayecto["nombre"],
-                    "Inicial",
-                    datos_trayecto["duracion_semanas"],
-                    datos_trayecto["duracion_horas"],
-                    datos_trayecto["creditos_minimos"],
-                    datos_trayecto["creditos_maximos"],
-                    datos_trayecto["numero_tramos"],
-                    datos_trayecto["objetivos"],
-                    datos_trayecto["perfil_egreso"],
-                    datos_trayecto["obligatorio"],
-                    datos_trayecto["secuencial"],
-                    datos_trayecto["estado"]
+                    numero_tramos
+                    
                 )
             )
 
@@ -94,8 +84,9 @@ class ModeloPNF:
             if con is not None:
                 con.close()
     
-    def registrar_tramos(self,datos_tramo,id_tramo):
+    def registrar_tramos(self, datos_tramo, id_trayecto):
         con = None
+        #print("id trayecro",id_trayecto)
         try:
             con = sql.connect(self.db_ruta)
             cursor = con.cursor()
@@ -103,19 +94,13 @@ class ModeloPNF:
             cursor.execute(
                 """
                 INSERT INTO tramos 
-                (trayecto_id, numero, nombre, duracion_semanas, duracion_horas, creditos,
-                objetivos, estado) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (trayecto_id, numero, nombre) 
+                VALUES (?, ?, ?)
                 """,
                 (
-                    id_tramo,
+                    id_trayecto,
                     datos_tramo["numero"],
                     datos_tramo["nombre"],
-                    datos_tramo["duracion_semanas"],
-                    datos_tramo["duracion_horas"],
-                    datos_tramo["creditos"],
-                    datos_tramo["objetivos"],
-                    datos_tramo["estado"]
                 )
             )
 
@@ -274,7 +259,7 @@ class ModeloPNF:
                     datos_pnf["duracion_creditos"],
                     datos_pnf["duracion_horas"],
                     datos_pnf["titulo_otorga"],
-                    datos_pnf["perfil_egreso"],
+                    #datos_pnf["perfil_egreso"],
                     datos_pnf["fecha_resolucion"],
                     datos_pnf["version_pensum"],
                     datos_pnf["estado"],

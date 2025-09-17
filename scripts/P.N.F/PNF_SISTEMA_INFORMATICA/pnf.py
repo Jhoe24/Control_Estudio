@@ -3,7 +3,7 @@ pnf_data = {
     'codigo_nacional': '3147',
     'nombre': 'Programa Nacional de Formación en Informática',
     'nombre_corto': 'PNFI',
-    'nivel': 'Ingeniería',
+    'nivel': 'Ingeniero',
     'area_conocimiento': 'Informática',
     'duracion_trayectos': 5, # Son 5 trayecyo incluyendo el trayecto inicial
     'duracion_semanas': 156,

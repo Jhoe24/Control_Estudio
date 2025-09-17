@@ -353,5 +353,3 @@ class UserModel:
         finally:
             if con is not None:
                 con.close()
-
-print(UserModel().obtener_telefono(21))

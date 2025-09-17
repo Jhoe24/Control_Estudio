@@ -234,7 +234,7 @@ class SistemaAcademicoDB:
             nombre TEXT,
             nombre_corto TEXT,
             nivel TEXT  
-                CHECK (nivel IN ('TSU', 'Ingeniería', 'Licenciatura', 'Medicina', 'Especialización')),
+                CHECK (nivel IN ('TSU', 'Ingeniero', 'Licenciatura', 'Medico Veterinario', 'Especialización')),
             area_conocimiento TEXT,
             duracion_trayectos INTEGER,
             duracion_semanas INTEGER,

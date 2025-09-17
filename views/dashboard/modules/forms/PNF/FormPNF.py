@@ -45,16 +45,16 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.var_tipo_pnf = ctk.StringVar(value='TSU')
         self._crear_fila_widgets([
             ("Tipo de PNF:", crear_option_menu, {
-                "values": ["TSU", "Ingeniería", "Especialización", "Licenciatura", "Medicina"],
+                "values": ["TSU", "Ingeniería", "Especialización", "Licenciatura", "Medicina Veterinaria"],
                 'variable': self.var_tipo_pnf,
                 "command": lambda v: setattr(self.tipo_pnf_menu, '_current_value', v)
             }, 1, self, 'tipo_pnf_menu')
         ])
 
         # --- Fila para area de conocimiento ---
-        self._crear_fila_widgets([
-            ('Área de Conocimiento:', crear_entry, {"width":300,"placeholder_text":"Ingrese área de conocimiento"}, 1, self, 'area_conocimiento_entry')
-        ])
+        # self._crear_fila_widgets([
+        #     ('Área de Conocimiento:', crear_entry, {"width":300,"placeholder_text":"Ingrese área de conocimiento"}, 1, self, 'area_conocimiento_entry')
+        # ])
 
         # 1. Crear el frame contenedor
         self.duracion_contenedor = ctk.CTkFrame(self,fg_color="transparent")
@@ -138,13 +138,28 @@ class DatosPNFPensumFrame(SectionFrameBase):
         # --- Fila para datos del PNF ---
         self._crear_fila_widgets([
             ('Titulo a Otorgar:', crear_entry, {"width":300,"placeholder_text":"Ingrese titulo"}, 1, self, 'titulo_otorga_entry'),
-            ("Perfil Egresado:", crear_entry, {"width":300,"placeholder_text":"Ingrese perfil del egresado"}, 1, self, 'perfil_egreso_entry'),
+            #("Perfil Egresado:", crear_entry, {"width":300,"placeholder_text":"Ingrese perfil del egresado"}, 1, self, 'perfil_egreso_entry'),
             #("Campo Ocupacional:", crear_entry, {"width":300,"placeholder_text":"Ingrese campo ocupacional"}, 1, self, 'campo_ocupacional_entry'),
         ])
 
+        # --- Botón para activar la fecha de resolución ---
+        self.fecha_resolucion_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.fecha_resolucion_frame.pack(fill="x", pady=5, padx=5)
+
+        self.fecha_resolucion_visible = False
+        self.btn_agregar_fecha = ctk.CTkButton(
+            self.fecha_resolucion_frame,
+            width=200,
+            height=30,
+            text="Agregar fecha de resolución",
+            command=self.mostrar_fecha_resolucion
+        )
+        self.btn_agregar_fecha.pack(side="left", padx=[0, 10])
+
         #self.registrar_fecha(self.set_fecha_resolucion,"Fecha Resolución")  # Registrar la fecha de resolución
         self.fecha_resolucion = CTKFecha(self,"Fecha Resolucion")
-        self.fecha_resolucion.pack(fill ="x", pady=PADY_FILA, padx = 15)
+        self.fecha_resolucion.pack(side="left")
+        self.fecha_resolucion.pack_forget()  # Ocultar inicialmente
         #label para mostrar la fecha de resolución
         # self.fecha_resolucion_label = ctk.CTkLabel(self, text="Fecha de Resolución: No seleccionada", text_color=COLOR_TEXTO_PRINCIPAL, font=("Arial", 14, "bold"))
         # self.fecha_resolucion_label.pack(pady=(10, 0), padx=10, anchor="w")
@@ -162,11 +177,11 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.codigo_nacional_entry,
             self.nombre_entry,
             self.siglas_entry,
-            self.area_conocimiento_entry,
+           # self.area_conocimiento_entry,
             self.duracion_creditos_entry,
             self.duracion_horas_entry,
             self.titulo_otorga_entry,
-            self.perfil_egreso_entry,
+            #self.perfil_egreso_entry,
             self.version_pensum_entry,
         ]
 
@@ -199,6 +214,10 @@ class DatosPNFPensumFrame(SectionFrameBase):
             "V": 5
         }
         return self.dict_trayectos.get(self.var_cantidad_trayectos.get(), 1)
+    
+    def get_tramos(self):
+        """Obtener el valor del tramo seleccionado."""
+        return self.dict_trayectos.get(self.var_cantidad_tramos.get(), 1)
 
     def deshabilitar_campos(self):
         # Deshabilita todos los entries a validar
@@ -229,8 +248,8 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.var_tipo_pnf.set(datos.get("nivel", "TSU"))
         self.tipo_pnf_menu.configure(state="disabled")
 
-        self.area_conocimiento_entry.insert(0, datos.get("area_conocimiento", ""))
-        self.area_conocimiento_entry.configure(state="disabled")
+        # self.area_conocimiento_entry.insert(0, datos.get("area_conocimiento", ""))
+        # self.area_conocimiento_entry.configure(state="disabled")
 
         self.duracion_semanas_entry.set(str(datos.get("duracion_semanas", "")))
         self.duracion_semanas_entry.configure(state="disabled")
@@ -242,12 +261,11 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.duracion_horas_entry.insert(0, str(datos.get("total_horas", "")))
         self.duracion_horas_entry.configure(state="disabled")
 
-        # Si tienes modalidad, puedes agregarlo aquí si tienes un campo correspondiente
         self.titulo_otorga_entry.insert(0, datos.get("titulo_otorga", ""))
         self.titulo_otorga_entry.configure(state="disabled")
 
-        self.perfil_egreso_entry.insert(0, datos.get("perfil_egreso", ""))
-        self.perfil_egreso_entry.configure(state="disabled")
+        #self.perfil_egreso_entry.insert(0, datos.get("perfil_egreso", ""))
+        #self.perfil_egreso_entry.configure(state="disabled")
 
         self.version_pensum_entry.insert(0, datos.get("version_pensum", ""))
         self.version_pensum_entry.configure(state="disabled")
@@ -257,7 +275,12 @@ class DatosPNFPensumFrame(SectionFrameBase):
 
         # Fecha de resolución
         if "fecha_resolucion" in datos and datos["fecha_resolucion"]:
+            self.mostrar_fecha_resolucion()
             self.fecha_resolucion.set_date(str(datos["fecha_resolucion"]))
+        else:
+            self.fecha_resolucion.pack_forget()  # Ocultar el selector de fecha
+            self.fecha_resolucion_visible = False
+            self.btn_agregar_fecha.configure(state="normal")
 
         cantidad = self.dict_trayectos_invertido[len(datos["lista_trayectos"])]
         if cantidad:
@@ -302,6 +325,9 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.duracion_semanas_entry.set("12")
             self.estado_menu.set("activo")  
             self.duracion_tramos_entry.set("I")
+            self.fecha_resolucion.pack_forget()
+            self.fecha_resolucion_visible = False
+            self.btn_agregar_fecha.configure(state="normal")
             
             for menu in self.optines_menus:
                 menu.configure(state="normal")
@@ -309,4 +335,22 @@ class DatosPNFPensumFrame(SectionFrameBase):
         except Exception as e:
             print(f"Error al limpiar el formulario: {e}")
         
-        
+    def mostrar_fecha_resolucion(self):
+        if not self.fecha_resolucion_visible:
+            self.fecha_resolucion.pack(side="left")
+            self.fecha_resolucion_visible = True
+            self.btn_agregar_fecha.configure(state="normal")
+            self.btn_agregar_fecha.configure(text="Quitar fecha de resolución",command= self.eliminar_fecha_resolucion)
+
+    def eliminar_fecha_resolucion(self):
+        if self.fecha_resolucion:
+            self.fecha_resolucion.pack_forget()
+            self.fecha_resolucion_visible = None
+            self.btn_agregar_fecha.configure(text="Agregar fecha de resolución", command= self.mostrar_fecha_resolucion)
+
+
+    def get_fecha_resolucion(self):
+        if self.fecha_resolucion_visible:
+            return self.fecha_resolucion.get_date()
+        else:
+            return None

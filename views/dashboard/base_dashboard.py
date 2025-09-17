@@ -231,10 +231,10 @@ class BaseDashboardView(BaseView):
                         submenu_items= [
                             ("Registrar P.N.F", "uc_icon", self.pnf),
                             ("Listas de P.N.F", "uc_icon", self.list_pnf),
-                            ("Secciones", "uc_icon", self.secciones),
-                            ("Listar Secciones", "uc_icon", self.list_secciones),
                             ("Unidades Curriculares", "uc_icon", self.unid_Curr),
-                            ("Listar U.C","uc_icon",self.listar_uc)  
+                            ("Listar U.C","uc_icon",self.listar_uc),
+                            ("Secciones", "uc_icon", self.secciones),
+                            ("Listar Secciones", "uc_icon", self.list_secciones)
                         ] 
                 elif texto == "Unidades Curriculares":
                     if self.user_role == "COORD_PNF":  
