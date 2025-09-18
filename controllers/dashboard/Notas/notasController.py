@@ -32,16 +32,21 @@ class NotasController:
             return True
         
         lisDicNotasEstudiante  = self.modelo_notas.bring_project(estudiante_id,pnf_id,trayectoId)
+        
 
         if not lisDicNotasEstudiante:
             mensaje = "No se encontró la materia 'Proyecto' para el trayecto actual del estudiante o no tiene notas cargadas."
             messagebox.showwarning("Sin Notas", mensaje, parent=vistaMostrar)
             return False
-        
+        numero_uc = len(lisDicNotasEstudiante)
         # Filtrar solo las notas que no son None y convertirlas a entero
-        notas_validas = [int(dic["nota"]) for dic in lisDicNotasEstudiante if dic.get("nota") is not None]
+       
+        conNotas = 0.0
+        for dicNotas in lisDicNotasEstudiante:
+            if dicNotas["nota"]:
+                conNotas = conNotas + dicNotas["nota"]
         
-        if not notas_validas:
+        if conNotas == 0.0:
             messagebox.showwarning("Sin Notas Válidas", "El estudiante no tiene notas válidas cargadas en la materia de Proyecto.", parent=vistaMostrar)
             return False
             
@@ -49,8 +54,10 @@ class NotasController:
         Segun el documento rector: Para aprobar la unidad curricular de proyecto se necesita que sea 
         mayor o igual a 16
         """
-        nota_final = int(sum(notas_validas) / len(notas_validas))
-        
+        nota_final = conNotas // numero_uc
+        # print("Notas Final: ",nota_final)
+        # print("ConNotas: ", conNotas)
+        # print("numero de uc: ", numero_uc)
         if nota_final >= 16:
             return True
         else:

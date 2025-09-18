@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import tkinter.messagebox as messagebox
+#import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 
 class FiltradoSecciones(ctk.CTkFrame):
@@ -53,6 +53,3 @@ class FiltradoSecciones(ctk.CTkFrame):
         self.master.actualizar_listado(pnf_id)
         print("probando")
         #self.master.calcular_pagina()
-
-    def actualizar_listado_por_busqueda(self,pnf_id):
-        self.realizar_busquedad(pnf_id)

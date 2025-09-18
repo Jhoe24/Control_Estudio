@@ -5,8 +5,8 @@ from views.dashboard.components.widget_utils import *
 #from views.dashboard.modules.forms.DatosUbicacion import DatosUbicacionFrame
 from views.dashboard.modules.forms.PNF.FormPNF import DatosPNFPensumFrame
 from views.dashboard.modules.forms.PNF.frameTrayecto import FrameTrayecto
-from pprint import pprint
-from config.app_config import AppConfig
+#from pprint import pprint
+#from config.app_config import AppConfig
 
 class FormularioPNFPensumView(ctk.CTkScrollableFrame):
 

@@ -97,8 +97,14 @@ class FremeSecciones(SectionFrameBase):
         self.nombres_docentes = []
         for id_nombre in self.id_nombres_docentes:
             self.nombres_docentes.append(id_nombre[1])
+        if self.nombres_docentes:
+            self.var_docente.set(self.nombres_docentes[0])
+            self.docente_menu.configure(values=self.nombres_docentes)
+           
+        else:
+            self.var_docente.set("No hay docente disponible")
+            self.docente_menu.configure(values=["No hay docente disponible"])
 
-        self.var_docente.set(self.nombres_docentes[0] if self.nombres_docentes else "No hay Docentes Asignado")
         self.trayecto_menu.configure(values=self.valores_trayecto)
         print("Trayectos disponibles:", self.valores_trayecto)
 

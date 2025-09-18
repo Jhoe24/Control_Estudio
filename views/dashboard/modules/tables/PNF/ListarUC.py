@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import tkinter as tk
+#import tkinter as tk
 import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.UnidadCurricular import UnidadCurricular
@@ -141,6 +141,22 @@ class ListarUC(ctk.CTkFrame):
         if tupla_datos:
             self.mostrar_listado()
         
+    def actualizar_listado(self, lista_uc):
+        """
+        Actualiza la tabla con una nueva lista de UCs y recalcula la paginación.
+        Este método será llamado desde el frame de filtrado.
+        """
+        self.lista_UC = lista_uc
+        self.pagina_actual = 1
+        self.busqueda_realizada = True
+        self.calcular_pagina()
+        self.mostrar_listado()
+        if not self.lista_UC:
+             messagebox.showinfo("Sin Resultados", "No se encontraron Unidades Curriculares con los filtros seleccionados.", parent=self)
+             for widget in self.fila_datos:
+                for w in widget:
+                    w.destroy()
+
     def mostrar_listado(self):
         """
         Muestra la lista de UC en la tabla, con sus botones de acción.
@@ -154,26 +170,6 @@ class ListarUC(ctk.CTkFrame):
             self.boton_siguiente.configure(state="disabled")
             self.frame_paginacion.grid_remove()
             self.busqueda_realizada = False # No se ha realizado la busqueda
-        else:
-            self.busqueda_realizada = True # Se ha realizado la busqueda
-            # Obtener la lista filtrada de UC según el PNF seleccionado
-            pnf_nombre = self.busqueda_frame.pnf_var.get()
-            periodo_nombre = self.busqueda_frame.periodo_var.get()
-            docente_id = self.docente_id
-
-            # Debes obtener los IDs necesarios para filtrar
-            pnf_id = self.controller_pnf.modelo.obtener_pnf_id_por_nombre(pnf_nombre)
-            periodo_id = self.controller_pnf.obtener_periodo_id_por_nombre(periodo_nombre)
-
-            # Filtrar por docente y periodo si corresponde
-            if docente_id and periodo_id:
-                lista_filtrada = self.controller_pnf.obtener_UC(periodo_id=periodo_id, docente_pnf_id=docente_id)
-            elif pnf_id:
-                lista_filtrada = self.controller_pnf.obtener_UC(tupla_datos=(pnf_id, None, None))
-            else:
-                lista_filtrada = []
-
-            self.calcular_pagina(lista_uc=lista_filtrada)
 
         # Si hay un PNF seleccionado, filtra la lista de UC de acuerdo al PNF
         if self.busqueda_frame.pnf_var.get() != "Seleccione un PNF":    
@@ -251,7 +247,7 @@ class ListarUC(ctk.CTkFrame):
             nuevo_fin = nuevo_inicio + self.uc_por_pagina
             self.paginas_mostrar = self.lista_UC[nuevo_inicio:nuevo_fin]
             self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
-            self.calcular_pagina()
+            self.mostrar_listado()
         
     def siguiente_pagina(self):
         """
@@ -263,7 +259,7 @@ class ListarUC(ctk.CTkFrame):
             self.pagina_actual += 1
             self.paginas_mostrar = self.lista_UC[nuevo_inicio:nuevo_fin]
             self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
-            self.calcular_pagina()
+            self.mostrar_listado()
     
     def calcular_pagina(self, lista_uc=None):
         """
@@ -312,7 +308,7 @@ class ListarUC(ctk.CTkFrame):
         self.boton_anterior.configure(state="disabled" if self.pagina_actual <= 1 else "normal")
         self.boton_siguiente.configure(state="disabled" if self.pagina_actual >= self.total_paginas else "normal")
 
-        self.mostrar_listado()
+        # self.mostrar_listado()
 
 
     def ver_datos_completos(self, uc):
@@ -351,7 +347,7 @@ class ListarUC(ctk.CTkFrame):
         top.protocol("WM_DELETE_WINDOW", on_close)
 
         #Frame de los datos generales de UC
-        self.frame_uc = UnidadCurricular(content_frame, None, self.controller, mostrar_botones=False, user_name=self.username, rol_user=self.user_role)
+        self.frame_uc = UnidadCurricular(content_frame, None, self.controller, mostrar_botones=False, user_name=self.username, rol_user=self.user_role, para_edicion=True)
         self.frame_uc.set_datos(dic_datos)
         self.frame_uc.pack(fill="both", expand=True, padx=0, pady=0)
 
@@ -390,6 +386,9 @@ class ListarUC(ctk.CTkFrame):
         Habilita todos los campos de edición en el modal y activa los botones de acción.
         """
         frame_uc.habilitar_campos()
+        if self.user_role and self.user_role.lower() == "coord_pnf":
+            self.frame_uc.pnfmenu.configure(state="disabled")  # lo bloquea
+            print("PNF bloqueado para coordinador")
         self.btn_actualizar.configure(state="normal")
 
     def actualizar_uc(self, frame_uc, datos_uc, id_uc, top):
@@ -405,18 +404,14 @@ class ListarUC(ctk.CTkFrame):
             self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
             self.paginas_mostrar = self.lista_UC[(self.pagina_actual-1)*self.uc_por_pagina:self.pagina_actual*self.uc_por_pagina]
             self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
+            self.actualizar_listado(self.lista_UC)
             self.mostrar_listado()
     
     def mostrar_resultado_busqueda(self, lista_uc):
         """
         Muestra el resultado filtrado por PNF.
         """
-        self.pagina_actual = 1
-        self.total_paginas = (len(lista_uc) + self.uc_por_pagina - 1) // self.uc_por_pagina
-        self.paginas_mostrar = lista_uc[:self.uc_por_pagina]
-        self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
-
-        # Ocultar paginación si no es necesaria
+        self.actualizar_listado(lista_uc)
         if len(self.lista_UC) <= self.uc_por_pagina:
             self.frame_paginacion.grid_remove()
         else:
@@ -431,7 +426,7 @@ class ListarUC(ctk.CTkFrame):
         """
         self.paginas_mostrar = self.lista_UC[(self.pagina_actual-1)*self.uc_por_pagina:self.pagina_actual*self.uc_por_pagina]
         self.label_pagina.configure(text=f"{self.pagina_actual} de {self.total_paginas}")
-        self.calcular_pagina()
+        self.mostrar_listado()
 
     def actualizar_botones_paginacion(self):
         """

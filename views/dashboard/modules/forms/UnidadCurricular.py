@@ -3,14 +3,14 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from views.dashboard.modules.forms.DatosPersonales import DatosPersonalesFrame
 
-from config.app_config import AppConfig
+#from config.app_config import AppConfig
 
 class UnidadCurricular(SectionFrameBase):
-    def __init__(self, master, vcmd_num, controllers, mostrar_botones=True, user_name = None, rol_user = None):
+    def __init__(self, master, vcmd_num, controllers, mostrar_botones=True, user_name = None, rol_user = None, para_edicion = False):
         
         super().__init__(master, "Unidad Curricular PNF")
         self.vcmd_num = vcmd_num # Validación para números
-
+        self.para_edicion = para_edicion
         self.controlador = controllers['PNF']
         self.controlador_docente = controllers['Docentes']
         self.controlador_user = controllers['Usuario']
@@ -58,8 +58,11 @@ class UnidadCurricular(SectionFrameBase):
         )
         self.pnfmenu.pack(side="left")
         if rol_user and rol_user.lower() == "coord_pnf":
+            print("si entró")
             self.pnfmenu.set(valores_pnf[0])    # selecciona el único valor
+            print("deah")
             self.pnfmenu.configure(state="disabled")  # lo bloquea
+            print("PNF bloqueado para coordinador")
 #==========================================================================================================================
 
         # Trayecto
@@ -68,7 +71,7 @@ class UnidadCurricular(SectionFrameBase):
         trayecto_label = ctk.CTkLabel(trayecto_frame, text="Trayecto:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
         trayecto_label.pack(side="left", padx=(0, 5))
         self.trayectomenu = ctk.CTkOptionMenu(
-            trayecto_frame, values=valores_trayecto, command=self.actualizar_tramos_por_trayecto,
+            trayecto_frame, values=valores_trayecto, command=lambda vf = False: self.actualizar_tramos_por_trayecto(permitir_todos_tramos=vf),
             font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
             text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
         )
@@ -90,8 +93,8 @@ class UnidadCurricular(SectionFrameBase):
             ("Código:", crear_entry, {"width":300,"placeholder_text":"Ingrese código"}, 1,  self.scroll, 'codigo_entry'),
             ("Nombre:", crear_entry, {"width":300,"placeholder_text":"Ingrese el nombre de la U.C"}, 1,  self.scroll, 'nombre_entry'),
             ("Nombre corto:", crear_entry, {"width":300,"placeholder_text":"Ingrese el nombre corto"}, 1,  self.scroll, 'nombre_corto_entry'),
-            ("Área:", crear_entry, {"width":300,"placeholder_text":"Ingrese área"}, 1, self.scroll, 'area_entry'),
-            ("Sub-area:", crear_entry, {"width":300,"placeholder_text":"Ingrese Sub-area"}, 1,  self.scroll, 'subarea_entry'),
+            #("Área:", crear_entry, {"width":300,"placeholder_text":"Ingrese área"}, 1, self.scroll, 'area_entry'),
+            #("Sub-area:", crear_entry, {"width":300,"placeholder_text":"Ingrese Sub-area"}, 1,  self.scroll, 'subarea_entry'),
         ], es_scroll=True)
         
         # Fila para las horas de la Unidad Curricular
@@ -218,8 +221,8 @@ class UnidadCurricular(SectionFrameBase):
         self.codigo_entry = self.scroll.codigo_entry
         self.nombre_entry = self.scroll.nombre_entry
         self.nombre_corto_entry = self.scroll.nombre_corto_entry
-        self.area_entry = self.scroll.area_entry
-        self.subarea_entry = self.scroll.subarea_entry
+        #self.area_entry = self.scroll.area_entry
+        #self.subarea_entry = self.scroll.subarea_entry
 
         self.horas_teoricas_entry = self.scroll.horas_teoricas_entry
         self.horas_practicas_entry = self.scroll.horas_practicas_entry
@@ -241,7 +244,8 @@ class UnidadCurricular(SectionFrameBase):
 
         # Bindings para validar al cambiar campos de texto
         for entry_name in [
-            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 'area_entry', 'subarea_entry',
+            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 
+            #'area_entry', 'subarea_entry',
             'horas_teoricas_entry', 'horas_practicas_entry',
             'horas_laboratorio_entry', 'horas_trabajo_independiente_entry', 'horas_totales_entry',
             'unidades_credito_entry', 'clave_especial_entry'
@@ -260,7 +264,7 @@ class UnidadCurricular(SectionFrameBase):
 
         # Bindings para PNF, Trayecto y Tramo
         self.pnfmenu.configure(command=lambda _: [self.actualizar_trayectos_por_pnf(self.pnfmenu.get()), self.validar_estado_boton_guardar()])
-        self.trayectomenu.configure(command=lambda _: [self.actualizar_tramos_por_trayecto(self.trayectomenu.get()), self.validar_estado_boton_guardar()])
+        self.trayectomenu.configure(command=lambda _: [self.actualizar_tramos_por_trayecto(nombre_trayecto =self.trayectomenu.get()), self.validar_estado_boton_guardar()])
         self.tramomenu.configure(command=lambda _: self.validar_estado_boton_guardar())
         
         self.bind("<Destroy>", self.on_destroy_unidad_curricular)
@@ -315,7 +319,8 @@ class UnidadCurricular(SectionFrameBase):
         Limpia todos los campos del formulario y resetea los OptionMenu a valores por defecto.
         """
         entradas = [
-            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 'area_entry', 'subarea_entry',
+            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 
+            #'area_entry', 'subarea_entry',
             'horas_teoricas_entry', 'horas_practicas_entry',
             'horas_laboratorio_entry', 'horas_trabajo_independiente_entry', 'horas_totales_entry',
             'unidades_credito_entry', 'clave_especial_entry'
@@ -402,6 +407,7 @@ class UnidadCurricular(SectionFrameBase):
         if pnf_id:
             nuevos_trayectos = self.controlador.obtener_trayectos_por_pnf(pnf_id)
             nombres_trayectos = [t[1] for t in nuevos_trayectos] if nuevos_trayectos else ["Sin opciones disponibles"]
+            
             # Actualizar OptionMenu de trayectos
             self.trayectomenu.configure(values=nombres_trayectos)
             if nombres_trayectos:
@@ -412,23 +418,33 @@ class UnidadCurricular(SectionFrameBase):
             # También limpiar tramos si cambió el PNF
             self.tramomenu.configure(values=["Seleccione un trayecto primero"])
             self.tramomenu.set("Seleccione un trayecto primero")
-            self.actualizar_tramos_por_trayecto(self.trayectomenu.get()) 
+            self.actualizar_tramos_por_trayecto(nombre_trayecto = self.trayectomenu.get(), permitir_todos_tramos=False) 
         else:
             print(f"No se encontró ID para PNF: {nombre_pnf}")
 
-    def actualizar_tramos_por_trayecto(self, nombre_trayecto):
+    def actualizar_tramos_por_trayecto(self,nombre_trayecto = None, permitir_todos_tramos=True):
+        if not nombre_trayecto:
+            nombre_trayecto = self.trayectomenu.get()
         """
         Actualiza el OptionMenu de tramos según el trayecto seleccionado.
         """
         trayecto_id = self.trayecto_id_por_nombre.get(nombre_trayecto)
         if trayecto_id:
             nuevos_tramos = self.controlador.obtener_tramos_por_trayecto(trayecto_id)
-            nombres_tramos = [t[1] for t in nuevos_tramos] if nuevos_tramos else ["Sin opciones disponibles"]
+            nombres_tramos = [t[1] for t in nuevos_tramos] if nuevos_tramos else []
+            todos = "Todos los Tramos"
+            if permitir_todos_tramos == True and nombre_trayecto != "Trayecto Inicial" and self.para_edicion == False:
+                nombres_tramos.append(todos) # Nueva opción
 
             # Actualiza los valores en el OptionMenu de tramos
+            print(permitir_todos_tramos)
+            if permitir_todos_tramos == False:
+                if todos in nombres_tramos:
+                    nombres_tramos.remove(todos)
+                print(nombres_tramos)
             self.tramomenu.configure(values=nombres_tramos)
             if nombres_tramos:
-                self.tramomenu.set(nombres_tramos[0])  # Selecciona automáticamente el primero
+                self.tramomenu.set(nombres_tramos[0])  # Selecciona el primero
 
             # Actualiza el mapeo de nombre -> id para los tramos
             self.tramo_id_por_nombre = {t[1]: t[0] for t in nuevos_tramos} if nuevos_tramos else {}
@@ -493,11 +509,11 @@ class UnidadCurricular(SectionFrameBase):
         self.nombre_corto_entry.delete(0, 'end')
         self.nombre_corto_entry.insert(0, valor_seguro(datos.get('nombre_corto')))
         
-        self.area_entry.delete(0, 'end')
-        self.area_entry.insert(0, valor_seguro(datos.get('area')))
+        # self.area_entry.delete(0, 'end')
+        # self.area_entry.insert(0, valor_seguro(datos.get('area')))
         
-        self.subarea_entry.delete(0, 'end')
-        self.subarea_entry.insert(0, valor_seguro(datos.get('subarea')))
+        # self.subarea_entry.delete(0, 'end')
+        # self.subarea_entry.insert(0, valor_seguro(datos.get('subarea')))
 
         # Rellenar campos numéricos (horas)
         self.horas_teoricas_entry.delete(0, 'end')
@@ -585,11 +601,11 @@ class UnidadCurricular(SectionFrameBase):
             trayecto_nombre_por_id = {v: k for k, v in self.trayecto_id_por_nombre.items()}
             trayecto_nombre = trayecto_nombre_por_id.get(trayecto_id)
             # Actualizar tramos basado en el trayecto seleccionado
-            self.actualizar_tramos_por_trayecto(trayecto_nombre)
+            self.actualizar_tramos_por_trayecto(nombre_trayecto = trayecto_nombre, permitir_todos_tramos=False) # Only Update causas
             if trayecto_nombre:
                 self.trayectomenu.set(trayecto_nombre)
                 # Actualizar tramos basado en el trayecto seleccionado
-                self.actualizar_tramos_por_trayecto(trayecto_nombre)
+                self.actualizar_tramos_por_trayecto(nombre_trayecto = trayecto_nombre, permitir_todos_tramos=False) # Only Update causas
             else:
                 # Si no encuentra el trayecto, mostrar el ID
                 valores_trayecto_actuales = list(self.trayectomenu.cget("values"))
@@ -631,7 +647,8 @@ class UnidadCurricular(SectionFrameBase):
         Deshabilita todos los campos del formulario.
         """
         entradas = [
-            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 'area_entry', 'subarea_entry',
+            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 
+            #'area_entry', 'subarea_entry',
             'horas_teoricas_entry', 'horas_practicas_entry',
             'horas_laboratorio_entry', 'horas_trabajo_independiente_entry', 'horas_totales_entry',
             'unidades_credito_entry', 'clave_especial_entry'
@@ -664,7 +681,8 @@ class UnidadCurricular(SectionFrameBase):
         Habilita todos los campos del formulario.
         """
         entradas = [
-            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 'area_entry', 'subarea_entry',
+            'codigo_entry', 'nombre_entry', 'nombre_corto_entry', 
+            #'area_entry', 'subarea_entry',
             'horas_teoricas_entry', 'horas_practicas_entry',
             'horas_laboratorio_entry', 'horas_trabajo_independiente_entry', 'horas_totales_entry',
             'unidades_credito_entry', 'clave_especial_entry'

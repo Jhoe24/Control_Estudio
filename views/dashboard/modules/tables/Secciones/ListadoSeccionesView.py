@@ -249,7 +249,7 @@ class ListSeccionesView(ctk.CTkFrame):
                 return
             exito = self.controlador_secciones.actualizar_seccion(seccion_id, datos_actualizados, ventana)
             if exito:
-                self.actualizar_listado()
+                self.actualizar_listado(id_pnf=datos_actualizados.get("pnf_id"))
                 ventana.destroy()
                 
     def actualizar_listado(self, id_pnf):
@@ -269,20 +269,21 @@ class ListSeccionesView(ctk.CTkFrame):
             #print(self.secciones)
             #print(f"Secciones obtenidas para PNF ID {id_pnf}: {len(self.secciones)}")
             # Actualizar estado de cada seccion segun las fechas del periodo academico
-            for seccion in self.secciones:
-                #print("Campos de la sección:", seccion.keys()) 
-                periodo_id = seccion.get("periodo_academico_id")
-                #print(f"periodo_id de la sección {seccion.get('codigo_seccion')}: {periodo_id}")  
-                if periodo_id:
-                    #obtener datos del periodo academico
-                    periodo = self.controlador_PA.obtener_periodo_academico_datos(periodo_id)
-                    #print(periodo)
-                    if periodo and len(periodo) > 0:
-                        periodo = periodo[0]
-                        #actualizar el estado de la seccion si corresponde
-                        self.controlador_secciones.actualizar_estado_seccion_por_fecha(seccion, periodo)
-                        #print(f'Se actualizo el estado de la seccion {seccion["codigo_seccion"]} segun las fechas del periodo academico {periodo["nombre"]}')
-                        #print(f'Fechas: inicio clases: {periodo["fecha_inicio_clases"]}, fin clases: {periodo["fecha_fin_clases"]}, fecha inicio clases: {periodo["fecha_inicio_clases"]}, fecha fin clases: {periodo["fecha_fin_clases"]}, fecha actual: {self.controlador_secciones.obtener_fecha_actual()}')
+            if self.secciones and len(self.secciones) > 0:
+                for seccion in self.secciones:
+                    #print("Campos de la sección:", seccion.keys()) 
+                    periodo_id = seccion.get("periodo_academico_id")
+                    #print(f"periodo_id de la sección {seccion.get('codigo_seccion')}: {periodo_id}")  
+                    if periodo_id:
+                        #obtener datos del periodo academico
+                        periodo = self.controlador_PA.obtener_periodo_academico_datos(periodo_id)
+                        #print(periodo)
+                        if periodo and len(periodo) > 0:
+                            periodo = periodo[0]
+                            #actualizar el estado de la seccion si corresponde
+                            self.controlador_secciones.actualizar_estado_seccion_por_fecha(seccion, periodo)
+            else:
+                messagebox.showinfo("Información", "No se encontraron secciones para el PNF seleccionado.")
 
         else:
             self.secciones = []  

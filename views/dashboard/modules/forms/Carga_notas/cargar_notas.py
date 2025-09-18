@@ -24,11 +24,12 @@ class CargaNotasFrame(SectionFrameBase):
         else:
             self.tuple_pnf = self.controller_pnf.listado_pnf
         
-        self.nombres_pnf = self.controller_pnf.obtener_nombres_pnf()
+        # Corregido: Usar la tupla ya filtrada para obtener los nombres
+        self.nombres_pnf = [tupla[2] for tupla in self.tuple_pnf] if self.tuple_pnf else []
         self.var_pnf = ctk.StringVar(value=self.nombres_pnf[0] if self.nombres_pnf else "")
         self.pnf_id_por_nombre = {tupla[2]: tupla[0] for tupla in self.tuple_pnf}  # nombre: id
         
-        pnf_id_inicial = self.pnf_id_por_nombre[self.var_pnf.get()]
+        pnf_id_inicial = self.pnf_id_por_nombre.get(self.var_pnf.get()) # Usar .get() para más seguridad
         self.secciones_disponibles = self.controller_secciones.obtener_nombres_secciones_por_pnf(pnf_id_inicial)
         self.var_seccion = ctk.StringVar(value=self.secciones_disponibles[0] if self.secciones_disponibles else "Sin secciones")
         

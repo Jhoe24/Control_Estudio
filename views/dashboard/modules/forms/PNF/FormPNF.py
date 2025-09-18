@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import tkinter.messagebox as messagebox
+#import tkinter.messagebox as messagebox
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from views.dashboard.components.caendario import CTKFecha
@@ -228,6 +228,8 @@ class DatosPNFPensumFrame(SectionFrameBase):
         self.duracion_trayectos_entry.configure(state="disabled")
         self.duracion_semanas_entry.configure(state="disabled")
         self.estado_menu.configure(state="disabled")
+        self.btn_agregar_fecha.configure(state="disabled")
+
         # Deshabilita el botón de grabar Trayecto
         if hasattr(self.master, 'button_siguiente'):
             self.master.button_siguiente.configure(state="disabled")
@@ -277,10 +279,11 @@ class DatosPNFPensumFrame(SectionFrameBase):
         if "fecha_resolucion" in datos and datos["fecha_resolucion"]:
             self.mostrar_fecha_resolucion()
             self.fecha_resolucion.set_date(str(datos["fecha_resolucion"]))
+            self.btn_agregar_fecha.configure(state="disabled")
         else:
             self.fecha_resolucion.pack_forget()  # Ocultar el selector de fecha
             self.fecha_resolucion_visible = False
-            self.btn_agregar_fecha.configure(state="normal")
+            self.btn_agregar_fecha.configure(state="disabled")
 
         cantidad = self.dict_trayectos_invertido[len(datos["lista_trayectos"])-1]#Menos 1 por el trayecto inicial
         if cantidad:
@@ -315,6 +318,7 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.estado_menu.configure(state="normal")
             self.tipo_pnf_menu.configure(state="normal")
             self.duracion_tramos_entry.configure("normal")
+            self.btn_agregar_fecha.configure(state="normal")
             self.fecha_resolucion.enable()
            
         # Habilitar el botón de grabar Trayecto si existe

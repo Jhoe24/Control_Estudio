@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from views.base_view import BaseView
 from config.settings import Settings
-import tkinter as tk
+#import tkinter as tk
 
 
 class BaseDashboardView(BaseView):

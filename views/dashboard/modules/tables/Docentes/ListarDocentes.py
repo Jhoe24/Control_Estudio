@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import tkinter as tk
+#import tkinter as tk
 import threading
 from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.FiltradoBusqueda import FiltradoBusquedaFrame

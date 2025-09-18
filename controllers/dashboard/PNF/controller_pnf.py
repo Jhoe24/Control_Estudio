@@ -4,6 +4,7 @@ from models.PNF.modelo_pnf import ModeloPNF
 from datetime import datetime
 from pprint import pprint
 import re
+
 class ControllerPNF:
     
     def __init__(self):
@@ -360,17 +361,40 @@ class ControllerPNF:
 #=============================================================================================
     #Metodos para el controlador de unidades Curriculares
     def registrar_unidad_curricular(self, datos_uc, vista_formulario=None):
-        try:
-            fecha_actual = self.obtener_fecha_actual()
-            id_uc = self.modelo.registrar_unidad_curricular(datos_uc, fecha_actual)
-            if not id_uc:
-                messagebox.showerror("Error", "No se pudo registrar la Unidad Curricular.", parent=vista_formulario)
+        fecha_actual = self.obtener_fecha_actual()
+        
+        # Si se seleccionó "Todos los Tramos"
+        if datos_uc.get("tramo_id") == "Todos los Tramos":
+            id_trayecto = datos_uc.get("trayecto_id")
+            if not id_trayecto:
+                messagebox.showerror("Error", "Se debe seleccionar un trayecto válido para registrar en todos sus tramos.", parent=vista_formulario)
                 return False
-            messagebox.showinfo("Éxito", "Unidad Curricular registrada correctamente.", parent=vista_formulario)
-            return True
-        except Exception as e:
-            print(f"Error inesperado al registrar la Unidad Curricular: {e}")
-            messagebox.showerror("Error inesperado", f"Ocurrió un error: {e}", parent=vista_formulario)
+
+            lista_tramos = self.obtener_tramos_por_trayecto(id_trayecto)
+            if not lista_tramos:
+                messagebox.showerror("Error", "No se encontraron tramos para el trayecto seleccionado.", parent=vista_formulario)
+                return False
+
+            registros_exitosos = 0
+            for tramo_tupla in lista_tramos:
+                id_tramo = tramo_tupla[0]
+                datos_uc_copia = datos_uc.copy()
+                datos_uc_copia["tramo_id"] = id_tramo
+                if self.modelo.registrar_unidad_curricular(datos_uc_copia, fecha_actual):
+                    registros_exitosos += 1
+            
+            if registros_exitosos == len(lista_tramos):
+                messagebox.showinfo("Éxito", f"Unidad Curricular registrada correctamente en {registros_exitosos} tramos.", parent=vista_formulario)
+                return True
+            else:
+                messagebox.showwarning("Advertencia", f"Se registraron {registros_exitosos} de {len(lista_tramos)} tramos. Verifique los datos.", parent=vista_formulario)
+                return False
+        else: # Registro en un solo tramo
+            exito = self.modelo.registrar_unidad_curricular(datos_uc, fecha_actual)
+            if exito:
+                messagebox.showinfo("Éxito", "Unidad Curricular registrada correctamente.", parent=vista_formulario)
+                return True
+            messagebox.showerror("Error", "No se pudo registrar la Unidad Curricular.", parent=vista_formulario)
             return False
         
     def obtener_datos_completos_uc(self, id_uc):
@@ -396,8 +420,8 @@ class ControllerPNF:
             "codigo": vista_uc.codigo_entry.get(),
             "nombre": vista_uc.nombre_entry.get(),
             "nombre_corto": vista_uc.nombre_corto_entry.get(),
-            "area": vista_uc.area_entry.get(),
-            "subarea": vista_uc.subarea_entry.get(),
+            #"area": vista_uc.area_entry.get(),
+            #"subarea": vista_uc.subarea_entry.get(),
             "horas_teoricas": vista_uc.horas_teoricas_entry.get(),
             "horas_practicas": vista_uc.horas_practicas_entry.get(),
             "horas_laboratorio": vista_uc.horas_laboratorio_entry.get(),
@@ -412,7 +436,9 @@ class ControllerPNF:
             "estado": vista_uc.estado_menu.get(),
             "pnf_id": vista_uc.pnf_id_por_nombre.get(vista_uc.pnfmenu.get()),
             "trayecto_id": vista_uc.trayecto_id_por_nombre.get(vista_uc.trayectomenu.get()),
-            "tramo_id": vista_uc.tramo_id_por_nombre.get(vista_uc.tramomenu.get()),
+            # Si se selecciona "Todos los Tramos", se pasa el string, si no, se busca el ID.
+            "tramo_id": "Todos los Tramos" if vista_uc.tramomenu.get() == "Todos los Tramos" 
+                        else vista_uc.tramo_id_por_nombre.get(vista_uc.tramomenu.get()),
             # "fecha_creacion": vista_uc.fecha_creacion_entry.get(),
             # "fecha_actualizacion": vista_uc.fecha_actualizacion_entry.get(),
         }
@@ -440,7 +466,10 @@ class ControllerPNF:
                 if not valor_campo:
                     campos_faltantes.append(nombre_campo)
             # Validar tramo
-            tramo_valido = datos_uc.get('id_tramo') is not None
+            # La validación ahora permite el string "Todos los Tramos" o un ID (que no sea None)
+            tramo_seleccionado = datos_uc.get('tramo_id')
+            tramo_valido = tramo_seleccionado is not None and tramo_seleccionado != "Seleccione un tramo"
+
 
             if mostrar_mensajes:
                 if campos_faltantes:

@@ -432,21 +432,21 @@ class ModeloPNF:
 
                 """
                 INSERT INTO unidades_curriculares
-                (codigo, nombre, nombre_corto, pnf_id, trayecto_id, tramo_id, area, subarea, horas_teoricas, horas_practicas,
+                (codigo, nombre, nombre_corto, pnf_id, trayecto_id, tramo_id, horas_teoricas, horas_practicas,
                 horas_laboratorio, horas_trabajo_independiente, horas_totales, unidades_credito, tipo, caracter, modalidad, complejidad, 
                 clave_especial,
                 estado, fecha_creacion, fecha_actualizacion)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """,
                 (
                     datos_uc["codigo"],
                     datos_uc["nombre"],
                     datos_uc["nombre_corto"],
-                    datos_uc["id_pnf"],
-                    datos_uc["id_trayecto"],
-                    datos_uc["id_tramo"],
-                    datos_uc["area"],
-                    datos_uc["subarea"],
+                    datos_uc["pnf_id"],
+                    datos_uc["trayecto_id"],
+                    datos_uc["tramo_id"],
+                    #datos_uc["area"],
+                    #datos_uc["subarea"],
                     datos_uc["horas_teoricas"],
                     datos_uc["horas_practicas"],
                     datos_uc["horas_laboratorio"],
@@ -543,8 +543,6 @@ class ModeloPNF:
                     codigo = ?,
                     nombre = ?,
                     nombre_corto = ?,
-                    area = ?,
-                    subarea = ?,
                     horas_teoricas = ?,
                     horas_practicas = ?,
                     horas_laboratorio = ?,
@@ -568,8 +566,8 @@ class ModeloPNF:
                     datos_uc["codigo"],
                     datos_uc["nombre"],
                     datos_uc["nombre_corto"],
-                    datos_uc["area"],
-                    datos_uc["subarea"],
+                    #datos_uc["area"],
+                    #datos_uc["subarea"],
                     datos_uc["horas_teoricas"],
                     datos_uc["horas_practicas"],
                     datos_uc["horas_laboratorio"],

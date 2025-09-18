@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from views.dashboard.components.widget_utils import *
 from views.dashboard.components.SectionFrameBase import SectionFrameBase
-from controllers.dashboard.PNF.controller_pnf import ControllerPNF
+#from controllers.dashboard.PNF.controller_pnf import ControllerPNF
 import tkinter.messagebox as messagebox
 import tkinter as tk
 
@@ -196,8 +196,7 @@ class FiltradoPNFFrame(SectionFrameBase):
         else:
             lista_uc = []
 
-        self.master.calcular_pagina(lista_uc)
-        self.master.actualizar_pagina()
+        self.master.actualizar_listado(lista_uc)
 
     def obtener_nombre_pnf(self):
         nombre_pnf = []
