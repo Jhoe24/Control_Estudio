@@ -60,7 +60,7 @@ class ListarUC(ctk.CTkFrame):
         elif escala == 125:
             self.uc_por_pagina = 13
         elif escala == 100:
-            self.uc_por_pagina = 18
+            self.uc_por_pagina = 12
             
         self.total_paginas = (len(self.lista_UC) + self.uc_por_pagina - 1) // self.uc_por_pagina
 
@@ -96,6 +96,8 @@ class ListarUC(ctk.CTkFrame):
         for i in range(len(headers)):
             self.grid_columnconfigure(i, weight=1)
 
+        # Bandera para el control de la búsqueda
+        self.busqueda_realizada = False
 
         # Frame de paginación
         self.frame_paginacion = ctk.CTkFrame(self, fg_color="transparent")
@@ -129,8 +131,15 @@ class ListarUC(ctk.CTkFrame):
         else:
             self.frame_paginacion.grid()
 
+        if not tupla_datos:
+            self.label_pagina.configure(text="0 de 0")
+            self.boton_anterior.configure(state="disabled")
+            self.boton_siguiente.configure(state="disabled")
+            self.frame_paginacion.grid_remove()
+
         # Lista para almacenar las filas de datos
-        self.mostrar_listado()
+        if tupla_datos:
+            self.mostrar_listado()
         
     def mostrar_listado(self):
         """
@@ -143,6 +152,28 @@ class ListarUC(ctk.CTkFrame):
             self.label_pagina.configure(text="0 de 0")
             self.boton_anterior.configure(state="disabled")
             self.boton_siguiente.configure(state="disabled")
+            self.frame_paginacion.grid_remove()
+            self.busqueda_realizada = False # No se ha realizado la busqueda
+        else:
+            self.busqueda_realizada = True # Se ha realizado la busqueda
+            # Obtener la lista filtrada de UC según el PNF seleccionado
+            pnf_nombre = self.busqueda_frame.pnf_var.get()
+            periodo_nombre = self.busqueda_frame.periodo_var.get()
+            docente_id = self.docente_id
+
+            # Debes obtener los IDs necesarios para filtrar
+            pnf_id = self.controller_pnf.modelo.obtener_pnf_id_por_nombre(pnf_nombre)
+            periodo_id = self.controller_pnf.obtener_periodo_id_por_nombre(periodo_nombre)
+
+            # Filtrar por docente y periodo si corresponde
+            if docente_id and periodo_id:
+                lista_filtrada = self.controller_pnf.obtener_UC(periodo_id=periodo_id, docente_pnf_id=docente_id)
+            elif pnf_id:
+                lista_filtrada = self.controller_pnf.obtener_UC(tupla_datos=(pnf_id, None, None))
+            else:
+                lista_filtrada = []
+
+            self.calcular_pagina(lista_uc=lista_filtrada)
 
         # Si hay un PNF seleccionado, filtra la lista de UC de acuerdo al PNF
         if self.busqueda_frame.pnf_var.get() != "Seleccione un PNF":    
@@ -238,6 +269,18 @@ class ListarUC(ctk.CTkFrame):
         """
         Habilita/deshabilita los botones de paginación según la página actual y muestra el listado.
         """
+
+        if not self.busqueda_realizada:
+            self.paginas_mostrar = []
+            self.total_paginas = 0
+            self.pagina_actual = 0
+            self.label_pagina.configure(text="0 de 0")
+            self.boton_anterior.configure(state="disabled")
+            self.boton_siguiente.configure(state="disabled")
+            self.frame_paginacion.grid_remove()
+            #self.mostrar_listado()
+            return
+        
         if lista_uc is not None:
             self.lista_UC = lista_uc
 
@@ -395,7 +438,7 @@ class ListarUC(ctk.CTkFrame):
         Habilita o deshabilita los botones de paginación según la página actual y el total de páginas.
         """
         # deshabilita los botones si no hay registros en la lista
-        if not self.lista_UC or len(self.lista_UC) <= 0:
+        if not self.lista_UC or len(self.lista_UC) <= 0 or not self.busqueda_realizada:
             self.frame_paginacion.grid_remove()
             self.boton_anterior.configure(state="disabled")
             self.boton_siguiente.configure(state="disabled")

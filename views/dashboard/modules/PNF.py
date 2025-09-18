@@ -119,6 +119,7 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         # if self.listado_trayectos:
         #     for frame_trayectos in self.listado_trayectos:
         #         list_dic_trayectos.append(frame_trayectos.obtener_datos_trayectos())
+        
         codigo = self.datos_pnf.codigo_entry.get().strip()
         if self.controlador.existe_codigo(codigo):
             messagebox.showerror("Error", "El código ingresado ya existe. Por favor, ingrese un código único.")
@@ -127,7 +128,19 @@ class FormularioPNFPensumView(ctk.CTkScrollableFrame):
         if self.controlador.existe_codigo_nacional(codigo_nacional):
             messagebox.showerror("Error", "El código nacional ingresado ya existe. Por favor, ingrese un código único.")
             return
-        
+
+        # Mensaje de confirmación antes de registrar
+        confirmacion = messagebox.askyesno(
+            "Confirmar Registro",
+            "Por favor, verifique que la cantidad de trayectos y tramos es la correcta.\n\n"
+            "Estos valores no podrán ser modificados fácilmente en el futuro, ya que de ellos depende la estructura de Unidades Curriculares, Secciones y Notas.\n\n"
+            "¿Desea continuar con el registro?",
+            parent=self
+        )
+
+        if not confirmacion:
+            return # El usuario canceló la operación
+
         dato_completos = self.controlador.getPNF(self.datos_pnf)
         if dato_completos:
             self.controlador.registrar_pnf(dato_completos,self)

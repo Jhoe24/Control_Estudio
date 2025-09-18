@@ -46,51 +46,13 @@ class ControllerPNF:
             if not id_pnf:
                 messagebox.showerror("Error", "No se pudo registrar el PNF.", parent=vista_formulario)
                 return False
-
-            # Iterar para registrar Trayecto Inicial (i=0) y los trayectos profesionales (i > 0)
-            for i in range(dic_pnf["cantidad_trayectos"] + 1):
-                if i == 0:
-                    # Registrar Trayecto Inicial
-                    trayecto_id = self.modelo.registrar_trayecto(datos_trayecto={
-                        "numero": 0,
-                        "nombre": "Trayecto Inicial"
-                    }, id_pnf=id_pnf, numero_tramos=1)
-                    cantidad_tramos_a_registrar = 1 # El trayecto inicial solo tiene 1 tramo
-                else:
-                    # Registrar Trayectos Profesionales
-                    trayecto_id = self.modelo.registrar_trayecto({
-                        "numero": i,
-                        "nombre": f"Trayecto {vista_formulario.dict_trayectos_invertido.get(i,i)}"
-                    }, id_pnf=id_pnf, numero_tramos=dic_pnf["cantidad_tramos"])
-                    cantidad_tramos_a_registrar = dic_pnf["cantidad_tramos"]
-
-                if not trayecto_id:
-                    nombre_trayecto = "Inicial" if i == 0 else vista_formulario.dict_trayectos_invertido.get(i, i)
-                    messagebox.showerror("Error", f"No se pudo registrar el trayecto {nombre_trayecto}.", parent=vista_formulario)
-                    continue # Si falla un trayecto, pasa al siguiente
-                
-                # Bucle para registrar los tramos correspondientes a cada trayecto
-                for j in range(1, cantidad_tramos_a_registrar + 1):
-                    nombre_tramo_romano = vista_formulario.dict_trayectos_invertido.get(j, j)
-                    exito_tramo = self.modelo.registrar_tramos(
-                        {"numero": j, "nombre": f"Tramo {nombre_tramo_romano}"}, 
-                        trayecto_id
-                    )
-                    if not exito_tramo:
-                        messagebox.showerror("Error",f"Error al registrar el tramo {nombre_tramo_romano}", parent=vista_formulario)
-
-            # for trayecto in lista_trayectos:
-            #     lista_tramos = trayecto["lista_tramos"]
-            #     id_trayecto = self.modelo.registrar_trayecto(trayecto, id_pnf)
-
-            #     if not id_trayecto:
-            #         messagebox.showerror("Error", f"No se pudo registrar el trayecto {trayecto.get('numero', '')}.", parent=vista_formulario)
-            #         continue
-
-            #     for tramo in lista_tramos:
-            #         exito_tramo = self.modelo.registrar_tramos(tramo, id_trayecto)
-            #         if exito_tramo is not True:
-            #             messagebox.showerror("Error", f"Error al registrar el tramo {tramo.get('numero', '')} del trayecto {trayecto.get('numero', '')}.", parent=vista_formulario)
+            
+            # Llamada al nuevo método reutilizable
+            exito_creacion = self._registrar_trayectos_y_tramos(id_pnf, dic_pnf, vista_formulario)
+            if not exito_creacion:
+                # Opcional: Podrías considerar eliminar el PNF si la creación de trayectos falla.
+                messagebox.showerror("Error", "Se registró el PNF pero falló la creación de trayectos y tramos.", parent=vista_formulario)
+                return False
 
             messagebox.showinfo("Éxito", "PNF registrado correctamente.", parent=vista_formulario)
             # Actualizar el listado de PNF en el modelo
@@ -126,48 +88,60 @@ class ControllerPNF:
         #pprint(dic_pnf)
         return dic_pnf
     
-    def update_pnf(self,dic_pnf,dic_id,top,nuevos_trayectos = None):
-        exito = self.modelo.update_pnf(dic_pnf,dic_id["id_pnf"])
-        if exito:
-            if dic_pnf["lista_trayectos"]:
-                for trayectos,id_trayecto in zip(dic_pnf["lista_trayectos"],dic_id["ids_trayectos"]):
-                    exito = self.modelo.update_trayecto(trayectos,id_trayecto[0])
-                    if exito:
-                        if trayectos["lista_tramos"]:
-                            for tramos,id in zip(trayectos["lista_tramos"],id_trayecto[1]):
-                                exito = self.modelo.update_tramo(tramos,id)
-                                if exito == False:
-                                    messagebox.showinfo("Error", f"tramo {tramos['numero']} no se puedo actualizar.", parent=top)
-                        if trayectos["lista_tramos_nuevos"]:
-                            for tramos in trayectos["lista_tramos_nuevos"]:
-                                exito = self.modelo.registrar_tramos(tramos, id_trayecto[0])
-                                if exito is not True:
-                                    messagebox.showerror("Error", f"tramo {tramos['numero']} no se pudo registrar.", parent=top)
-                    else:
-                        messagebox.showinfo("Error", f"trayecto {trayectos['numero']} no se puedo actualizar.", parent=top)
+    def update_pnf(self,dic_pnf,id_pnf,top):
+        # 1. Actualizar los datos principales del PNF
+        exito_pnf = self.modelo.update_pnf(dic_pnf, id_pnf, self.obtener_fecha_actual())
+        if not exito_pnf:
+            messagebox.showerror("Error", "No se pudo actualizar la información principal del PNF.", parent=top)
+            return False
 
-            messagebox.showinfo("Éxito","PNF actualizado correctamente.", parent=top)
+        # # 2. Eliminar los trayectos y tramos existentes asociados a este PNF
+        # exito = self.modelo.eliminar_trayectos_tramos(id_pnf)
+        # if not exito:
+        #     messagebox.showerror("Error", "No se pudieron actualizar los trayectos y tramos existentes.", parent=top)
+        #     return False
 
-            if nuevos_trayectos:
-                for trayecto in nuevos_trayectos:
-                    lista_tramos = trayecto["lista_tramos"]
-                    id_trayecto = self.modelo.registrar_trayecto(trayecto, dic_id["id_pnf"])
+        # # 3. Volver a crear los trayectos y tramos según las nuevas cantidades
+        # exito_recreacion = self._registrar_trayectos_y_tramos(id_pnf, dic_pnf, top)
+        # if not exito_recreacion:
+        #     messagebox.showerror("Error", "Se actualizó el PNF pero falló la actualizacion de trayectos y tramos.", parent=top)
+        #     return False
 
-                    if not id_trayecto:
-                        messagebox.showerror("Error", f"No se pudo actualizar el nuevo trayecto {trayecto.get('numero', '')}.", parent=top)
-                        continue
+        messagebox.showinfo("Éxito", "PNF actualizado correctamente.", parent=top)
+        self.actualizar_listado()
+        return True
 
-                    for tramo in lista_tramos:
-                        exito_tramo = self.modelo.registrar_tramos(tramo, id_trayecto)
-                        if exito_tramo is not True:
-                            messagebox.showerror("Error", f"Error al actualizar el nuevo tramo {tramo.get('numero', '')} del trayecto {trayecto.get('numero', '')}.", parent=top)
+     
+    def _registrar_trayectos_y_tramos(self, id_pnf, dic_pnf, parent_window):
+        """
+        Método reutilizable para crear la estructura de trayectos y tramos para un PNF.
+        """
+        dict_trayectos_invertido = {1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V'}
+        try:
+            for i in range(dic_pnf["cantidad_trayectos"] + 1):
+                if i == 0: # Trayecto Inicial
+                    datos_trayecto = {"numero": 0, "nombre": "Trayecto Inicial"}
+                    cantidad_tramos_a_registrar = 1
+                    trayecto_id = self.modelo.registrar_trayecto(datos_trayecto, id_pnf, numero_tramos=1)
+                else: # Trayectos Profesionales
+                    nombre_trayecto_romano = dict_trayectos_invertido.get(i, i)
+                    datos_trayecto = {"numero": i, "nombre": f"Trayecto {nombre_trayecto_romano}"}
+                    cantidad_tramos_a_registrar = dic_pnf["cantidad_tramos"]
+                    trayecto_id = self.modelo.registrar_trayecto(datos_trayecto, id_pnf, numero_tramos=cantidad_tramos_a_registrar)
 
-
-
-            self.listado_pnf = self.modelo.obtner_lista_pnf()
+                if not trayecto_id:
+                    nombre_trayecto = "Inicial" if i == 0 else dict_trayectos_invertido.get(i, i)
+                    messagebox.showerror("Error", f"No se pudo registrar el trayecto {nombre_trayecto}.", parent=parent_window)
+                    continue
+                
+                for j in range(1, cantidad_tramos_a_registrar + 1):
+                    nombre_tramo_romano = dict_trayectos_invertido.get(j, j)
+                    exito_tramo = self.modelo.registrar_tramos({"numero": j, "nombre": f"Tramo {nombre_tramo_romano}"}, trayecto_id)
+                    if not exito_tramo:
+                        messagebox.showerror("Error", f"Error al registrar el tramo {nombre_tramo_romano}", parent=parent_window)
             return True
-        else: 
-            messagebox.showinfo("Error", f"El PNF no se puedo actualizar.", parent=top)
+        except Exception as e:
+            messagebox.showerror("Error", f"Ocurrió un error creando trayectos y tramos: {e}", parent=parent_window)
             return False
 
     def obtener_id(self, dic_pnf):
@@ -450,42 +424,14 @@ class ControllerPNF:
         - Deshabilita el botón si falta algún campo o si no se selecciona un tramo válido.
         - Habilita el botón si todo está completo.
         """
-        # campos_obligatorios = [
-        #     'codigo', 'nombre', 'nombre_corto', 'area', 'subarea',
-        #     'horas_teoricas', 'horas_practicas',
-        #     'horas_laboratorio', 'horas_trabajo_independiente', 'horas_totales',
-        #     'unidades_credito', 'clave_especial'
-        #     # 'fecha_creacion', 'fecha_actualizacion'
-        # ]
-
-        # campos_faltantes = []
-        # for campo in campos_obligatorios:
-        #     valor = datos_uc.get(campo, "").strip()
-        #     if not valor:
-        #         campos_faltantes.append(campo)
-
-        # # Validar selección de Tramo
-        # id_tramo = datos_uc.get('id_tramo')
-        # tramo_valido = id_tramo is not None
-
-        # if campos_faltantes or not tramo_valido:
-        #     # Deshabilitar botón
-        #     if hasattr(vista, "btn_guardar") and vista.btn_guardar:
-        #         vista.btn_guardar.configure(state="disabled")
-        #     return False
-        # else:
-        #     # Habilitar botón
-        #     if hasattr(vista, "btn_guardar") and vista.btn_guardar:
-        #         vista.btn_guardar.configure(state="normal")
-        #     return True
         try:
             campos_a_validar = [
                 ("codigo", "Código"),
                 ("nombre", "Nombre"),
-                ("horas_teoricas", "Horas Teóricas"),
-                ("horas_practicas", "Horas Prácticas"),
-                ("horas_laboratorio", "Horas Laboratorio"),
-                ("horas_trabajo_independiente", "Horas Trabajo Independiente"),
+                #("horas_teoricas", "Horas Teóricas"),
+                #("horas_practicas", "Horas Prácticas"),
+                #("horas_laboratorio", "Horas Laboratorio"),
+                #("horas_trabajo_independiente", "Horas Trabajo Independiente"),
                 ("unidades_credito", "Unidad de Crédito"),
             ]
             campos_faltantes = []
@@ -654,3 +600,6 @@ class ControllerPNF:
 
     def obtener_docente_asignado_uc(self, uc_id, periodo_id):
         return self.modelo.obtener_docente_asignado_uc(uc_id, periodo_id)
+    
+    def obtener_pnf_id_por_nombre(self, nombre_pnf):
+        return self.modelo.obtener_pnf_id_por_nombre(nombre_pnf)

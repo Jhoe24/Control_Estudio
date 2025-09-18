@@ -38,7 +38,54 @@ class UnidadCurricular(SectionFrameBase):
         self.evento_mouse()
 
         # Fila para los datos de la Unidad Curricular
+        # Crear un frame para la fila de PNF, Trayecto y Tramo con etiquetas
+        self.fila_pnf_trayecto_tramo = ctk.CTkFrame(self.scroll, fg_color="transparent")
+        self.fila_pnf_trayecto_tramo.pack(fill="x", padx=10, pady=5)
+        
+        valores_pnf = self.obtener_nombre_pnf() if self.obtener_nombre_pnf() else ["Sin opciones disponibles"]
+        valores_trayecto = self.nombre_trayecto if self.nombre_trayecto else ["Sin opciones disponibles"]
+        valores_tramo = self.nombre_tramo if self.nombre_tramo else ["Sin opciones disponibles"]
 
+        # PNF
+        pnf_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")
+        pnf_frame.pack(side="left", padx=10)
+        pnf_label = ctk.CTkLabel(pnf_frame, text="PNF:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
+        pnf_label.pack(side="left", padx=(0, 5))
+        self.pnfmenu = ctk.CTkOptionMenu(
+            pnf_frame, values=valores_pnf, command=self.actualizar_trayectos_por_pnf,
+            font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
+            text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
+        )
+        self.pnfmenu.pack(side="left")
+        if rol_user and rol_user.lower() == "coord_pnf":
+            self.pnfmenu.set(valores_pnf[0])    # selecciona el único valor
+            self.pnfmenu.configure(state="disabled")  # lo bloquea
+#==========================================================================================================================
+
+        # Trayecto
+        trayecto_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")
+        trayecto_frame.pack(side="left", padx=10)
+        trayecto_label = ctk.CTkLabel(trayecto_frame, text="Trayecto:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
+        trayecto_label.pack(side="left", padx=(0, 5))
+        self.trayectomenu = ctk.CTkOptionMenu(
+            trayecto_frame, values=valores_trayecto, command=self.actualizar_tramos_por_trayecto,
+            font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
+            text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
+        )
+        self.trayectomenu.pack(side="left")
+
+        # Tramo
+        tramo_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")
+        tramo_frame.pack(side="left", padx=10)
+        tramo_label = ctk.CTkLabel(tramo_frame, text="Tramo:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
+        tramo_label.pack(side="left", padx=(0, 5))
+        self.tramomenu = ctk.CTkOptionMenu(
+            tramo_frame, values=valores_tramo,
+            font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
+            text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
+        )
+        self.tramomenu.pack(side="left")
+        
         self._crear_fila_widgets([
             ("Código:", crear_entry, {"width":300,"placeholder_text":"Ingrese código"}, 1,  self.scroll, 'codigo_entry'),
             ("Nombre:", crear_entry, {"width":300,"placeholder_text":"Ingrese el nombre de la U.C"}, 1,  self.scroll, 'nombre_entry'),
@@ -83,72 +130,69 @@ class UnidadCurricular(SectionFrameBase):
             # ("Fecha de Actualización:", crear_entry, {"width": 300, "placeholder_text": "YYYY-MM-DD"}, 1,  self.scroll, 'fecha_actualizacion_entry'),
         ], es_scroll=True)
 
-        # Crear un frame para la fila de PNF, Trayecto y Tramo con etiquetas
-        self.fila_pnf_trayecto_tramo = ctk.CTkFrame(self.scroll, fg_color="transparent")
-        self.fila_pnf_trayecto_tramo.pack(fill="x", padx=10, pady=5)
+        
 #==========================================================================================================================
         # Valores seguros por defecto si las listas están vacías
-        valores_pnf = self.obtener_nombre_pnf() if self.obtener_nombre_pnf() else ["Sin opciones disponibles"]
-        if rol_user == "coord_pnf" and user_name:
-            persona_id = self.controlador_user.obtener_persona_id(user_name)
+        
+        if rol_user.lower() == "coord_pnf" and user_name:
+            persona_id = self.controlador_user.obtener_persona_id(user_name) 
             docente_id = self.controlador_docente.obtener_id_docente(persona_id)
             pnf_id = self.controlador_docente.obtener_pnf_id(docente_id)
-            # Busca el nombre del PNF por id
-            nombre_pnf = None
-            for tupla in self.lista_pnf:
-                if tupla[0] == pnf_id:
-                    nombre_pnf = tupla[2]
-                    break
+            # Usamos la misma lógica que en FiltradoPNFFrame para encontrar el nombre del PNF
+            nombre_pnf = next((tupla[2] for tupla in self.lista_pnf if tupla[0] == pnf_id), None)
+            print(nombre_pnf)
             if nombre_pnf:
-                # Actualizar el mapeo para que solo contenga el PNF del coordinador
+                # Actualizamos el mapeo y la lista de valores para que solo contengan el PNF del coordinador
                 self.pnf_id_por_nombre = {nombre_pnf: pnf_id}
                 valores_pnf = [nombre_pnf]
+                # Llamamos a la actualización de trayectos para que cargue los datos correspondientes al PNF
+                self.actualizar_trayectos_por_pnf(nombre_pnf)
             else:
                 self.deshabilitar_campos()
-                valores_pnf = ["Sin opciones disponibles"]
+                valores_pnf = ["Sin PNF asignado"]
 
-        valores_trayecto = self.nombre_trayecto if self.nombre_trayecto else ["Sin opciones disponibles"]
-        valores_tramo = self.nombre_tramo if self.nombre_tramo else ["Sin opciones disponibles"]
+#         valores_trayecto = self.nombre_trayecto if self.nombre_trayecto else ["Sin opciones disponibles"]
+#         valores_tramo = self.nombre_tramo if self.nombre_tramo else ["Sin opciones disponibles"]
 
-        # PNF
-        pnf_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")
-        pnf_frame.pack(side="left", padx=10)
-        pnf_label = ctk.CTkLabel(pnf_frame, text="PNF:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
-        pnf_label.pack(side="left", padx=(0, 5))
-        self.pnfmenu = ctk.CTkOptionMenu(
-            pnf_frame, values=valores_pnf, command=self.actualizar_trayectos_por_pnf,
-            font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
-            text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
-        )
-        self.pnfmenu.pack(side="left")
-        if rol_user and rol_user.lower() == "coord_pnf":
-            self.pnfmenu.set(valores_pnf[0])    # selecciona el único valor
-            self.pnfmenu.configure(state="disabled")  # lo bloquea
-#==========================================================================================================================
+#         # PNF
+#         pnf_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")
+#         pnf_frame.pack(side="left", padx=10)
+#         pnf_label = ctk.CTkLabel(pnf_frame, text="PNF:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
+#         pnf_label.pack(side="left", padx=(0, 5))
+#         self.pnfmenu = ctk.CTkOptionMenu(
+#             pnf_frame, values=valores_pnf, command=self.actualizar_trayectos_por_pnf,
+#             font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
+#             text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
+#         )
+#         self.pnfmenu.pack(side="left")
+#         if rol_user and rol_user.lower() == "coord_pnf":
+#             self.pnfmenu.set(valores_pnf[0])    # selecciona el único valor
+#             self.pnfmenu.configure(state="disabled")  # lo bloquea
+# #==========================================================================================================================
 
-        # Trayecto
-        trayecto_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")
-        trayecto_frame.pack(side="left", padx=10)
-        trayecto_label = ctk.CTkLabel(trayecto_frame, text="Trayecto:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
-        trayecto_label.pack(side="left", padx=(0, 5))
-        self.trayectomenu = ctk.CTkOptionMenu(
-            trayecto_frame, values=valores_trayecto, command=self.actualizar_tramos_por_trayecto,
-            font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
-            text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
-        )
-        self.trayectomenu.pack(side="left")
+#         # Trayecto
+#         trayecto_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")
+#         trayecto_frame.pack(side="left", padx=10)
+#         trayecto_label = ctk.CTkLabel(trayecto_frame, text="Trayecto:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
+#         trayecto_label.pack(side="left", padx=(0, 5))
+#         self.trayectomenu = ctk.CTkOptionMenu(
+#             trayecto_frame, values=valores_trayecto, command=self.actualizar_tramos_por_trayecto,
+#             font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
+#             text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
+#         )
+#         self.trayectomenu.pack(side="left")
 
-        # Tramo
-        tramo_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")
-        tramo_frame.pack(side="left", padx=10)
-        tramo_label = ctk.CTkLabel(tramo_frame, text="Tramo:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
-        tramo_label.pack(side="left", padx=(0, 5))
-        self.tramomenu = ctk.CTkOptionMenu(
-            tramo_frame, values=valores_tramo,
-            font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
-            text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
-        )
-        self.tramomenu.pack(side="left")
+#         # Tramo
+#         tramo_frame = ctk.CTkFrame(self.fila_pnf_trayecto_tramo, fg_color="transparent")
+#         tramo_frame.pack(side="left", padx=10)
+#         tramo_label = ctk.CTkLabel(tramo_frame, text="Tramo:", font=FUENTE_BASE, text_color=COLOR_TEXTO_PRINCIPAL)
+#         tramo_label.pack(side="left", padx=(0, 5))
+#         self.tramomenu = ctk.CTkOptionMenu(
+#             tramo_frame, values=valores_tramo,
+#             font=FUENTE_BASE, fg_color=COLOR_ENTRY_BG, button_color=COLOR_BOTON_PRIMARIO_FG,
+#             text_color=COLOR_ENTRY_TEXT, dropdown_fg_color=COLOR_ENTRY_PLACEHOLDER
+#         )
+#         self.tramomenu.pack(side="left")
 
 
         # Empacar los frames
@@ -354,6 +398,7 @@ class UnidadCurricular(SectionFrameBase):
     
     def actualizar_trayectos_por_pnf(self, nombre_pnf):
         pnf_id = self.pnf_id_por_nombre.get(nombre_pnf)
+        self.pnfmenu.set(nombre_pnf)  # Asegura que el OptionMenu muestre el PNF seleccionado
         if pnf_id:
             nuevos_trayectos = self.controlador.obtener_trayectos_por_pnf(pnf_id)
             nombres_trayectos = [t[1] for t in nuevos_trayectos] if nuevos_trayectos else ["Sin opciones disponibles"]
@@ -367,6 +412,7 @@ class UnidadCurricular(SectionFrameBase):
             # También limpiar tramos si cambió el PNF
             self.tramomenu.configure(values=["Seleccione un trayecto primero"])
             self.tramomenu.set("Seleccione un trayecto primero")
+            self.actualizar_tramos_por_trayecto(self.trayectomenu.get()) 
         else:
             print(f"No se encontró ID para PNF: {nombre_pnf}")
 

@@ -222,7 +222,28 @@ class ModeloPNF:
             if con is not None:
                 con.close()
 
-    def update_pnf(self, datos_pnf, id):
+    def eliminar_trayectos_tramos(self, pnf_id):
+        """Solo se necesita eliminar los trayectos, los tramos se eliminan en cascada"""
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                """
+                DELETE FROM trayectos WHERE pnf_id = ?
+                """, (pnf_id,)
+            )
+            con.commit()
+            return True
+        except Exception as e:
+            print(f"Error al eliminar los trayectos: {e}")
+            return False
+        finally:
+            if con is not None:
+                con.close()
+
+
+    def update_pnf(self, datos_pnf, id, fecha_actualizacion):
         con = None
         try:
             con = sql.connect(self.db_ruta)
@@ -235,15 +256,14 @@ class ModeloPNF:
                     nombre = ?,
                     nombre_corto = ?,
                     nivel = ?,
-                    area_conocimiento = ?,
                     duracion_trayectos = ?,
                     duracion_semanas = ?,
                     total_creditos = ?,
                     total_horas = ?,
                     titulo_otorga = ?,
-                    perfil_egreso = ?,
                     fecha_resolucion = ?,
                     version_pensum = ?,
+                    fecha_actualizacion = ?,
                     estado = ?
                 WHERE id = ?
                 """,
@@ -253,15 +273,14 @@ class ModeloPNF:
                     datos_pnf["nombre_pnf"],
                     datos_pnf["siglas"],
                     datos_pnf["tipo_pnf"],
-                    datos_pnf["area_conocimiento"],
                     datos_pnf["cantidad_trayectos"],
                     datos_pnf["duracion_semana"],
                     datos_pnf["duracion_creditos"],
                     datos_pnf["duracion_horas"],
                     datos_pnf["titulo_otorga"],
-                    #datos_pnf["perfil_egreso"],
                     datos_pnf["fecha_resolucion"],
                     datos_pnf["version_pensum"],
+                    fecha_actualizacion,
                     datos_pnf["estado"],
                     id
                 )
@@ -269,6 +288,7 @@ class ModeloPNF:
             con.commit()
             return True
         except Exception as e:
+            print("es aca")
             print(f"Error al actualizar el PNF: {e}")
             return False
         finally:
@@ -1107,5 +1127,24 @@ class ModeloPNF:
             if con:
                 con.close()
 
-
+    def obtener_pnf_id_por_nombre(self, nombre_pnf):
+        """
+        Devuelve el ID de un PNF a partir de su nombre.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            cursor.execute(
+                "SELECT id FROM pnf WHERE nombre = ?",
+                (nombre_pnf,)
+            )
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else None
+        except Exception as e:
+            print(f"Error al obtener el ID del PNF por nombre: {e}")
+            return None
+        finally:
+            if con is not None:
+                con.close()
     

@@ -282,17 +282,26 @@ class DatosPNFPensumFrame(SectionFrameBase):
             self.fecha_resolucion_visible = False
             self.btn_agregar_fecha.configure(state="normal")
 
-        cantidad = self.dict_trayectos_invertido[len(datos["lista_trayectos"])]
+        cantidad = self.dict_trayectos_invertido[len(datos["lista_trayectos"])-1]#Menos 1 por el trayecto inicial
         if cantidad:
             self.var_cantidad_trayectos.set(cantidad)
             self.duracion_trayectos_entry.configure(state="disabled")
-        
+        cantidad_tramos = 0
         for trayecto in datos["lista_trayectos"]:
             if trayecto["lista_tramos"]:
-                cantidad_tramos = len(trayecto["lista_tramos"])
-                break
+              
+                cantidad_tramos = cantidad_tramos + len(trayecto["lista_tramos"])
+             
+        trayectos_brutos = len(datos["lista_trayectos"])-1
+        tramos_brutos = cantidad_tramos -1
 
-        self.var_cantidad_tramos.set(self.dict_trayectos_invertido[cantidad_tramos])
+        if trayectos_brutos and tramos_brutos:
+            tramos_por_trayecto = int(tramos_brutos / trayectos_brutos)
+        else:
+            tramos_por_trayecto = 1
+        
+        
+        self.var_cantidad_tramos.set(self.dict_trayectos_invertido[tramos_por_trayecto])
         self.duracion_tramos_entry.configure(state="disabled")
 
 
@@ -300,7 +309,8 @@ class DatosPNFPensumFrame(SectionFrameBase):
     def habilitar_campos(self):
         for campo in self.entries_a_validar:
             campo.configure(state="normal")
-            self.duracion_trayectos_entry.configure(state="normal")
+            # self.duracion_trayectos_entry.configure(state="de")
+            # self.duracion_tramos_entry.configure(state="normal")
             self.duracion_semanas_entry.configure(state="normal")
             self.estado_menu.configure(state="normal")
             self.tipo_pnf_menu.configure(state="normal")

@@ -125,7 +125,6 @@ class ListarPNF(ctk.CTkFrame):
         Abre una ventana modal para ver y editar todos los datos del PNF seleccionado.
         """
         dic_datos = self.controller.obtener_datos_completos(pnf[0])
-        dic_id = self.controller.obtener_id(dic_datos)
         top = ctk.CTkToplevel(self, fg_color="White")
         top.title("Datos Completos del PNF")
         ancho = 900
@@ -157,42 +156,42 @@ class ListarPNF(ctk.CTkFrame):
         self.frame_pnf.pack(fill="x", padx=20, pady=10)
 
         # Botón para agregar trayectos (deshabilitado hasta editar)
-        self.button_trayecto = ctk.CTkButton(
-            scroll_frame,
-            text="Agregar Mas Trayectos",
-            width=140,
-            font=FUENTE_BOTON,
-            fg_color=COLOR_BOTON_PRIMARIO_FG,
-            hover_color=COLOR_BOTON_PRIMARIO_HOVER,
-            text_color=COLOR_BOTON_PRIMARIO_TEXT,
-            command=lambda: self.agregar_trayecto(scroll_frame),
-            state="disabled"
-        )
-        self.button_trayecto.pack(pady=(20, 0))
+        # self.button_trayecto = ctk.CTkButton(
+        #     scroll_frame,
+        #     text="Agregar Mas Trayectos",
+        #     width=140,
+        #     font=FUENTE_BOTON,
+        #     fg_color=COLOR_BOTON_PRIMARIO_FG,
+        #     hover_color=COLOR_BOTON_PRIMARIO_HOVER,
+        #     text_color=COLOR_BOTON_PRIMARIO_TEXT,
+        #     command=lambda: self.agregar_trayecto(scroll_frame),
+        #     state="disabled"
+        # )
+        # self.button_trayecto.pack(pady=(20, 0))
 
-        self.list_trayecto = []
+        #self.list_trayecto = []
 
         # Carga los trayectos existentes
-        if dic_datos["lista_trayectos"]:
-            i = 1
-            for datos_trayecto in dic_datos["lista_trayectos"]:
-                frame = FrameTrayecto(scroll_frame, self.controller, self.vcmd_num_val, self.vcmd_fecha_val, f"Trayecto #{i}")
-                frame.set_datos(datos_trayecto)
-                self.list_trayecto.append(frame)
-                i += 1
-            for frame in self.list_trayecto:
-                frame.pack(fill="x", padx=20, pady=10)
+        # if dic_datos["lista_trayectos"]:
+        #     i = 1
+        #     for datos_trayecto in dic_datos["lista_trayectos"]:
+        #         frame = FrameTrayecto(scroll_frame, self.controller, self.vcmd_num_val, self.vcmd_fecha_val, f"Trayecto #{i}")
+        #         frame.set_datos(datos_trayecto)
+        #         self.list_trayecto.append(frame)
+        #         i += 1
+        #     for frame in self.list_trayecto:
+        #         frame.pack(fill="x", padx=20, pady=10)
 
         # Frame de botones de acción
         self.botones_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
         self.botones_frame.pack(pady=10)
 
         self.btn_actualizar = ctk.CTkButton(
-            self.botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_pnf(self.frame_pnf, dic_id, top)
+            self.botones_frame, text="Actualizar Datos", state="disabled", command=lambda: self.actualizar_pnf(self.frame_pnf, dic_datos["id"], top)
         )
         self.btn_actualizar.pack(side="left", padx=10)
 
-        ctk.CTkButton(self.botones_frame, text="Editar Campos", command=lambda: self.habilitar_todos(self.frame_pnf, self.list_trayecto)).pack(side="left", padx=10)
+        ctk.CTkButton(self.botones_frame, text="Editar Campos", command=self.habilitar_todos).pack(side="left", padx=10)
         ctk.CTkButton(self.botones_frame, text="Cerrar", command=top.destroy).pack(side="left", padx=10)
 
     def siguiente_pagina(self):
@@ -233,16 +232,14 @@ class ListarPNF(ctk.CTkFrame):
         self.boton_siguiente.configure(state=estado_btn_siguiente)
         self.mostrar_listado()
 
-    def habilitar_todos(self, frame_pnf, lista_trayecto):
+    def habilitar_todos(self):
         """
         Habilita todos los campos de edición en el modal y activa los botones de acción.
         """
-        frame_pnf.habilitar_campos()
-        self.button_trayecto.configure(state="normal")
-        for frame_trayecto in lista_trayecto:
-            frame_trayecto.habilitar_campos()
+        if self.frame_pnf:
+            self.frame_pnf.habilitar_campos()
         self.btn_actualizar.configure(state="normal")
-
+   
     def obtener_todos_los_datos_trayectos(self):
         """
         Obtiene los datos de todos los trayectos (existentes y nuevos) para actualizar o guardar.
@@ -266,13 +263,11 @@ class ListarPNF(ctk.CTkFrame):
         """
         Actualiza los datos del PNF y sus trayectos/tramos en la base de datos.
         """
-        lista_datos_trayecto, n_lista_datos_trayecto = self.obtener_todos_los_datos_trayectos()
-        dic_pnf = self.controller.getPNF(frame_pnf, lista_datos_trayecto)
+        #lista_datos_trayecto, n_lista_datos_trayecto = self.obtener_todos_los_datos_trayectos()
+        dic_pnf = self.controller.getPNF(frame_pnf)
         print("Datos PNF a actualizar:")
         pprint(dic_pnf)
-        print("\n\n\n\nDatos Trayectos a actualizar:")
-        pprint(lista_datos_trayecto)
-        exito = self.controller.update_pnf(dic_pnf, dic_id, top, n_lista_datos_trayecto)
+        exito = self.controller.update_pnf(dic_pnf, dic_id, top)
         if exito:
             top.destroy()
             self.lista_pnf = self.controller.listado_pnf
