@@ -16,15 +16,19 @@ class BaseDashboardView(BaseView):
         
         self.update_idletasks()  # Asegúrate de que el frame esté renderizado
         
+        # Configurar el layout con grid
+        self.grid_columnconfigure(1, weight=1) # Columna para el cuerpo principal se expande
+        self.grid_rowconfigure(1, weight=1)    # Fila para el cuerpo principal y sidebar se expande
+
         self.topbar()
         self.sidebar()
         
         self.cuerpo_principal = ctk.CTkFrame(self, fg_color="white")
-        self.cuerpo_principal.pack(side="right", fill="both", expand=True)
+        # Usamos grid en lugar de pack
+        self.cuerpo_principal.grid(row=1, column=1, sticky="nsew")
 
         # Bindeo global y único para el scroll
         self.master.bind_all("<MouseWheel>", self._on_global_mousewheel, add="+")
-
 
     def topbar(self):
         
@@ -33,7 +37,9 @@ class BaseDashboardView(BaseView):
         logo = self.leer_imagen(Settings().rutas_imagenes.get("logo2", "resources/images/logo2.png"), (32,32))
         icon_menu = self.leer_imagen(Settings().rutas_iconos.get("icono_menu", "resources/icons/menu.png"), (32,32))
         
+        # Usamos grid para el topbar, ocupando ambas columnas
         frameTopbar = ctk.CTkFrame(self)
+        frameTopbar.grid(row=0, column=0, columnspan=2, sticky="ew")
         
         cintillo = ctk.CTkLabel(frameTopbar, text='', image=cintillo, fg_color="white")
         cintillo.pack(side="top", fill="x", expand=False)
@@ -66,8 +72,6 @@ class BaseDashboardView(BaseView):
         labelUsuario = ctk.CTkLabel( barra, text="", font=("Roboto",18), text_color="white")
         labelUsuario.pack(side=ctk.RIGHT, padx=15)
         
-        frameTopbar.pack(side="top", fill="x", expand=False)
-        
     def sidebar(self):
         """
         Crea el sidebar completo con submenús expandibles y ajuste automático de ancho
@@ -83,7 +87,8 @@ class BaseDashboardView(BaseView):
             scrollbar_button_hover_color="#18244c"
         )
         
-        self.menu_lateral.pack(side="left", fill="y")
+        # Usamos grid en lugar de pack
+        self.menu_lateral.grid(row=1, column=0, sticky="ns")
         # CTkScrollableFrame no usa pack_propagate, el ancho se controla con el parámetro 'width'
         # self.menu_lateral.pack_propagate(False) 
         
@@ -359,21 +364,31 @@ class BaseDashboardView(BaseView):
     
     def toggle_sidebar(self):
         """Alterna la visibilidad del sidebar"""
-        if hasattr(self, 'menu_lateral'):
-            if self.menu_lateral.winfo_ismapped():
-                self.menu_lateral.pack_forget()
-                self.cuerpo_principal.pack_forget()
-                self.cuerpo_principal.pack(side="right", fill="both", expand=True)
-            else:
-                self.menu_lateral.pack(side="left", fill="y")
-                self.menu_lateral.pack_propagate(False)
-                self.menu_lateral.lift()
-                # Reempaquetar el cuerpo principal para que se ajuste al nuevo espacio
-                self.cuerpo_principal.pack_forget()
-                self.cuerpo_principal.pack(side="right", fill="both", expand=True)
-                self._ajustar_ancho_sidebar()
-            self.cuerpo_principal.update_idletasks()
-            self.menu_lateral.update_idletasks()
+        # if hasattr(self, 'menu_lateral'):
+        #     if self.menu_lateral.winfo_ismapped():
+        #         self.menu_lateral.pack_forget()
+        #         self.cuerpo_principal.pack_forget()
+        #         self.cuerpo_principal.pack(side="right", fill="both", expand=True)
+        #     else:
+        #         self.menu_lateral.pack(side="left", fill="y")
+        #         self.menu_lateral.pack_propagate(False)
+        #         self.menu_lateral.lift()
+        #         # Reempaquetar el cuerpo principal para que se ajuste al nuevo espacio
+        #         self.cuerpo_principal.pack_forget()
+        #         self.cuerpo_principal.pack(side="right", fill="both", expand=True)
+        #         self._ajustar_ancho_sidebar()
+        #     self.cuerpo_principal.update_idletasks()
+        #     self.menu_lateral.update_idletasks()
+        if not hasattr(self, 'menu_lateral'):
+            return
+
+        if self.menu_lateral.winfo_ismapped():
+            # Ocultar el sidebar
+            self.menu_lateral.grid_forget()
+        else:
+            # Mostrar el sidebar
+            self.menu_lateral.grid(row=1, column=0, sticky="ns")
+            self._ajustar_ancho_sidebar()
 
     def _confirmar_logout(self):
         """Confirma antes de cerrar sesión"""
