@@ -353,3 +353,5 @@ class UserModel:
         finally:
             if con is not None:
                 con.close()
+
+#UserModel().cambiar_user_admin()

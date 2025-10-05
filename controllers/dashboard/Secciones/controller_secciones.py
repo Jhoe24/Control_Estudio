@@ -15,7 +15,7 @@ class ControllerSecciones:
         
         sede_id = vista.controller_sede.obtener_id_por_codigo(vista.var_sede.get())
         periodo_academico_id = vista.controller_PA.obtener_id_por_codigo(vista.var_periodo.get())
-
+        docente_titular_id = None
         for id_nombre in vista.id_nombres_docentes:
             if id_nombre[1] == vista.var_docente.get():
                 docente_titular_id = id_nombre[0]
@@ -38,12 +38,34 @@ class ControllerSecciones:
         return datos
     
     def campos_obligatorios(self, vista, datos):
-       
+        
         alias=[
             ("codigo_seccion", "Codigo"),
             ("cupo_maximo", "Cupo Máximo"),
             ("aula", "Aula")
         ]
+
+        # Validar periodo académico obligatorio
+       
+        periodo_seleccionado = vista.form_seccion.var_periodo.get()
+
+        # No hay periodos académicos registrados
+        if  len(vista.form_seccion.periodos_academicos) == 0:
+            messagebox.showwarning(
+                "Periodo Académico Obligatorio",
+                "Debe registrar al menos un Periodo Académico antes de crear una sección.",
+                parent=vista
+            )
+            return False
+
+        # No ha seleccionado ningún periodo académico
+        if not periodo_seleccionado or periodo_seleccionado == "No hay Periodos Academicos":
+            messagebox.showwarning(
+                "Periodo Académico Obligatorio",
+                "Debe seleccionar un Periodo Académico para crear una sección.",
+                parent=vista
+            )
+            return False
 
         for campo,nombre_mostrar in alias:
             if datos[campo] == "" or datos[campo] == None:

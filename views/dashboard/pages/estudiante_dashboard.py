@@ -27,7 +27,6 @@ class EstudianteDashboardView(BaseDashboardView):
 
         # Obtener datos completos del usuario/estudiante
         self.datos_estudiante = self.controller["Usuario"].obtener_datos_completos_usuario(self.username)
-
         self.inicio()
     
     def inicio(self):

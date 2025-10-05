@@ -7,11 +7,11 @@ class EstudianteController:
     def __init__(self):
         self.modelo = ModelRegistroEstudiantes()
 
-    def guardar_nota(self, inscripcion_id, unidad_curricular_id, valor):
+    def guardar_nota(self, inscripcion_id, unidad_curricular_id, valor, valor_asis):
         """
         Guarda o actualiza la nota de un estudiante para una unidad curricular específica.
         """
-        return self.modelo.guardar_nota(inscripcion_id, unidad_curricular_id, valor)
+        return self.modelo.guardar_nota(inscripcion_id, unidad_curricular_id, valor, valor_asis)
     
 
     def procesar_guardado_estudiante(self, datos_estudiante, vista_formulario):
@@ -35,7 +35,7 @@ class EstudianteController:
         else:
             messagebox.showerror("Error", "Hubo un error al registrar el estudiante.", parent=vista_formulario)
             return False
-        p#rint(datos_estudiante)
+        #rint(datos_estudiante)
 
     def cargar_estudiante_para_edicion(self, id_estudiante, dic_estudiante, vista_formulario):
         print(f"cargar estudiante para edicion {id_estudiante} : {dic_estudiante}")

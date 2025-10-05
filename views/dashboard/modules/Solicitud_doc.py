@@ -72,34 +72,43 @@ class SolicitudDoc(SectionFrameBase):
         if self.rol.lower() == "estudiante":
             frase_a_quitar = "Programa Nacional de Formación"
             datos = self.controllerEstudiante.modelo.obtener_datos_para_constancia(self.id)
-            nombre_pnf = datos.get('pnf_nombre', '')
-
-            if nombre_pnf.startswith(frase_a_quitar):
-                datos['pnf_nombre'] = nombre_pnf.replace(frase_a_quitar, "").strip()
-                print(datos["pnf_nombre"])
 
             if not datos:
                 messagebox.showerror("Error", "No se encontraron datos para la constancia.")
                 return
-            
-            try:
+
+            # Si la consulta principal no trajo datos de inscripción, busca en estudiante_pnf
+            if not datos.get('pnf_nombre') or not datos.get('trayecto_nombre'):
+                datos_faltantes = self.controllerEstudiante.modelo.obtener_datos_faltantes(self.id)
+                if datos_faltantes:
+                    # Actualiza el diccionario 'datos' con la información encontrada
+                    datos.update(datos_faltantes)
+
+            # Ahora, verifica y procesa el nombre del PNF de forma segura
+            nombre_pnf = datos.get('pnf_nombre')
+            if nombre_pnf and nombre_pnf.startswith(frase_a_quitar):
+                datos['pnf_nombre'] = nombre_pnf.replace(frase_a_quitar, "").strip()
+
+            if not datos.get('periodo_academico_nombre'):
+                datos['periodo_academico_nombre']='Actual'
+
+            #try:
                 # El controlador devuelve la ruta del archivo generado
-                ruta_docx = self.controllerSolicitud.generar_constancia(datos)
-                
-                if ruta_docx and os.path.exists(ruta_docx):
-                    messagebox.showinfo("Éxito", f"Constancia DOCX generada en:\n{ruta_docx}")
-                    
-                    # Intentar convertir a PDF
-                    ruta_pdf = self.controllerSolicitud.convertir_a_pdf(ruta_docx)
-                    if ruta_pdf and os.path.exists(ruta_pdf):
-                        respuesta = messagebox.askyesno("Éxito", f"Constancia PDF generada en:\n{ruta_pdf}\n\n¿Desea abrir el archivo ahora?")
-                        if respuesta:
-                            # Abrir el archivo PDF en el navegador o visor predeterminado
-                            webbrowser.open_new_tab(ruta_pdf)
-                    else:
-                        messagebox.showwarning("Advertencia", "No se pudo convertir el archivo a PDF. Asegúrate de tener MS Word instalado.")
+            ruta_docx = self.controllerSolicitud.generar_constancia(datos)
+
+            if ruta_docx and os.path.exists(ruta_docx):
+                messagebox.showinfo("Éxito", f"Constancia DOCX generada en:\n{ruta_docx}")
+
+                # Intentar convertir a PDF
+                ruta_pdf = self.controllerSolicitud.convertir_a_pdf(ruta_docx)
+                if ruta_pdf and os.path.exists(ruta_pdf):
+                    respuesta = messagebox.askyesno("Éxito", f"Constancia PDF generada en:\n{ruta_pdf}\n\n¿Desea abrir el archivo ahora?")
+                    if respuesta:
+                        # Abrir el archivo PDF en el navegador o visor predeterminado
+                        webbrowser.open_new_tab(ruta_pdf)
                 else:
-                    messagebox.showerror("Error", "No se pudo generar el archivo de la constancia.")
-            
-            except Exception as e:
-                messagebox.showerror("Error Inesperado", f"Ocurrió un error al generar la constancia: {e}")
+                    messagebox.showwarning("Advertencia", "No se pudo convertir el archivo a PDF. Asegúrate de tener MS Word instalado.")
+            else:
+                messagebox.showerror("Error", "No se pudo generar el archivo de la constancia.")
+
+            #

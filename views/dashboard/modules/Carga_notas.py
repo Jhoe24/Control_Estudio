@@ -64,6 +64,24 @@ class CargaNotasView(ctk.CTkFrame):
         # )
 
     def mostrar_listado(self):
+        # Validación de periodos y secciones antes de continuar
+        nombres_periodos = self.datos_carga_notas.nombres_periodos
+        nombres_secciones = self.datos_carga_notas.secciones_disponibles
+
+        if not nombres_periodos or nombres_periodos[0] == "No hay periodos disponibles":
+            messagebox.showwarning(
+                "Periodo académico requerido",
+                "Debe registrar al menos un periodo académico para continuar."
+                )
+            return
+
+        if not nombres_secciones or nombres_secciones[0] == "No hay secciones disponibles":
+            messagebox.showwarning(
+                "Sección requerida",
+                "Debe registrar al menos una sección para continuar."
+                )
+            return
+        
         tuplas_datos = self.datos_carga_notas.obtener_filtros_seleccionados()
       
         self.datos_carga_notas.destroy()

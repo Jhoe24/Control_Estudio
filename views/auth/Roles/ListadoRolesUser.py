@@ -253,7 +253,12 @@ class FrameRoles(ctk.CTkFrame):
             if not es_coordinador:
                 messagebox.showerror("Error de Asignación", "El docente no está registrado como coordinador de ningún P.N.F.")
                 return
-
+        
+        if rol_a_asignar.lower() == "estudiante":
+            if self.controller_user.obtener_tipo_user(user["persona_id"]) != "estudiante":
+                messagebox.showerror("Error de Asignación", "El usuario no es un estudiante.")
+                return
+        
         if self.controller_user.register_rol(rol_a_asignar, user["id"]):
             messagebox.showinfo("Éxito", "Rol asignado correctamente.")
             self.mostrar_pagina()

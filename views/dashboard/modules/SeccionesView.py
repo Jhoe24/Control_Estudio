@@ -3,7 +3,7 @@ from views.dashboard.components.widget_utils import *
 from views.dashboard.modules.forms.PNF.FrameSecciones import FremeSecciones
 
 
-class SeccionView(ctk.CTkFrame):
+class SeccionView(ctk.CTkScrollableFrame):
     def __init__(self, master, controller_Doc, controller_pnf,controller_secciones,controller_PA, controller_sede):
         super().__init__(master, fg_color="transparent")
         self.controller_Doc = controller_Doc

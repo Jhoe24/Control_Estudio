@@ -659,6 +659,8 @@ class SistemaAcademicoDB:
         CREATE TABLE IF NOT EXISTS asistencia (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             inscripcion_id INTEGER,
+            unidad_curricular_id INTEGER,
+            valor_asistencia INTEGER DEFAULT 0,
             fecha DATE,
             presente BOOLEAN DEFAULT 0,
             tardanza BOOLEAN DEFAULT 0,
@@ -668,6 +670,7 @@ class SistemaAcademicoDB:
             docente_registro INTEGER,
             fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (inscripcion_id) REFERENCES inscripciones(id),
+            FOREIGN KEY (unidad_curricular_id) REFERENCES unidades_curriculares(id),
             FOREIGN KEY (docente_registro) REFERENCES docentes(id),
             UNIQUE(inscripcion_id, fecha)
         );'''

@@ -29,8 +29,8 @@ class FremeSecciones(SectionFrameBase):
             self.var_sede = ctk.StringVar(value=self.sedes[0])
         else:
             self.var_sede = ctk.StringVar(value="No hay sedes")
-
         self.periodos_academicos = self.controller_PA.obtener_codigos()
+        
         if self.periodos_academicos:
             self.var_periodo = ctk.StringVar(value=self.periodos_academicos[0])
         else:

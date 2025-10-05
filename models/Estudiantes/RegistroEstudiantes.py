@@ -4,50 +4,57 @@ from pprint import pprint
 
 class ModelRegistroEstudiantes:
 
-    def guardar_nota(self, inscripcion_id, unidad_curricular_id, valor):
+    def guardar_nota(self, inscripcion_id, unidad_curricular_id, valor, valor_asis):
         """
         Guarda o actualiza la nota de un estudiante para una unidad curricular específica.
         """
-        db_ruta = self.db_ruta
-        con = sql.connect(db_ruta)
-        cursor = con.cursor()
-        cursor.execute("PRAGMA foreign_keys = ON;")
         try:
-            # Verificar si ya existe una nota para esta inscripcion y unidad curricular
-            cursor.execute("SELECT id FROM notas WHERE inscripcion_id = ? AND unidad_curricular_id = ?", (inscripcion_id, unidad_curricular_id))
-            existe = cursor.fetchone()
-            if existe:
-                # Actualizar nota existente
-                cursor.execute("UPDATE notas SET valor = ? WHERE id = ?", (valor, existe[0]))
-            else:
-                # Insertar nueva nota
-                cursor.execute("INSERT INTO notas (inscripcion_id, unidad_curricular_id, valor) VALUES (?, ?, ?)", (inscripcion_id, unidad_curricular_id, valor))
-            con.commit()
-            return True
-        except Exception as e:
-            print(f"Error al guardar la nota: {e}")
+            with sql.connect(self.db_ruta) as con:
+                cursor = con.cursor()
+                cursor.execute("PRAGMA foreign_keys = ON;")
+
+                # --- Operación de Notas ---
+                cursor.execute("SELECT id FROM notas WHERE inscripcion_id = ? AND unidad_curricular_id = ?", (inscripcion_id, unidad_curricular_id))
+                existe_nota = cursor.fetchone()
+                if existe_nota:
+                    cursor.execute("UPDATE notas SET valor = ? WHERE id = ?", (valor, existe_nota[0]))
+                else:
+                    cursor.execute("INSERT INTO notas (inscripcion_id, unidad_curricular_id, valor) VALUES (?, ?, ?)", (inscripcion_id, unidad_curricular_id, valor))
+
+                # --- Operación de Asistencias ---
+                cursor.execute("SELECT id FROM asistencia WHERE inscripcion_id = ? AND unidad_curricular_id = ?", (inscripcion_id, unidad_curricular_id))
+                existe_asis = cursor.fetchone()
+                if existe_asis:
+                    cursor.execute("UPDATE asistencia SET valor_asistencia = ? WHERE id = ?", (valor_asis, existe_asis[0]))
+                else:
+                    cursor.execute("INSERT INTO asistencia (inscripcion_id, unidad_curricular_id, valor_asistencia) VALUES (?, ?, ?)", (inscripcion_id, unidad_curricular_id, valor_asis))
+                
+                con.commit()
+                return True
+        except sql.Error as e:
+            print(f"Error de base de datos al guardar la nota y asistencia: {e}")
             raise
-        finally:
-            con.close()
 
     def obtener_nota(self, inscripcion_id, unidad_curricular_id):
         """
-        Guarda o actualiza la nota de un estudiante para una unidad curricular específica.
+        Obtiene la nota y la asistencia de un estudiante para una unidad curricular específica.
         """
-        db_ruta = self.db_ruta
-        con = sql.connect(db_ruta)
-        cursor = con.cursor()
+        query = """
+            SELECT n.valor, a.valor_asistencia
+            FROM inscripciones i
+            LEFT JOIN notas n ON i.id = n.inscripcion_id AND n.unidad_curricular_id = ?
+            LEFT JOIN asistencia a ON i.id = a.inscripcion_id AND a.unidad_curricular_id = ?
+            WHERE i.id = ?
+        """
         try:
-            # Verificar si ya existe una nota para esta inscripcion y unidad curricular
-            cursor.execute("SELECT valor FROM notas WHERE inscripcion_id = ? AND unidad_curricular_id = ?", (inscripcion_id, unidad_curricular_id))
-            resultado =  cursor.fetchone()
-            return resultado[0] if resultado else None
-        
-        except Exception as e:
-            print(f"Error al obtener la nota: {e}")
+            with sql.connect(self.db_ruta) as con:
+                cursor = con.cursor()
+                cursor.execute(query, (unidad_curricular_id, unidad_curricular_id, inscripcion_id))
+                resultado = cursor.fetchone()
+                return (resultado[0], resultado[1]) if resultado else (None, None)
+        except sql.Error as e:
+            print(f"Error de base de datos al obtener la nota y asistencia: {e}")
             raise
-        finally:
-            con.close()
     
     def __init__(self):
         self.db_ruta = os.path.join('db', 'sistema_academico.db')
@@ -822,12 +829,12 @@ class ModelRegistroEstudiantes:
                     pa.nombre AS periodo_academico_nombre
                 FROM estudiantes e
                 INNER JOIN informacion_personal ip ON e.persona_id = ip.id
-                INNER JOIN inscripciones i ON e.id = i.estudiante_id
-                INNER JOIN secciones sec ON i.seccion_id = sec.id
-                INNER JOIN sedes s ON sec.sede_id = s.id
-                INNER JOIN pnf p ON sec.pnf_id = p.id
-                INNER JOIN trayectos t ON sec.trayecto_id = t.id
-                INNER JOIN periodos_academicos pa ON sec.periodo_academico_id = pa.id
+                LEFT JOIN inscripciones i ON e.id = i.estudiante_id
+                LEFT JOIN secciones sec ON i.seccion_id = sec.id
+                LEFT JOIN sedes s ON sec.sede_id = s.id
+                LEFT JOIN pnf p ON sec.pnf_id = p.id
+                LEFT JOIN trayectos t ON sec.trayecto_id = t.id
+                LEFT JOIN periodos_academicos pa ON sec.periodo_academico_id = pa.id
                 WHERE e.id = ?
                 ORDER BY i.id DESC -- Ordenar por la inscripción más reciente
                 LIMIT 1
@@ -842,5 +849,44 @@ class ModelRegistroEstudiantes:
         finally:
             if con:
                 con.close()
+        
+    def obtener_datos_faltantes(self, estudiante_id):
+        """
+        Obtiene datos académicos del estudiante desde la tabla 'estudiante_pnf'
+        cuando no se encuentra una inscripción reciente.
+        """
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = sql.Row
+            cursor = con.cursor()
 
-#pprint(ModelRegistroEstudiantes().obtener_datos_para_constancia(11))
+            query = """
+                SELECT
+                    p.nombre AS pnf_nombre,
+                    t.nombre AS trayecto_nombre,
+                    tr.nombre AS tramo_nombre
+                FROM estudiante_pnf ep
+                LEFT JOIN pnf p ON ep.pnf_id = p.id
+                LEFT JOIN trayectos t ON p.id = t.pnf_id
+                LEFT JOIN tramos tr ON t.id = tr.trayecto_id
+                WHERE ep.estudiante_id = ?
+                LIMIT 1
+            """
+            cursor.execute(query, (estudiante_id,))
+            resultado = cursor.fetchone()
+            return dict(resultado) if resultado else None
+
+        except Exception as e:
+            print(f"Error al obtener datos faltantes desde estudiante_pnf: {e}")
+            return None
+        finally:
+            if con:
+                con.close()
+        
+
+
+
+        
+
+#pprint(ModelRegistroEstudiantes().obtener_datos_faltantes(1))
