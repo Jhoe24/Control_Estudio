@@ -8,6 +8,7 @@ import re
 class ControllerPNF:
     
     def __init__(self):
+      
         self.modelo = ModeloPNF()
         self.listado_pnf = self.modelo.obtner_lista_pnf()
 

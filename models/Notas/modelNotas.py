@@ -167,10 +167,12 @@ class ModeloNotas:
                     n.id AS nota_id,
                     n.valor,
                     uc.nombre AS unidad_curricular,
+                    uc.unidades_credito,
                     t.nombre AS trayecto,
                     tr.nombre AS tramo,
                     p.nombre AS pnf,
                     pa.nombre AS periodo_academico,
+                    i.id AS inscripcion_id,
                     ip_docente.nombres || ' ' || ip_docente.apellidos AS nombre_docente
                 FROM
                     notas n
@@ -211,4 +213,42 @@ class ModeloNotas:
         finally:
             if con is not None:
                 con.close()
-#pprint(ModeloNotas().listar_notas_estudiante(13))
+
+    def obtener_historial_asistencias(self, estudiante_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            con.row_factory = sql.Row  # Para que los resultados se puedan acceder como diccionarios
+            cursor = con.cursor()
+            cursor.execute('''
+                SELECT
+                    i.id AS inscripcion_id,
+                    a.valor_asistencia AS asistencia
+                FROM
+                    asistencia a
+                JOIN
+                    unidades_curriculares uc ON a.unidad_curricular_id = uc.id
+                JOIN
+                    inscripciones i ON a.inscripcion_id = i.id
+                JOIN
+                    secciones s ON i.seccion_id = s.id
+                JOIN
+                    trayectos t ON uc.trayecto_id = t.id
+                JOIN
+                    tramos tr ON uc.tramo_id = tr.id
+                JOIN
+                    pnf p ON uc.pnf_id = p.id
+                WHERE
+                    i.estudiante_id = ?
+                ORDER BY a.fecha DESC
+                            ''',(estudiante_id,))
+            resultado = cursor.fetchall()
+            return [dict(fila) for fila in resultado]
+        except Exception as e:
+            print(f"Error al realizar la consulta: {e}") 
+            return []
+        finally:
+            if con is not None:
+                con.close()
+
+#pprint(ModeloNotas().listar_notas_estudiante(1))

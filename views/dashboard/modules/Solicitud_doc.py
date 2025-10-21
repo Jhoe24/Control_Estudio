@@ -8,13 +8,19 @@ from views.dashboard.components.SectionFrameBase import SectionFrameBase
 from views.dashboard.components.widget_utils import *
 
 class SolicitudDoc(SectionFrameBase):
-    def __init__(self, master, controllers, rol, id):
+    def __init__(self, master, controllers, rol, id, username):
         super().__init__(master, header_text="Solicitud de Documentos")
         self.master = master
         self.controllerEstudiante = controllers["Estudiantes"]
+        self.controllerPNF = controllers["PNF"]
         self.controllerSolicitud = controllers["Solicitud"]
+        self.controllerUser = controllers["Usuario"]
+        self.controllerSede = controllers["Sedes"]
+        self.controllerNotas = controllers["Notas"]
         self.rol = rol
         self.id = id
+        self.username = username
+        self.personaId = self.controllerUser.obtener_persona_id(self.username)
 
         card_btn_style = {
             "width": 250,
@@ -45,7 +51,7 @@ class SolicitudDoc(SectionFrameBase):
 
         self.btn_sit_academica = ctk.CTkButton(
             row1, text="Situación Académica", 
-            #command=...
+            command=self.situacionAcademica,
             **card_btn_style
         )
         self.btn_sit_academica.pack(side="left", padx=20)
@@ -111,4 +117,71 @@ class SolicitudDoc(SectionFrameBase):
             else:
                 messagebox.showerror("Error", "No se pudo generar el archivo de la constancia.")
 
-            #
+    def situacionAcademica(self):
+        if not self.personaId:
+            messagebox.showerror("Error", "Ocurrió un error con inesperado")
+            return
+        dictDatosPersonales = self.controllerUser.obtener_datos_personales(self.personaId)
+        if not dictDatosPersonales:
+            messagebox.showerror("Error", "Ocurrió un error con inesperado")
+            return
+        
+        datosPNF = self.controllerPNF.modelo.obtener_pnf_asignado(self.id)
+
+        if not datosPNF:
+            messagebox.showerror("Error", "Ocurrió un error con inesperado")
+            return
+
+        nombrePNF =  self.controllerPNF.modelo.obtener_nombres_por_id("pnf",datosPNF["pnf_id"])
+        nombreSede = self.controllerSede.obtenerSedeEstudiante(self.id)
+        
+        dictDatosSolicitud = {
+            'documento_identidad': dictDatosPersonales["documento_identidad"],
+            'tipo_documento': "V" if dictDatosPersonales["nacionalidad"] == "Venezolano" else "E",
+            'nombres': dictDatosPersonales["nombres"],
+            'apellidos': dictDatosPersonales["apellidos"],
+            'pnf_nombre':nombrePNF[0],
+            'sede_nombre':nombreSede
+        }
+
+        # For para calcular el indiceAcademico
+        listNotas = self.controllerNotas.obtener_lista_notas_historialAcademico(self.id)
+        #print(listNotas)
+        # For para calcular el promedio de las assistencias
+        listaMapeada = []
+        asistencia = 0
+        for dicNotas in listNotas:
+            if dicNotas["valor"]:
+                asistencia = asistencia + dicNotas["valor"]
+            listaMapeada.append({
+                "periodo_academico":dicNotas['periodo_academico'],
+                "nombre_trayecto":dicNotas['trayecto'],
+                "nombre_unidad_curricular":dicNotas['unidad_curricular'],
+                "nota":dicNotas['valor'],
+                "asistencia":dicNotas['asistencia'],
+                "unidades_credito":dicNotas['unidades_credito'],
+            })
+        dictDatosSolicitud["indiceAcademico"] = asistencia/len(listNotas)
+
+
+        reporte_generator = self.controllerSolicitud.generarSituacionAcademica(dictDatosSolicitud, listaMapeada)
+        ruta_pdf = reporte_generator.generar_pdf()
+
+        # 4. Mostrar resultado y abrir el archivo
+        if ruta_pdf:
+            respuesta = messagebox.askyesno("Éxito", f"Situación Académica PDF generada en:\n{ruta_pdf}\n\n¿Desea abrir el archivo ahora?")
+            if respuesta:
+                # Abrir el archivo PDF en el navegador o visor predeterminado
+                webbrowser.open_new_tab(ruta_pdf)
+            return
+        else:
+            messagebox.showerror("Error", "Ocurrió un error con inesperado")
+            return
+           
+
+
+    def historialAcademico(self):
+        pass
+
+    def servicioComunitario(self):
+        pass

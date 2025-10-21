@@ -92,7 +92,7 @@ class EstudianteDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
         
-        solicitud = SolicitudDoc(self.cuerpo_principal, self.controller, rol = self.user_role, id = self.estudiante_id)
+        solicitud = SolicitudDoc(self.cuerpo_principal, self.controller, rol = self.user_role, id = self.estudiante_id, username=self.username)
         solicitud.pack(fill="both", expand=True, padx=10, pady=10)
                 
 

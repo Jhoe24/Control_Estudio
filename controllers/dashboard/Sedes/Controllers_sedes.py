@@ -59,6 +59,9 @@ class ControladorSedes:
     
     def obtener_codigo_por_id(self, id):
         return self.modelo.obtener_codigo_por_id(id)
+    
+    def obtenerSedeEstudiante(self, estudiante_id):
+        return self.modelo.obtener_sede_por_estudiante(estudiante_id)
 
     # def obtener_periodo_academico_datos(self, id_periodo):
     #     return self.modelo.obtener_periodo_academico_datos(id_periodo)

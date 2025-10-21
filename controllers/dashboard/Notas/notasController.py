@@ -1,4 +1,3 @@
-
 from models.Notas.modelNotas import ModeloNotas
 from models.PNF.modelo_pnf import ModeloPNF
 import tkinter.messagebox as messagebox
@@ -70,3 +69,33 @@ class NotasController:
     
     def listarNotasEstudiante(self, estudiante_id):
         return self.modelo_notas.listar_notas_estudiante(estudiante_id)
+    
+    def obtener_historial_asistencias(self, estudiante_id):
+        return self.modelo_notas.obtener_historial_asistencias(estudiante_id)
+    
+    def obtener_lista_notas_historialAcademico(self, estudiante_id):
+        dic = []
+        notas = self.modelo_notas.listar_notas_estudiante(estudiante_id)
+        asistencias = self.modelo_notas.obtener_historial_asistencias(estudiante_id)
+
+        # Crear un diccionario para mapear inscripcion_id a asistencia
+        mapeo = {}
+        for a in asistencias:
+            insc = a.get("inscripcion_id")
+            if insc is not None:
+                mapeo[insc] = a
+            
+        coincidencias = []
+        for n in notas:
+            insc = n.get("inscripcion_id")
+            if insc is None:
+                continue
+            if insc in mapeo:
+                combinado = n.copy()  # Copiar los datos de la nota
+                combinado["asistencia"] = mapeo[insc].get("asistencia")  # Agregar la asistencia correspondiente
+                coincidencias.append(combinado)
+
+        return coincidencias
+
+
+

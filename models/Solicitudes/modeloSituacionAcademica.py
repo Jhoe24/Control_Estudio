@@ -514,7 +514,7 @@ class ModeloSituacionAcademica:
             data_notas = [self._cabecera_tabla_notas]
             for nota in self.listNotas:
                 valor_nota = nota.get('nota', 0.0)
-                condicion = "APROBADA" if valor_nota >= 10 else "REPROBADA"
+                condicion = "APROBADA" if valor_nota >= 12 else "REPROBADA"
                 trayecto_split = nota.get('nombre_trayecto', 'N/A').split(' ')
                 trayecto_val = trayecto_split[-1] if trayecto_split[-1] != 'Inicial' else 'Inicial'
                 data_notas.append([
@@ -567,107 +567,107 @@ class ModeloSituacionAcademica:
 
     
 
-if __name__ == '__main__':
-    print("Iniciando prueba de generación de Situación Académica (Diseño Final)...")
+# if __name__ == '__main__':
+#     print("Iniciando prueba de generación de Situación Académica (Diseño Final)...")
 
-    # 1. Datos de ejemplo para el estudiante
-    sample_datos_estudiante = {
-        'documento_identidad': '10999894',
-        'tipo_documento': 'V',
-        'nombres': 'Rafael Gabriel',
-        'apellidos': 'Semejal Herrera',
-        'pnf_nombre': 'Medicina Veterinaria',
-        'sede_nombre': 'Socopó',
-        'indiceAcademico': '17.546392'
-    }
+#     # 1. Datos de ejemplo para el estudiante
+#     sample_datos_estudiante = {
+#         'documento_identidad': '10999894',
+#         'tipo_documento': 'V',
+#         'nombres': 'Rafael Gabriel',
+#         'apellidos': 'Semejal Herrera',
+#         'pnf_nombre': 'Medicina Veterinaria',
+#         'sede_nombre': 'Socopó',
+#         'indiceAcademico': '17.546392'
+#     }
 
-    # 2. Lista de ejemplo de notas (LO SUFICIENTEMENTE LARGA PARA FORZAR 2 PÁGINAS)
-    sample_lista_notas = [
-        {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'INTRODUCCION A LA MEDICINA VETERINARIA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 2},
-        {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'LECTURA Y COMPRENSION', 'nota': 19.00, 'asistencia': 100, 'unidades_credito': 1},
-        {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'APLICACIÓN DE LAS TICS', 'nota': 19.00, 'asistencia': 98, 'unidades_credito': 1},
-        {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'MATEMATICA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 3},
-        {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'PROYECTO NACIONAL Y NUEVA CIUDADANIA', 'nota': 19.00, 'asistencia': 92, 'unidades_credito': 3},
-        {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'TALLER DE INTRODUCCION A LA UNIVERSIDAD Y AL P.N.F.', 'nota': 19.00, 'asistencia': 85, 'unidades_credito': 2},
-        {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'ALIMENTACION Y NUTRICION', 'nota': 20.00, 'asistencia': 100, 'unidades_credito': 8},
-        {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'BIOQUIMICA', 'nota': 15.00, 'asistencia': 100, 'unidades_credito': 7},
-        {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'DEPORTE Y ACTIVIDAD FISICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 1},
-        {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'ESTADISTICA Y DISEÑO EXPERIMENTAL', 'nota': 19.00, 'asistencia': 100, 'unidades_credito': 1},
-        {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'FISIOLOGIA', 'nota': 18.00, 'asistencia': 100, 'unidades_credito': 7},
-        {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'MORFOFISIOLOGIA I', 'nota': 15.00, 'asistencia': 100, 'unidades_credito': 9},
-        {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'ORGANIZACION COMUNITARIA Y SU AMBIENTE', 'nota': 19.00, 'asistencia': 100, 'unidades_credito': 4},
-        {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'PROYECTO I: Introducción a la Producción Animal desde la Medicina Veterinaria', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 8},
-        {'periodo_academico': '2019-I', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL I', 'nota': 17.00, 'asistencia': 100, 'unidades_credito': 3},
-        {'periodo_academico': '2019-I', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ELECTIVA', 'nota': 17.00, 'asistencia': 75, 'unidades_credito': 1},
-        {'periodo_academico': '2019-I', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ÉTICA Y DEONTOLOGÍA VETERINARIA', 'nota': 18.00, 'asistencia': 100, 'unidades_credito': 1},
-        {'periodo_academico': '2019-I', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'GENÉTICA', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 7},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'MICROBIOLOGÍA', 'nota': 20.00, 'asistencia': 77, 'unidades_credito': 5},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'MORFOFISIOLOGÍA II', 'nota': 15.00, 'asistencia': 77, 'unidades_credito': 9},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
-        {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
-        {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
-        {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
-    ]
+#     # 2. Lista de ejemplo de notas (LO SUFICIENTEMENTE LARGA PARA FORZAR 2 PÁGINAS)
+#     sample_lista_notas = [
+#         {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'INTRODUCCION A LA MEDICINA VETERINARIA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 2},
+#         {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'LECTURA Y COMPRENSION', 'nota': 19.00, 'asistencia': 100, 'unidades_credito': 1},
+#         {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'APLICACIÓN DE LAS TICS', 'nota': 19.00, 'asistencia': 98, 'unidades_credito': 1},
+#         {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'MATEMATICA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 3},
+#         {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'PROYECTO NACIONAL Y NUEVA CIUDADANIA', 'nota': 19.00, 'asistencia': 92, 'unidades_credito': 3},
+#         {'periodo_academico': '2017-I', 'nombre_trayecto': 'Inicial', 'nombre_unidad_curricular': 'TALLER DE INTRODUCCION A LA UNIVERSIDAD Y AL P.N.F.', 'nota': 19.00, 'asistencia': 85, 'unidades_credito': 2},
+#         {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'ALIMENTACION Y NUTRICION', 'nota': 20.00, 'asistencia': 100, 'unidades_credito': 8},
+#         {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'BIOQUIMICA', 'nota': 15.00, 'asistencia': 100, 'unidades_credito': 7},
+#         {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'DEPORTE Y ACTIVIDAD FISICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 1},
+#         {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'ESTADISTICA Y DISEÑO EXPERIMENTAL', 'nota': 19.00, 'asistencia': 100, 'unidades_credito': 1},
+#         {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'FISIOLOGIA', 'nota': 18.00, 'asistencia': 100, 'unidades_credito': 7},
+#         {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'MORFOFISIOLOGIA I', 'nota': 15.00, 'asistencia': 100, 'unidades_credito': 9},
+#         {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'ORGANIZACION COMUNITARIA Y SU AMBIENTE', 'nota': 19.00, 'asistencia': 100, 'unidades_credito': 4},
+#         {'periodo_academico': '2018-I', 'nombre_trayecto': 'Primero', 'nombre_unidad_curricular': 'PROYECTO I: Introducción a la Producción Animal desde la Medicina Veterinaria', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 8},
+#         {'periodo_academico': '2019-I', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL I', 'nota': 17.00, 'asistencia': 100, 'unidades_credito': 3},
+#         {'periodo_academico': '2019-I', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ELECTIVA', 'nota': 17.00, 'asistencia': 75, 'unidades_credito': 1},
+#         {'periodo_academico': '2019-I', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ÉTICA Y DEONTOLOGÍA VETERINARIA', 'nota': 18.00, 'asistencia': 100, 'unidades_credito': 1},
+#         {'periodo_academico': '2019-I', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'GENÉTICA', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 7},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'MICROBIOLOGÍA', 'nota': 20.00, 'asistencia': 77, 'unidades_credito': 5},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'MORFOFISIOLOGÍA II', 'nota': 15.00, 'asistencia': 77, 'unidades_credito': 9},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'ORIENTACIÓN E INTEGRACIÓN PSICOSOCIAL', 'nota': 19.00, 'asistencia': 77, 'unidades_credito': 2},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'PROYECTO II: Atención al Cuidado y Producción Animal', 'nota': 19.00, 'asistencia': 75, 'unidades_credito': 8},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'RECREACIÓN Y CULTURA', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 1},
+#         {'periodo_academico': '2019-II', 'nombre_trayecto': 'Segundo', 'nombre_unidad_curricular': 'SISTEMAS DE PRODUCCIÓN ANIMAL II', 'nota': 18.00, 'asistencia': 77, 'unidades_credito': 9},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'PATOLOGÍA', 'nota': 18.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'FARMACOLOGÍA', 'nota': 15.00, 'asistencia': 90, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'TOXICOLOGÍA', 'nota': 19.00, 'asistencia': 90, 'unidades_credito': 4},
+#         {'periodo_academico': '2020-I', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'EPIDEMIOLOGÍA', 'nota': 16.00, 'asistencia': 90, 'unidades_credito': 3},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CLÍNICA DE PEQUEÑOS ANIMALES', 'nota': 17.00, 'asistencia': 95, 'unidades_credito': 8},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'CIRUGÍA VETERINARIA', 'nota': 14.00, 'asistencia': 95, 'unidades_credito': 6},
+#         {'periodo_academico': '2020-II', 'nombre_trayecto': 'Tercero', 'nombre_unidad_curricular': 'SALUD PÚBLICA', 'nota': 19.00, 'asistencia': 95, 'unidades_credito': 4},
+#     ]
 
-    # 3. Instanciar la clase y generar el PDF
-    reporte_generator = ModeloSituacionAcademica(sample_datos_estudiante, sample_lista_notas)
-    ruta_pdf = reporte_generator.generar_pdf()
+#     # 3. Instanciar la clase y generar el PDF
+#     reporte_generator = ModeloSituacionAcademica(sample_datos_estudiante, sample_lista_notas)
+#     ruta_pdf = reporte_generator.generar_pdf()
 
-    # 4. Mostrar resultado y abrir el archivo
-    if ruta_pdf:
-        print(f"¡Éxito! PDF generado en: {ruta_pdf}")
-        print("Abriendo el archivo...")
-        webbrowser.open(ruta_pdf)
-    else:
-        print("Error: No se pudo generar el PDF.")
+#     # 4. Mostrar resultado y abrir el archivo
+#     if ruta_pdf:
+#         print(f"¡Éxito! PDF generado en: {ruta_pdf}")
+#         print("Abriendo el archivo...")
+#         webbrowser.open(ruta_pdf)
+#     else:
+#         print("Error: No se pudo generar el PDF.")
