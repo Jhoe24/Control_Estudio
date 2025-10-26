@@ -56,23 +56,30 @@ class SolicitudDoc(SectionFrameBase):
         )
         self.btn_sit_academica.pack(side="left", padx=20)
 
+        ctk.CTkLabel(
+            button_container,
+            text="Plantillas de Servicio Comunitario",
+            font=("Segoe UI", 16, "bold"),
+            text_color=COLOR_TEXTO_PRINCIPAL
+        ).pack(pady=(20, 0))
+
         # --- Fila 2 ---
         row2 = ctk.CTkFrame(button_container, fg_color="transparent")
-        row2.pack(pady=20)
-
-        self.btn_hist_academico = ctk.CTkButton(
-            row2, text="Historial Académico", 
-            #command=...
-            **card_btn_style
-        )
-        self.btn_hist_academico.pack(side="left", padx=20)
+        row2.pack(pady=10)
 
         self.btn_serv_comunitario = ctk.CTkButton(
-            row2, text="Carta de Servicio Comunitario", 
+            row2, text="Planilla de incripción\nServicio Comunitario", 
             #command=...
             **card_btn_style
         )
         self.btn_serv_comunitario.pack(side="left", padx=20)
+
+        self.btn_infomeFinal = ctk.CTkButton(
+            row2, text="Informe Final de Servicio\nComunitario", 
+            #command=...
+            **card_btn_style
+        )
+        self.btn_infomeFinal.pack(side="left", padx=20)
 
     def contanciaEstudio(self):
         if self.rol.lower() == "estudiante":
