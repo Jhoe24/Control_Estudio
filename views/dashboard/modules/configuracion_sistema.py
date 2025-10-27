@@ -15,7 +15,7 @@ class Config_system(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self,
-            text="Gestión de Datos de Docente",
+            text="Configuaración",
             font=FUENTE_TITULO_FORMULARIO,
             text_color=COLOR_TEXTO_PRINCIPAL
         ).pack(pady=(10, 20), padx=20, anchor="w")

@@ -1,5 +1,6 @@
 from models.Notas.modelNotas import ModeloNotas
 from models.PNF.modelo_pnf import ModeloPNF
+
 import tkinter.messagebox as messagebox
 
 class NotasController:
@@ -74,8 +75,8 @@ class NotasController:
         return self.modelo_notas.obtener_historial_asistencias(estudiante_id)
     
     def obtener_lista_notas_historialAcademico(self, estudiante_id):
-        dic = []
         notas = self.modelo_notas.listar_notas_estudiante(estudiante_id)
+        print("Notas obtenidas:", notas)  # Para depuración
         asistencias = self.modelo_notas.obtener_historial_asistencias(estudiante_id)
 
         # Crear un diccionario para mapear inscripcion_id a asistencia
@@ -86,16 +87,58 @@ class NotasController:
                 mapeo[insc] = a
             
         coincidencias = []
-        for n in notas:
-            insc = n.get("inscripcion_id")
-            if insc is None:
-                continue
-            if insc in mapeo:
-                combinado = n.copy()  # Copiar los datos de la nota
-                combinado["asistencia"] = mapeo[insc].get("asistencia")  # Agregar la asistencia correspondiente
-                coincidencias.append(combinado)
+        trayecto_promedios = {}  # Para almacenar promedios por trayecto
+        for nota in notas:
+            trayecto_id = nota.get("trayecto_id")
+            valor_nota = nota.get("valor")
 
+            if trayecto_id not in trayecto_promedios:
+                trayecto_promedios[trayecto_id] = {"total": 0, "count": 0}
+            
+            if valor_nota is not None:
+                trayecto_promedios[trayecto_id]["total"] += valor_nota
+                trayecto_promedios[trayecto_id]["count"] += 1
+
+        # Calcular promedios finales y agregar a coincidencias
+        for trayecto_id, datos in trayecto_promedios.items():
+            if datos["count"] > 0:
+                promedio = datos["total"] / datos["count"]
+                coincidencias.append({"trayecto_id": trayecto_id, "promedio": promedio})
         return coincidencias
 
+    def obtener_historial_academico_completo(self, estudiante_id):
+        notas = self.modelo_notas.listar_notas_estudiante(estudiante_id)
+        print("Notas obtenidas:", notas)  # Para depuración
 
+        # Crear un diccionario para almacenar las notas por trayecto y tramo
+        trayecto_tramo_map = {}
 
+        for nota in notas:
+            trayecto_id = nota.get("trayecto_id")
+            tramo = nota.get("tramo")
+            valor_nota = nota.get("valor")
+
+            # Solo considerar una nota por unidad curricular por trayecto
+            if trayecto_id not in trayecto_tramo_map:
+                trayecto_tramo_map[trayecto_id] = {}
+
+            if tramo not in trayecto_tramo_map[trayecto_id]:
+                trayecto_tramo_map[trayecto_id][tramo] = []
+
+            # Agregar la nota al tramo correspondiente solo si no existe ya
+            if valor_nota is not None and valor_nota not in trayecto_tramo_map[trayecto_id][tramo]:
+                trayecto_tramo_map[trayecto_id][tramo].append(valor_nota)
+
+        # Calcular promedios finales y crear la lista de resultados
+        coincidencias = []
+        for trayecto_id, tramos in trayecto_tramo_map.items():
+            for tramo, notas in tramos.items():
+                if notas:  # Solo si hay notas
+                    promedio = sum(notas) / len(notas)
+                    coincidencias.append({
+                        "trayecto_id": trayecto_id,
+                        "tramo": tramo,
+                        "promedio": promedio
+                    })
+
+        return coincidencias

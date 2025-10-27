@@ -169,6 +169,7 @@ class ModeloNotas:
                     uc.nombre AS unidad_curricular,
                     uc.unidades_credito,
                     t.nombre AS trayecto,
+                    t.id AS trayecto_id,
                     tr.nombre AS tramo,
                     p.nombre AS pnf,
                     pa.nombre AS periodo_academico,
@@ -251,4 +252,31 @@ class ModeloNotas:
             if con is not None:
                 con.close()
 
-#pprint(ModeloNotas().listar_notas_estudiante(1))
+    def obtener_notas_por_trayecto(self, estudiante_id):
+        con = None
+        try:
+            con = sql.connect(self.db_ruta)
+            cursor = con.cursor()
+            
+            cursor.execute('''
+                SELECT t.id AS trayecto_id, tr.id AS tramo_id, n.valor
+                FROM notas n
+                JOIN inscripciones i ON n.inscripcion_id = i.id
+                JOIN unidades_curriculares uc ON n.unidad_curricular_id = uc.id
+                JOIN trayectos t ON uc.trayecto_id = t.id
+                JOIN tramos tr ON uc.tramo_id = tr.id
+                WHERE i.estudiante_id = ?
+                GROUP BY t.id, tr.id  -- Agrupar por trayecto y tramo
+            ''', (estudiante_id,))
+            
+            resultados = cursor.fetchall()
+            return resultados if resultados else []
+            
+        except Exception as e:
+            print(f"Error al realizar la consulta: {e}") 
+            return []
+        finally:
+            if con is not None:
+                con.close()
+
+pprint(ModeloNotas().listar_notas_estudiante(1))

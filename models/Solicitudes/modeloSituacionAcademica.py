@@ -303,16 +303,26 @@ class ModeloSituacionAcademica:
         # --- Tabla de notas ---
         data_notas = [self._cabecera_tabla_notas]
         for nota in self.listNotas:
-            valor_nota = nota.get('nota', 0.0)
-            condicion = "APROBADA" if valor_nota >= 10 else "REPROBADA"
-            trayecto_split = nota.get('nombre_trayecto', 'N/A').split(' ')
-            trayecto_val = trayecto_split[-1] if trayecto_split[-1] != 'Inicial' else 'Inicial'
+            # Si 'nota' es None, lo tratamos como 0.0 para la comparación.
+            valor_nota = nota.get('nota')
+            nota_numerica = valor_nota if valor_nota is not None else 0.0 # Manejo de nota None
+            condicion = "APROBADA" if nota_numerica >= 12 else "REPROBADA" # O el umbral que uses
 
+            # Manejo de nombre_trayecto None
+            nombre_trayecto = nota.get('nombre_trayecto') or 'N/A'
+            trayecto_split = nombre_trayecto.split(' ')
+            trayecto_val = trayecto_split[-1] if len(trayecto_split) > 0 and trayecto_split[-1] != 'Inicial' else 'Inicial'
+
+            # Manejo de periodo_academico None
+            periodo_academico = nota.get('periodo_academico') or 'N/A'
             data_notas.append([
-                nota.get('periodo_academico', 'N/A').split('-')[0],
+                periodo_academico.split('-')[0],
                 trayecto_val,
-                Paragraph(nota.get('nombre_unidad_curricular', 'N/A'), style_info_value),
-                f"{valor_nota:.2f}",
+                # Manejo de nombre_unidad_curricular None
+                Paragraph(
+                    nota.get('nombre_unidad_curricular') or 'N/A', style_info_value
+                ),
+                f"{nota_numerica:.2f}",
                 str(nota.get('asistencia', 'N/A')),
                 str(nota.get('unidades_credito', 'N/A')),
                 condicion
@@ -513,15 +523,23 @@ class ModeloSituacionAcademica:
             # Tabla de notas
             data_notas = [self._cabecera_tabla_notas]
             for nota in self.listNotas:
-                valor_nota = nota.get('nota', 0.0)
-                condicion = "APROBADA" if valor_nota >= 12 else "REPROBADA"
-                trayecto_split = nota.get('nombre_trayecto', 'N/A').split(' ')
-                trayecto_val = trayecto_split[-1] if trayecto_split[-1] != 'Inicial' else 'Inicial'
+                # Manejo de valores None para evitar errores
+                valor_nota = nota.get('nota')
+                nota_numerica = valor_nota if valor_nota is not None else 0.0
+                condicion = "APROBADA" if nota_numerica >= 12 else "REPROBADA"
+                
+                nombre_trayecto = nota.get('nombre_trayecto') or 'N/A'
+                trayecto_split = nombre_trayecto.split(' ')
+                trayecto_val = trayecto_split[-1] if len(trayecto_split) > 0 and trayecto_split[-1] != 'Inicial' else 'Inicial'
+                
+                periodo_academico = nota.get('periodo_academico') or 'N/A'
+                nombre_uc = nota.get('nombre_unidad_curricular') or 'N/A'
+
                 data_notas.append([
-                    nota.get('periodo_academico', 'N/A').split('-')[0],
+                    periodo_academico.split('-')[0],
                     trayecto_val,
-                    Paragraph(nota.get('nombre_unidad_curricular', 'N/A'), style_info_value),
-                    f"{valor_nota:.2f}",
+                    Paragraph(nombre_uc, style_info_value),
+                    f"{nota_numerica:.2f}",
                     str(nota.get('asistencia', 'N/A')),
                     str(nota.get('unidades_credito', 'N/A')),
                     condicion

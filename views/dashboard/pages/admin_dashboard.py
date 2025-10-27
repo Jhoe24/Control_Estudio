@@ -7,6 +7,7 @@ from views.dashboard.components.label_Bienvenida import LabelBienvenida
 from views.dashboard.components.card import Card, CardDisplay
 
 from views.dashboard.modules.RegistrarEstudiantes import FormularioEstudianteView
+
 from views.dashboard.modules.tables.Estudiantes.ListarEstudiantes import ListEstudiantesView
 
 
@@ -30,6 +31,7 @@ from views.dashboard.modules.tables.Sedes.ListSedesView import ListSedesView
 
 from views.dashboard.modules.configuracion import Config_user
 from views.dashboard.modules.configuracion_sistema import Config_system
+from views.dashboard.modules.configuracion_respaldo import ConfiguracionRespaldo
 
 from views.dashboard.modules.tables.Secciones.ListadoSeccionesView import ListSeccionesView
 
@@ -187,5 +189,12 @@ class AdminDashboardView(BaseDashboardView):
 
         configuracion = Config_system(self.cuerpo_principal)
         configuracion.pack(fill="both", expand=True, padx=10, pady=10)
+
+    def configuracion_respaldos(self):
+        for widget in self.cuerpo_principal.winfo_children():
+            widget.pack_forget()
+
+        configuracion_respaldo = ConfiguracionRespaldo(self.cuerpo_principal)
+        configuracion_respaldo.pack(fill="both", expand=True, padx=10, pady=10)
         
     
