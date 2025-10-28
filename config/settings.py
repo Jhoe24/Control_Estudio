@@ -24,6 +24,7 @@ class Settings:
             "ayuda_icon": "resources/icons/ayuda.png",
             "historial_icon": "resources/icons/historial.png",
             "info_icon": "resources/icons/info.png",
+            "advertencia_icon": "resources/icons/advertencia.png",
             "configuracion_icon": "resources/icons/config.png",
             "cerrar_sesion_icon": "resources/icons/cerrar-sesion.png",	
             

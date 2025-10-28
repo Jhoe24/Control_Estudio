@@ -194,7 +194,7 @@ class AdminDashboardView(BaseDashboardView):
         for widget in self.cuerpo_principal.winfo_children():
             widget.pack_forget()
 
-        configuracion_respaldo = ConfiguracionRespaldo(self.cuerpo_principal)
+        configuracion_respaldo = ConfiguracionRespaldo(self.cuerpo_principal,self.controller)
         configuracion_respaldo.pack(fill="both", expand=True, padx=10, pady=10)
         
     
