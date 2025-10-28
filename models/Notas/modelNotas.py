@@ -219,30 +219,27 @@ class ModeloNotas:
         con = None
         try:
             con = sql.connect(self.db_ruta)
-            con.row_factory = sql.Row  # Para que los resultados se puedan acceder como diccionarios
+            con.row_factory = sql.Row
             cursor = con.cursor()
             cursor.execute('''
                 SELECT
                     i.id AS inscripcion_id,
-                    a.valor_asistencia AS asistencia
+                    uc.id AS unidad_curricular_id,
+                    uc.nombre AS unidad_curricular,
+                    AVG(a.valor_asistencia) AS asistencia_promedio
                 FROM
                     asistencia a
                 JOIN
                     unidades_curriculares uc ON a.unidad_curricular_id = uc.id
                 JOIN
                     inscripciones i ON a.inscripcion_id = i.id
-                JOIN
-                    secciones s ON i.seccion_id = s.id
-                JOIN
-                    trayectos t ON uc.trayecto_id = t.id
-                JOIN
-                    tramos tr ON uc.tramo_id = tr.id
-                JOIN
-                    pnf p ON uc.pnf_id = p.id
                 WHERE
                     i.estudiante_id = ?
-                ORDER BY a.fecha DESC
-                            ''',(estudiante_id,))
+                GROUP BY
+                    uc.id, i.id
+                ORDER BY
+                    uc.nombre
+            ''', (estudiante_id,))
             resultado = cursor.fetchall()
             return [dict(fila) for fila in resultado]
         except Exception as e:
@@ -251,6 +248,7 @@ class ModeloNotas:
         finally:
             if con is not None:
                 con.close()
+
 
     def obtener_notas_por_trayecto(self, estudiante_id):
         con = None

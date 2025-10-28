@@ -172,69 +172,81 @@ class SolicitudDoc(SectionFrameBase):
         }
 
         # For para calcular el indiceAcademico
-        listNotas = self.controllerNotas.obtener_historial_academico_completo(self.id)
-
+        #listNotas = self.controllerNotas.obtener_historial_academico_completo(self.id)
+        listNotas = self.controllerNotas.modelo_notas.listar_notas_estudiante(self.id)
+        listAsistencias = self.controllerNotas.modelo_notas.obtener_historial_asistencias(self.id)
 
         # # For para calcular el promedio de las asistencias
-        
-        # listaMapeada = []
-        # asistencia = 0
-        # for dicNotas in listNotas:
-        #     if dicNotas["valor"]:
-        #         asistencia = asistencia + dicNotas["valor"]
-        #     listaMapeada.append({
-        #         "periodo_academico":dicNotas['periodo_academico'],
-        #         "nombre_trayecto":dicNotas['trayecto'],
-        #         "nombre_unidad_curricular":dicNotas['unidad_curricular'],
-        #         "nota":dicNotas['valor'],
-        #         "asistencia":dicNotas['asistencia'],
-        #         "unidades_credito":dicNotas['unidades_credito'],
-        #     })
-        # dictDatosSolicitud["indiceAcademico"] = asistencia/len(listNotas)
+        # --- Construir un diccionario de asistencias por unidad curricular ---
+        mapeo_asistencia = {}
+
+        for a in listAsistencias:
+            uc_nombre = a.get("unidad_curricular")
+            asistencia_valor = a.get("asistencia_promedio", 0)
+            if not uc_nombre:
+                continue
+
+            if uc_nombre not in mapeo_asistencia:
+                mapeo_asistencia[uc_nombre] = {
+                    "total": 0,
+                    "count": 0
+                }
+
+            mapeo_asistencia[uc_nombre]["total"] += asistencia_valor
+            mapeo_asistencia[uc_nombre]["count"] += 1
+
+        # Ahora convertir totales a promedios
+        for uc in mapeo_asistencia:
+            total = mapeo_asistencia[uc]["total"]
+            count = mapeo_asistencia[uc]["count"]
+            mapeo_asistencia[uc] = round(total / count, 2) if count > 0 else 0
+
+        uc_data = {}
+
+        for nota in listNotas:
+            uc = nota["unidad_curricular"]
+            trayecto = nota["trayecto"]
+            insc_id = nota["inscripcion_id"]
+            valor = nota["valor"]
+            uc_creditos = nota["unidades_credito"]
+            asistencia = mapeo_asistencia.get(uc, 0)
+
+            if uc not in uc_data:
+                uc_data[uc] = {
+                    "trayecto": trayecto,
+                    "notas": [],
+                    "asistencias": [],
+                    "unidades_credito": uc_creditos
+                }
+
+            if valor is not None:
+                uc_data[uc]["notas"].append(valor)
+            uc_data[uc]["asistencias"].append(asistencia)
         print(listNotas)
         if not listNotas:
             messagebox.showwarning("Advertencia", "No se encontraron notas para calcular el índice académico.")
             dictDatosSolicitud["indiceAcademico"] = 0
         else:
+            listaMapeada = []
             total_notas = 0
             count_notas = 0
-            listaMapeada = []
 
-            # Crear un diccionario para almacenar promedios por trayecto
-            trayecto_promedios = {}
-            for dic in listNotas:
-                trayecto_id = dic['trayecto_id']
-                if trayecto_id not in trayecto_promedios:
-                    trayecto_promedios[trayecto_id] = {'total': 0, 'count': 0}
-
-                # Sumar las notas para el promedio
-                if dic.get('valor') is not None:
-                    trayecto_promedios[trayecto_id]['total'] += dic['valor']
-                    trayecto_promedios[trayecto_id]['count'] += 1
-
-            # Calcular promedios finales
-            for trayecto_id, values in trayecto_promedios.items():
-                promedio = values['total'] / values['count'] if values['count'] > 0 else 0
-                trayecto_promedios[trayecto_id] = promedio
-
-            # Llenar listaMapeada con los datos y promedios
-            for dicNotas in listNotas:
-                valor_nota = dicNotas.get('valor', 0)
-                trayecto_id = dicNotas.get('trayecto_id')
+            for uc, datos in uc_data.items():
+                promedio_nota = sum(datos["notas"]) / len(datos["notas"]) if datos["notas"] else 0
+                promedio_asistencia = sum(datos["asistencias"]) / len(datos["asistencias"]) if datos["asistencias"] else 0
 
                 listaMapeada.append({
-                    "periodo_academico": dicNotas.get('periodo_academico'),
-                    "nombre_trayecto": dicNotas.get('trayecto'),
-                    "nombre_unidad_curricular": dicNotas.get('unidad_curricular'),
-                    "nota": valor_nota,
-                    "asistencia": dicNotas.get('asistencia', 0),
-                    "unidades_credito": dicNotas.get('unidades_credito', 0),
-                    "promedio": trayecto_promedios.get(trayecto_id, 0)  # Obtener el promedio correspondiente
+                    "periodo_academico": "2025",  # o el actual
+                    "nombre_trayecto": datos["trayecto"],
+                    "nombre_unidad_curricular": uc,
+                    "nota": round(promedio_nota, 2),
+                    "asistencia": round(promedio_asistencia, 2),
+                    "unidades_credito": datos["unidades_credito"],
+                    "promedio": promedio_nota
                 })
 
-                if valor_nota is not None:
-                    total_notas += valor_nota
-                    count_notas += 1
+                total_notas += promedio_nota
+                count_notas += 1
 
             dictDatosSolicitud["indiceAcademico"] = total_notas / count_notas if count_notas > 0 else 0
        
