@@ -118,76 +118,51 @@ class ModeloExportar:
         except Exception as e:
             print(f"Error al exportar a Excel: {e}")
             return None # Devolver None en caso de error
+        
+    def exportarSQL(self, directorio_destino, progress_callback=None):
+        """
+        Exporta la base de datos a un archivo .sql en el directorio especificado.
 
+        Args:
+            directorio_destino (str): La carpeta donde se guardará el archivo SQL.
+            progress_callback (function, optional): Callback para notificar el progreso.
+                                                    Recibe (items_procesados, total_items).
+        Returns:
+            str|None: La ruta del archivo si la exportación fue exitosa, None en caso contrario.
+        """
+        con = None
+        try:
+            # 1. Asegurarse de que el directorio de destino exista
+            if not os.path.exists(directorio_destino):
+                os.makedirs(directorio_destino)
+                print(f"Directorio creado: {directorio_destino}")
+            
+            nombre_archivo_sql = f"respaldo_completo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.sql"
+            sql_dump_file = os.path.join(directorio_destino, nombre_archivo_sql)
 
-# --- CÓDIGO DE PRUEBA CON BARRA DE PROGRESO ---
-# Este bloque solo se ejecuta si corres este archivo directamente.
-# if __name__ == "__main__":
-#     import customtkinter as ctk
-#     import threading
-#     from tkinter import filedialog, messagebox
-#     import webbrowser
-
-#     def prueba_exportacion_con_progreso():
-#         """
-#         Función de prueba que crea una ventana para iniciar la exportación
-#         y muestra una barra de progreso.
-#         """
-#         # 1. Crear la ventana principal de prueba
-#         app = ctk.CTk()
-#         app.title("Prueba de Exportación")
-#         app.geometry("300x150")
-
-#         def iniciar_exportacion():
-#             # 2. Crear la ventana de progreso
-#             progress_window = ctk.CTkToplevel(app)
-#             progress_window.title("Exportando...")
-#             progress_window.geometry("400x150")
-#             progress_window.grab_set()
-#             progress_window.resizable(False, False)
-
-#             ctk.CTkLabel(progress_window, text="Exportando datos, por favor espere...", font=("Segoe UI", 14)).pack(pady=(20, 10))
-#             progress_bar = ctk.CTkProgressBar(progress_window, width=350)
-#             progress_bar.pack(pady=10)
-#             progress_bar.set(0)
-#             progress_label = ctk.CTkLabel(progress_window, text="Iniciando...", font=("Segoe UI", 12))
-#             progress_label.pack(pady=5)
-
-#             def update_progress(current, total):
-#                 """Función para actualizar la barra de progreso desde el hilo principal."""
-#                 progress = current / total
-#                 progress_bar.set(progress)
-#                 progress_label.configure(text=f"Exportando tabla {current} de {total}...")
-#                 progress_window.update_idletasks()
-
-#             def worker_exportar():
-#                 """Función que se ejecuta en un hilo para no congelar la UI."""
-#                 exportador = ModeloExportar()
-#                 # Se llama al modelo y se le pasa la función de callback
-#                 ruta_final = exportador.exportar_a_excel(
-#                     progress_callback=lambda c, t: progress_window.after(0, update_progress, c, t)
-#                 )
-
-#                 # Cuando termina, se cierra la ventana de progreso y se muestra el resultado
-#                 progress_window.after(0, progress_window.destroy)
-
-#                 if ruta_final:
-#                     respuesta = messagebox.askyesno("Éxito", f"Exportación completada.\nArchivo guardado en:\n{ruta_final}\n\n¿Desea abrir el archivo?")
-#                     if respuesta:
-#                         webbrowser.open(ruta_final)
-#                 else:
-#                     messagebox.showerror("Error", "Ocurrió un error durante la exportación.")
-
-#             # 3. Iniciar el hilo de trabajo
-#             thread = threading.Thread(target=worker_exportar)
-#             thread.start()
-
-#         # Botón para iniciar la prueba
-#         btn_probar = ctk.CTkButton(app, text="Iniciar Exportación de Prueba", command=iniciar_exportacion)
-#         btn_probar.pack(expand=True, padx=20, pady=20)
-
-#         app.mainloop()
-
-#     # Llamar a la función de prueba
-#     prueba_exportacion_con_progreso()
-
+            con = sql.connect(self.db_ruta)
+            
+            # Contar tablas para la barra de progreso
+            total_tablas = len(self.nombre_tabla_exportable)
+            tablas_exportadas = 0
+            
+            # 2. Abrir el archivo de salida para escribir
+            with open(sql_dump_file, 'w') as f:
+                print(f"Exportando base de datos a: '{sql_dump_file}'...")
+                
+                # 3. Iterar sobre las líneas de SQL generadas por iterdump()
+                for line in con.iterdump():
+                    f.write(f'{line}\n')
+                    # Si la línea es un COMMIT, consideramos que una tabla ha terminado.
+                    if 'COMMIT' in line and progress_callback:
+                        tablas_exportadas += 1
+                        progress_callback(tablas_exportadas, total_tablas)
+            
+            print("¡Exportación SQL completada exitosamente!")
+            return sql_dump_file
+        except Exception as e:
+            print(f"Error durante la exportación SQL: {e}")
+            return None
+        finally:
+            if con:
+                con.close()

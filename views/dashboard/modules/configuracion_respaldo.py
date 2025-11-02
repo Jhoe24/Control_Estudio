@@ -57,7 +57,7 @@ class ConfiguracionRespaldo(ctk.CTkFrame):
         )
         infoExportLabel.pack(side="left", padx=16)
 
-        tooltip_text = "⚠️ Tener extremo cuidado con la información que desee Exportación\nSe recomienda resguardarla en una unidad de almacenamiento seguro\nPara no comprometer la información de los usuarios"
+        tooltip_text = "⚠️ Tener extremo cuidado con la información que desee Exportar\nSe recomienda resguardarla en una unidad de almacenamiento seguro\nPara no comprometer la información de los usuarios"
         Tooltip(infoExportLabel, tooltip_text)
 
         self.varTipoExpor = ctk.StringVar(value="*.xlxs")
@@ -65,7 +65,7 @@ class ConfiguracionRespaldo(ctk.CTkFrame):
         self.menuTipoExpor = create_option_menu_row(
             frameFilaExportacion,
             label_text="Seleccione el formato del archivo",
-            options=  ["*.xlxs","*.db","*.csv"],
+            options=  ["*.xlxs","*.sql"],
             variable=self.varTipoExpor,
             side_="left",
             crear_frame=False,
@@ -113,7 +113,7 @@ class ConfiguracionRespaldo(ctk.CTkFrame):
         )
         infoImportLabel.pack(side="left", padx=16)
 
-        tooltip_text = "⚠️ Tener extremo cuidado con la información que desee Exportación\npara no comprometer la integridad del sistema"
+        tooltip_text = "⚠️ Tener extremo cuidado con la información que desee importar\npara no comprometer la integridad del Sistema"
         Tooltip(infoImportLabel, tooltip_text)
 
         self.btn_importar = ctk.CTkButton(
@@ -130,55 +130,80 @@ class ConfiguracionRespaldo(ctk.CTkFrame):
 
 
     def iniciar_proceso_exportacion(self):
+        """
+        Inicia el proceso de exportación según el formato seleccionado.
+        Actúa como un despachador para los métodos específicos de exportación.
+        """
         tipoFormato = self.varTipoExpor.get()
-        if not tipoFormato in ["*.xlxs"]:
-            messagebox.showwarning("Advertencia","Formato no implementado",parent=self)
-            return
-        
-        # 1. Pedir al usuario que seleccione una CARPETA
-        ruta_carpeta = filedialog.askdirectory(
-            title="Seleccione la carpeta para guardar la exportación"
-        )
+        if tipoFormato == "*.xlxs":
+            self._iniciar_exportacion_excel()
+        elif tipoFormato == "*.sql":
+            self._iniciar_exportacion_sql()
+        else:
+            messagebox.showwarning("Advertencia", "Formato no implementado", parent=self)
 
-        # 2. Si el usuario cancela, la ruta estará vacía. No hacemos nada.
-        if not ruta_carpeta:
-            print("Exportación cancelada por el usuario.")
-            return
-
-        # 3. Crear el nombre del archivo y unirlo a la ruta de la carpeta
-        nombre_archivo = f"exportacion_sistema_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-        ruta_completa_destino = os.path.join(ruta_carpeta, nombre_archivo)
-
-        # --- Lógica de la barra de progreso ---
-        # Mostrar widgets de progreso y deshabilitar botones
+    def _preparar_ui_para_exportacion(self):
+        """Muestra la barra de progreso y deshabilita los botones."""
         self.progress_bar.pack(side="left", padx=(10, 5), pady=5)
         self.progress_label.pack(side="left", padx=5, pady=5)
         self.btn_exportar.configure(state="disabled")
         self.btn_importar.configure(state="disabled")
 
-        def update_progress(current, total):
-            """Función para actualizar la barra de progreso desde el hilo principal."""
-            progress = current / total
-            self.progress_bar.set(progress)
-            self.progress_label.configure(text=f"Exportando {current}/{total}...")
-            self.update_idletasks()
+    def update_progress(self, current, total):
+        """Actualiza la barra de progreso. Se llama desde el hilo principal."""
+        progress = current / total
+        self.progress_bar.set(progress)
+        self.progress_label.configure(text=f"Procesando {current}/{total}...")
+        self.update_idletasks()
 
+    def _iniciar_exportacion_excel(self):
+        """Maneja la lógica de exportación para archivos Excel."""
+        ruta_carpeta = filedialog.askdirectory(title="Seleccione la carpeta para guardar la exportación Excel")
+        if not ruta_carpeta:
+            return
+
+        nombre_archivo = f"exportacion_sistema_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        ruta_completa_destino = os.path.join(ruta_carpeta, nombre_archivo)
+
+        self._preparar_ui_para_exportacion()
+        
         def worker_exportar():
-            """Función que se ejecuta en un hilo para no congelar la UI."""
             ruta_final = self.controllerSolicitud.exportarAExcel(
                 ruta_archivo=ruta_completa_destino,
-                progress_callback=lambda c, t: self.after(0, update_progress, c, t)
+                progress_callback=lambda c, t: self.after(0, self.update_progress, c, t)
             )
-            # Cuando termina, llama a la función de finalización en el hilo principal
             self.after(0, self.finalizar_exportacion, ruta_final)
 
-        # Iniciar el hilo de trabajo
         thread = threading.Thread(target=worker_exportar)
         thread.start()
 
+    def _iniciar_exportacion_sql(self):
+        """Maneja la lógica de exportación para archivos SQL."""
+        directorio_destino = filedialog.askdirectory(title="Seleccione la carpeta para guardar el respaldo SQL")
+        if not directorio_destino:
+            return
+
+        self._preparar_ui_para_exportacion()
+
+        def worker_exportar_sql():
+            """Función que se ejecuta en un hilo para la exportación SQL."""
+            ruta_final = self.controllerSolicitud.exportarSQL(
+                directorio_destino=directorio_destino,
+                progress_callback=lambda c, t: self.after(0, self.update_progress, c, t)
+            )
+            self.after(0, self.finalizar_exportacion, ruta_final)
+
+        thread = threading.Thread(target=worker_exportar_sql)
+        thread.start()
+
     def finalizar_exportacion(self, ruta_final):
-        """Se ejecuta en el hilo principal para actualizar la UI después de la exportación."""
-        # Ocultar widgets de progreso y rehabilitar botones
+        """
+        Se ejecuta en el hilo principal para actualizar la UI después de cualquier exportación.
+        Oculta la barra de progreso, reactiva los botones y muestra el resultado.
+        
+        Args:
+            ruta_final (str|None): La ruta del archivo generado o None si hubo un error.
+        """
         self.progress_bar.pack_forget()
         self.progress_label.pack_forget()
         self.btn_exportar.configure(state="normal")

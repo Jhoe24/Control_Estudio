@@ -22,5 +22,8 @@ class ControllerSolcitud:
     
     def exportarAExcel(self, ruta_archivo=None, progress_callback=None):
         return self.modelExportacion.exportar_a_excel(ruta_archivo, progress_callback)
+    
+    def exportarSQL(self, directorio_destino, progress_callback=None):
+        return self.modelExportacion.exportarSQL(directorio_destino, progress_callback)
         
     
