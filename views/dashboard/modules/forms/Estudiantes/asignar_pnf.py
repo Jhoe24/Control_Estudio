@@ -347,6 +347,7 @@ class AsignarPNFFrame(SectionFrameBase):
         self.fecha_inicio.enable()
         self.fecha_fin.enable()
         self.btn_guardar.configure(state="normal")
+        self.btn_secciones.configure(state="normal")
 
         if self.asignacion_seccion:
             self.asignacion_seccion.habilitar_campos()

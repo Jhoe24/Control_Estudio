@@ -17,7 +17,7 @@ class CTKFecha(ctk.CTkFrame):
         self.frame_fecha.pack(side = "top", padx=10, pady=(10,0), anchor="w")
         
         #Se crea el campo para el anio que esta desde el anio actual hasta 70 anios menos 
-        self.year_values = [str(self.anio_actual - i) for i in range(0, 71)]
+        self.year_values = [str((self.anio_actual + 5) - i) for i in range(0, 71)]
         self.var_year = ctk.StringVar(value=self.year_values[0])
 
         self.year_menu = create_option_menu_row(self.frame_fecha, 
