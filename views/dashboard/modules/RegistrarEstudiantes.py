@@ -7,9 +7,7 @@ from views.dashboard.modules.forms.Estudiantes.InformacionAcademica import Infor
 from views.dashboard.modules.forms.Estudiantes.SistemaIngreso import SistemaIngresoFrame
 from views.dashboard.modules.forms.DatosUbicacion import DatosUbicacionFrame
 
-
 from views.dashboard.components.widget_utils import *
-
 
 from config.app_config import AppConfig
 
@@ -21,10 +19,16 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
         self.master = master
         self.controlador = controlador
         self.btn_actualizar = None
+
+        # Frames de cada sección (se instancian con el contenedor como master)
         self.datos_personales_frame = None
         self.informacion_academica_frame = None
         self.sistema_ingreso_frame = None
         self.datos_ubicacion_frame = None
+
+        # Indice y lista de secciones
+        self.secciones = []
+        self.seccion_actual = 0
 
         # Registrar funciones de validación
         try:
@@ -39,23 +43,206 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
 
         ctk.CTkLabel(self, text="Gestión de Datos del Alumno", font=FUENTE_TITULO_FORMULARIO, text_color=COLOR_TEXTO_PRINCIPAL).pack(pady=(10, 20), padx=20, anchor="w")
 
-        # Instanciar los frames de sección, pasando las validaciones
-        self.datos_personales_frame = DatosPersonalesFrame(self, self.vcmd_num_val, self.vcmd_fecha_val)
-        self.informacion_academica_frame = InformacionAcademicaFrame(self, self.vcmd_fecha_val, self.vcmd_decimal_val)
-        self.sistema_ingreso_frame = SistemaIngresoFrame(self, self.vcmd_num_val)
-        self.datos_ubicacion_frame = DatosUbicacionFrame(self, self.vcmd_num_val)
+        # Contenedor donde se mostrará la sección actual (se crea antes de instanciar los frames)
+        self.contenedor_seccion = ctk.CTkFrame(self, fg_color="transparent")
+        self.contenedor_seccion.pack(fill="both", expand=False, padx=5, pady=5)
+
+        # Instanciar los frames de sección con el contenedor como master (no empacar aquí)
+        self.datos_personales_frame = DatosPersonalesFrame(self.contenedor_seccion, self.vcmd_num_val, self.vcmd_fecha_val)
+        self.informacion_academica_frame = InformacionAcademicaFrame(self.contenedor_seccion, self.vcmd_fecha_val, self.vcmd_decimal_val)
+        self.sistema_ingreso_frame = SistemaIngresoFrame(self.contenedor_seccion, self.vcmd_num_val)
+        self.datos_ubicacion_frame = DatosUbicacionFrame(self.contenedor_seccion, self.vcmd_num_val)
+
+        # Definición de la lista de secciones
+        self.secciones = [
+            ("Datos Personales", self.datos_personales_frame),
+            ("Información Académica", self.informacion_academica_frame),
+            ("Sistema de Ingreso", self.sistema_ingreso_frame),
+            ("Datos de Ubicación", self.datos_ubicacion_frame)
+        ]
         
-        # Empacar los frames
-        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.button_frame.pack(pady=(25, 20))
+        # Frame de botones de navegación (se actualiza según sección)
+        self.nav_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.nav_frame.pack(pady=(15, 20))
 
-        self.btn_guardar = ctk.CTkButton(self.button_frame, text="Grabar Datos", width=140, command=self.procesar_formulario,
+        # Botones de navegación
+        self.btn_anterior = ctk.CTkButton(self.nav_frame, text="Anterior", width=120, command=self.anterior_seccion)
+        self.btn_limpiar_seccion = ctk.CTkButton(self.nav_frame, text="Limpiar Campos", width=140, command=self.limpiar_seccion_actual)
+        self.btn_siguiente = ctk.CTkButton(self.nav_frame, text="Siguiente", width=140, command=self.siguiente_seccion)
+        self.btn_guardar = ctk.CTkButton(self.nav_frame, text="Grabar Datos", width=140, command=self.procesar_formulario,
                                         font=FUENTE_BOTON, fg_color=COLOR_BOTON_PRIMARIO_FG, hover_color=COLOR_BOTON_PRIMARIO_HOVER, text_color=COLOR_BOTON_PRIMARIO_TEXT)
-        self.btn_guardar.pack(side="left", padx=10)
 
-        self.btn_cancelar = ctk.CTkButton(self.button_frame, text="Limpiar Campos", width=140, command=self.limpiar_formulario_completo,
-                                        font=FUENTE_BOTON, fg_color=COLOR_BOTON_SECUNDARIO_FG, hover_color=COLOR_BOTON_SECUNDARIO_HOVER, text_color=COLOR_BOTON_SECUNDARIO_TEXT)
-        self.btn_cancelar.pack(side="left", padx=10)
+        # Mostrar la primera sección
+        self.mostrar_seccion(0)
+
+    def mostrar_seccion(self, index):
+        # Ocultar cualquier frame previo dentro del contenedor
+        for child in self.contenedor_seccion.winfo_children():
+            child.pack_forget()
+
+        self.seccion_actual = max(0, min(index, len(self.secciones) - 1))
+        nombre, frame = self.secciones[self.seccion_actual]
+        # Empacar el frame correspondiente dentro del contenedor (ya tiene como master al contenedor)
+        frame.pack(fill="x", pady=5, padx=5)
+
+        # Actualizar botones según la sección actual
+        for widget in self.nav_frame.winfo_children():
+            widget.pack_forget()
+
+        # Siempre mostrar limpiar de sección
+        self.btn_limpiar_seccion.pack(side="left", padx=8)
+
+        if self.seccion_actual > 0:
+            self.btn_anterior.pack(side="left", padx=8)
+
+        if self.seccion_actual < len(self.secciones) - 1:
+            self.btn_siguiente.pack(side="left", padx=8)
+        else:
+            # última sección: mostrar botón de grabar
+            self.btn_guardar.pack(side="left", padx=8)
+
+    def siguiente_seccion(self):
+        # Validar los campos obligatorios de la sección actual antes de avanzar
+        if not self.validar_seccion_actual():
+            return
+        self.mostrar_seccion(self.seccion_actual + 1)
+
+    def anterior_seccion(self):
+        self.mostrar_seccion(self.seccion_actual - 1)
+
+    def limpiar_seccion_actual(self):
+        # Limpiar solo los campos de la sección visible
+        _, frame = self.secciones[self.seccion_actual]
+
+        # Sección 0: Datos Personales
+        if frame is self.datos_personales_frame:
+            try:
+                self.datos_personales_frame.nro_documento_entry.configure(state="normal")
+                self.datos_personales_frame.nro_documento_entry.delete(0, 'end')
+                self.datos_personales_frame.nombre_entry.delete(0, 'end')
+                self.datos_personales_frame.apellido_entry.delete(0, 'end')
+                self.datos_personales_frame.lugar_nac_entry.delete(0, 'end')
+                if self.datos_personales_frame.correo_electronico_entry:
+                    self.datos_personales_frame.correo_electronico_entry.delete(0, 'end')
+                self.datos_personales_frame.limpiar_telefonos()
+            except Exception:
+                pass
+
+        # Sección 1: Información Académica
+        elif frame is self.informacion_academica_frame:
+            try:
+                self.informacion_academica_frame.tipo_mencion_menu.set("Bachiller")
+                self.informacion_academica_frame.tipo_inst_menu.set("Pública")
+                self.informacion_academica_frame.institucion_entry.delete(0, 'end')
+                self.informacion_academica_frame.titulo_entry.delete(0, 'end')
+                try:
+                    self.informacion_academica_frame.fecha_grado.set_date("")  # si la clase soporta vaciar
+                except Exception:
+                    pass
+                self.informacion_academica_frame.condicion_menu.set("Regular")
+            except Exception:
+                pass
+
+        # Sección 2: Sistema de Ingreso
+        elif frame is self.sistema_ingreso_frame:
+            try:
+                self.sistema_ingreso_frame.codigo_entry.configure(state="normal")
+                self.sistema_ingreso_frame.codigo_entry.delete(0, 'end')
+                self.sistema_ingreso_frame.anio_entry.delete(0, 'end')
+            except Exception:
+                pass
+
+        # Sección 3: Datos de Ubicación
+        elif frame is self.datos_ubicacion_frame:
+            try:
+                self.datos_ubicacion_frame.estado_entry.delete(0, 'end')
+                self.datos_ubicacion_frame.municipio_entry.delete(0, 'end')
+                self.datos_ubicacion_frame.parroquia_entry.delete(0, 'end')
+                self.datos_ubicacion_frame.sector_entry.delete(0, 'end')
+                self.datos_ubicacion_frame.calle_entry.delete(0, 'end')
+                self.datos_ubicacion_frame.casa_apart_entry.delete(0, 'end')
+                self.datos_ubicacion_frame.var_opcion.set('residencia')
+            except Exception:
+                pass
+
+    def validar_seccion_actual(self):
+        """
+        Validaciones mínimas por sección antes de permitir avanzar.
+        Si falla retorna False y muestra un mensaje.
+        """
+        nombre, frame = self.secciones[self.seccion_actual]
+
+        # Sección Datos Personales
+        if frame is self.datos_personales_frame:
+            tipo = self.datos_personales_frame.tipo_documento_var.get()
+            nro = self.datos_personales_frame.nro_documento_entry.get().strip()
+            nombre_val = self.datos_personales_frame.nombre_entry.get().strip()
+            apellido_val = self.datos_personales_frame.apellido_entry.get().strip()
+            correo = ""
+            if self.datos_personales_frame.correo_electronico_entry:
+                correo = self.datos_personales_frame.correo_electronico_entry.get().strip()
+
+            if tipo.lower().startswith("ced") and not nro:
+                messagebox.showwarning("Validación", "El Nro. de Cédula es obligatorio.", parent=self)
+                return False
+            if tipo.lower().startswith("pas") and not nro:
+                messagebox.showwarning("Validación", "El Nro. de Pasaporte es obligatorio.", parent=self)
+                return False
+            if not nombre_val:
+                messagebox.showwarning("Validación", "El Nombre es obligatorio.", parent=self)
+                return False
+            if not apellido_val:
+                messagebox.showwarning("Validación", "El Apellido es obligatorio.", parent=self)
+                return False
+            if not correo:
+                messagebox.showwarning("Validación", "El Correo Electrónico es obligatorio.", parent=self)
+                return False
+            # correo si existe, validar formato básico
+            if correo:
+                if "@" not in correo or "." not in correo.split("@")[-1]:
+                    messagebox.showwarning("Validación", "El correo electrónico tiene formato inválido.", parent=self)
+                    return False
+            return True
+
+        # Sección Información Académica
+        if frame is self.informacion_academica_frame:
+            instit = self.informacion_academica_frame.institucion_entry.get().strip()
+            titulo = self.informacion_academica_frame.titulo_entry.get().strip()
+            # condición y tipo institución vienen con valores por defecto
+            if not instit:
+                messagebox.showwarning("Validación", "La Institución es obligatoria.", parent=self)
+                return False
+            if not titulo:
+                messagebox.showwarning("Validación", "El Título obtenido es obligatorio.", parent=self)
+                return False
+            return True
+
+        # Sección Sistema de Ingreso
+        if frame is self.sistema_ingreso_frame:
+            codigo = self.sistema_ingreso_frame.codigo_entry.get().strip()
+            anio = self.sistema_ingreso_frame.anio_entry.get().strip()
+            if not codigo:
+                messagebox.showwarning("Validación", "El Código de Ingreso es obligatorio.", parent=self)
+                return False
+            if not anio:
+                messagebox.showwarning("Validación", "El Año de Ingreso es obligatorio.", parent=self)
+                return False
+            return True
+
+        # Sección Datos Ubicación
+        if frame is self.datos_ubicacion_frame:
+            estado = self.datos_ubicacion_frame.estado_entry.get().strip()
+            municipio = self.datos_ubicacion_frame.municipio_entry.get().strip()
+            if not estado:
+                messagebox.showwarning("Validación", "El Estado es obligatorio.", parent=self)
+                return False
+            if not municipio:
+                messagebox.showwarning("Validación", "El Municipio es obligatorio.", parent=self)
+                return False
+            return True
+
+        return True
+
 
     def procesar_formulario(self):
         datos = self.controlador.obtener_todos_los_datos(self)
@@ -65,13 +252,15 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
             if self.controlador.validar_campos_obligatorios(datos, self):
                 exito = self.controlador.procesar_guardado_estudiante(datos, self)
                 if exito:
+                    # Limpiar formulario
                     self.controlador.limpiar_formulario_completo(self)
+                    # Volver a la primera sección
+                    self.mostrar_seccion(0)
                 else:
                     pass
 
     def limpiar_formulario_completo(self):
         self.controlador.limpiar_formulario_completo(self)
-
 
     # Formulario de actualizacion
     def ver_datos_completos(self, estudiante, listado_estudiantes=None):
@@ -158,6 +347,5 @@ class FormularioEstudianteView(ctk.CTkScrollableFrame):
                 ventana.destroy()
             else:
                 pass
-                
-       
-    
+
+

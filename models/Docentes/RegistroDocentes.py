@@ -115,7 +115,8 @@ class ModeloDocente:
             return True   
 
         except Exception as e:
-             print(f"Error al registrar docente: {e}") 
+            print(f"Error al registrar docente: {e}") 
+            return False
         finally:
             if con is not None:
                 con.close()

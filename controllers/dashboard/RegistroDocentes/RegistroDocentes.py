@@ -15,6 +15,7 @@ class DocenteController:
         else:
             messagebox.showerror("Error de Registro", "No se pudo registrar el docente. Por favor, intente nuevamente.", parent=vista_formulario)
         print(dic_docentes)
+        return resultado
         
     def obtener_lista_docentes(self, canRegistro,desde=0, pnf_id=None):
         #Obtener 10 registro de docentes
@@ -170,7 +171,7 @@ class DocenteController:
             vista_formulario.datos_personales_frame.lugar_nac_entry,
             vista_formulario.datos_personales_frame.correo_electronico_entry,
             vista_formulario.datos_docente_frame.especialidad_entry,
-            vista_formulario.datos_docente_frame.fecha_ingreso_entry, #comentarle de esto a andy
+            #vista_formulario.datos_docente_frame.fecha_ingreso_entry, #comentarle de esto a andy
             vista_formulario.datos_docente_frame.categoria_entry,
             vista_formulario.datos_ubicacion_frame.estado_entry,
             vista_formulario.datos_ubicacion_frame.municipio_entry,
