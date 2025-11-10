@@ -39,7 +39,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         self._actualizar_estado_nro_doc() # Llamada inicial para configurar el estado
         # --- Fin Fila Documento ---
 
-        self._crear_fila_widgets([
+        self._crear_fila_widgets_datos([
             ("Nombres:", crear_entry, {"width":300}, 1, self, 'nombre_entry'),
             ("Apellidos:", crear_entry, {"width":300}, 1, self, 'apellido_entry')
         ])
@@ -50,13 +50,13 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.var_telefono_s = ctk.StringVar(value='movil')
         
         # --- Fila para genero, estado civil ---
-        self._crear_fila_widgets([
+        self._crear_fila_widgets_datos([
             ("Género:", crear_option_menu, {"values":["M", "F"],'variable': self.var_sexo,"command": lambda v: setattr(self.genero_menu, '_current_value',v)}, 1, self, 'genero_menu'),
             ("Edo Civil:", crear_option_menu, {"values":["Soltero", "Casado", "Divorciado","Viudo"],"variable":self.var_estadoCivil ,"command": lambda v: setattr(self.edo_civil_menu, '_current_value',v)}, 1, self, 'edo_civil_menu')
         ])
 
         # --- Fila para nacionalidad ---
-        self._crear_fila_widgets([
+        self._crear_fila_widgets_datos([
             ("Nacionalidad",crear_option_menu, {"values":["Venezolano", "Extranjero"] ,"variable":self.var_nacionalidad,"command": lambda v: setattr(self.nacionalidad_menu, '_current_value',v)}, 1, self, 'nacionalidad_menu'),
         ])
 
@@ -64,7 +64,7 @@ class DatosPersonalesFrame(SectionFrameBase):
         self.fecha_nacimiento = CTKFecha(self, "Fecha de Nacimiento")
         self.fecha_nacimiento.pack(fill="x", pady=PADY_FILA, padx=15)
 
-        self._crear_fila_widgets([
+        self._crear_fila_widgets_datos([
             ("Lugar Nacimiento:", crear_entry, {"width":300}, 1, self, 'lugar_nac_entry')
         ])
         self.fecha_ingreso = CTKFecha(self, "Fecha de Ingreso")
@@ -72,7 +72,7 @@ class DatosPersonalesFrame(SectionFrameBase):
 
         if set_contactos:
         # --- Fila para correo electronico ---
-            self._crear_fila_widgets([
+            self._crear_fila_widgets_datos([
                 ("Correo Electrónico:", crear_entry, {"width":300}, 1, self, 'correo_electronico_entry')
             ])
         else:
@@ -190,6 +190,35 @@ class DatosPersonalesFrame(SectionFrameBase):
                 for i in range(widget_span):
                     frame_fila.grid_columnconfigure(col_index - widget_span + i, weight=1 if widget_span > 1 else 0)
 
+    def _crear_fila_widgets_datos(self, widgets_info_list_of_tuples, es_scroll = False):
+        # Se crea un único frame por llamada, que actuará como una fila.
+        frame_fila = ctk.CTkFrame(self, fg_color="transparent")
+        # Se expande para ocupar el ancho, con padding a los lados.
+        frame_fila.pack(fill="x", pady=PADY_FILA, padx=40)
+
+        num_widgets = len(widgets_info_list_of_tuples)
+        for i, widgets_info_tuple in enumerate(widgets_info_list_of_tuples):
+            label_text, widget_creator_func, widget_creator_args, widget_span, target_object, attr_name, *optional_setter = widgets_info_tuple
+            
+            # Frame para agrupar label y widget, y controlar el espaciado.
+            group_frame = ctk.CTkFrame(frame_fila, fg_color="transparent")
+
+            # El último widget se alinea a la derecha, los demás a la izquierda.
+            side = "right" if i == num_widgets - 1 and num_widgets > 1 else "left"
+            group_frame.pack(side=side)
+
+            widget_obj = widget_creator_func(group_frame, **widget_creator_args)
+            setattr(target_object, attr_name, widget_obj)
+
+            if optional_setter and callable(optional_setter[0]):
+                optional_setter[0](widget_obj)
+
+            if label_text:
+                label = ctk.CTkLabel(group_frame, text=label_text, font=FUENTE_LABEL_CAMPO, text_color=COLOR_TEXTO_PRINCIPAL, anchor="w")
+                label.pack(side="left", padx=PADX_LABEL)
+
+            # El widget se alinea a la izquierda, respetando su ancho.
+            widget_obj.pack(side="left", padx=PADX_ENTRY)
     
 
     def set_datos(self, estudiante, nro_doc = None, set_contactos = True):
